@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+  Copyright 2017, Data61
+  Commonwealth Scientific and Industrial Research Organisation (CSIRO)
+  ABN 41 687 119 230.
+
+  This software may be distributed and modified according to the terms of
+  the BSD 2-Clause license. Note that NO WARRANTY is provided.
+  See "LICENSE_BSD2.txt" for details.
+
+  @TAG(D61_BSD)
+
+  -->
+
+<manifest>
+    <remote name="seL4"
+        fetch="../seL4"
+    />
+
+    <remote name="seL4-projects"
+        fetch="../seL4-projects"
+    />
+
+
+    <remote name="rumprun-packages"
+        fetch="https://github.com/rumpkernel/"
+    />
+
+
+    <!-- default revision for each project, and name of the remote -->
+    <default revision="master"
+        remote="seL4"
+    />
+
+    <!-- list of 'projects' (i.e repositories), path is relative to the path in remote above -->
+    <project name="seL4" path="kernel">
+        <linkfile src="libsel4" dest="libs/libsel4"/>
+    </project>
+
+    <project name="seL4_tools" path="projects/seL4_tools">
+        <linkfile src="common-tool" dest="tools/common"/>
+        <linkfile src="elfloader-tool" dest="tools/elfloader"/>
+        <linkfile src="kbuild-tool" dest="tools/kbuild"/>
+    </project>
+
+    <project name="seL4_libs" path="projects/seL4_libs">
+        <linkfile src="libsel4muslcsys" dest="libs/libsel4muslcsys"/>
+        <linkfile src="libsel4platsupport" dest="libs/libsel4platsupport"/>
+        <linkfile src="libsel4utils" dest="libs/libsel4utils"/>
+        <linkfile src="libsel4sync" dest="libs/libsel4sync"/>
+        <linkfile src="libsel4vspace" dest="libs/libsel4vspace"/>
+        <linkfile src="libsel4vka" dest="libs/libsel4vka"/>
+        <linkfile src="libsel4debug" dest="libs/libsel4debug"/>
+        <linkfile src="libsel4simple" dest="libs/libsel4simple"/>
+        <linkfile src="libsel4simple-default" dest="libs/libsel4simple-default"/>
+        <linkfile src="libsel4bench" dest="libs/libsel4bench"/>
+        <linkfile src="libsel4allocman" dest="libs/libsel4allocman"/>
+    </project>
+
+    <project name="util_libs" path="projects/util_libs">
+        <linkfile src="libplatsupport" dest="libs/libplatsupport"/>
+        <linkfile src="libcpio" dest="libs/libcpio"/>
+        <linkfile src="libelf" dest="libs/libelf"/>
+        <linkfile src="libutils" dest="libs/libutils"/>
+	    <linkfile src="libethdrivers" dest="libs/libethdrivers"/>
+    </project>
+
+    <project name="musllibc" path="libs/libmuslc"/>
+
+    <project name="rumprun-sel4-demoapps" remote="seL4-projects" path="projects/rumprun-sel4-demoapps">
+        <!-- symlinks to make the project structure fit the build system -->
+        <linkfile src="Kconfig" dest="Kconfig"/>
+        <linkfile src="Kbuild" dest="Kbuild" />
+        <linkfile src="Makefile" dest="Makefile" />
+        <linkfile src="configs" dest="configs"/>
+        <linkfile src="roottask" dest="apps/roottask"/>
+        <linkfile src="scripts" dest="scripts"/>
+        <linkfile src="README.md" dest="README.md"/>
+    </project>
+
+    <project name="rumprun" remote="seL4-projects" path="rumprun"/>
+
+    <project name="rumprun-packages" remote="rumprun-packages" path="projects/rumprun-packages"/>
+
+</manifest>
