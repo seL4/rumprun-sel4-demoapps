@@ -1,0 +1,7 @@
+nginx
+hello
+netserver
+redis
+python
+lmbench
+iperf3
