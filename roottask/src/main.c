@@ -66,14 +66,17 @@ seL4_BootInfo *info;
 static vka_object_t untypeds[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
 /* list of sizes (in bits) corresponding to untyped */
 static uint8_t untyped_size_bits_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
-static uint32_t untyped_paddr_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
+static uintptr_t untyped_paddr_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
 static bool untyped_device_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
 
 
 seL4_SlotRegion devices;
 uint8_t device_size_bits_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
-uint32_t device_paddr_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
+uintptr_t device_paddr_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
 
+extern vspace_t *muslc_this_vspace;
+extern reservation_t muslc_brk_reservation;
+extern void *muslc_brk_reservation_start;
 /* initialise our runtime environment */
 static void
 init_env(env_t env)
@@ -100,6 +103,14 @@ init_env(env_t env)
     if (error) {
         ZF_LOGF("Failed to bootstrap vspace");
     }
+
+    sel4utils_res_t muslc_brk_reservation_memory;
+     error = sel4utils_reserve_range_no_alloc(&env->vspace, &muslc_brk_reservation_memory, 1048576, seL4_AllRights, 1, &muslc_brk_reservation_start);
+     if (error) {
+         ZF_LOGF("Failed to reserve_range");
+     }
+     muslc_this_vspace = &env->vspace;
+     muslc_brk_reservation.res = &muslc_brk_reservation_memory;
 
     /* fill the allocator with virtual memory */
     void *vaddr;
@@ -306,7 +317,7 @@ send_init_data(env_t env, seL4_CPtr endpoint, sel4utils_process_t *process)
 
 /* copy the caps required to set up the sel4platsupport default timer */
 static void
-copy_timer_caps(test_init_data_t *init, env_t env, sel4utils_process_t *test_process)
+copy_timer_caps(init_data_t *init, env_t env, sel4utils_process_t *test_process)
 {
     /* irq cap for the timer irq */
     init->timer_irq = copy_cap_to_process(test_process, env->irq_path.capPtr);
@@ -387,7 +398,7 @@ run_rr(void)
     copy_timer_caps(env.init, &env, &test_process);
     copy_device_frames_to_process(&test_process);
     memcpy(env.init->device_size_bits_list, device_size_bits_list, sizeof(uint8_t) * (devices.end - devices.start));
-    memcpy(env.init->device_paddr_list, device_paddr_list, sizeof(uint32_t) * (devices.end - devices.start));
+    memcpy(env.init->device_paddr_list, device_paddr_list, sizeof(uintptr_t) * (devices.end - devices.start));
     env.init->devices = devices;
     /* copy the fault endpoint - we wait on the endpoint for a message
      * or a fault to see when the test finishes */
@@ -494,7 +505,7 @@ void *main_continued(void *arg UNUSED)
 
     /* create a frame that will act as the init data, we can then map
      * into target processes */
-    env.init = (test_init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, INIT_DATA_NUM_FRAMES, PAGE_BITS_4K);
+    env.init = (init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, INIT_DATA_NUM_FRAMES, PAGE_BITS_4K);
     if (env.init == NULL) {
         ZF_LOGF("Could not create init_data frame");
     }
@@ -516,7 +527,7 @@ void *main_continued(void *arg UNUSED)
 
     /* copy the untyped size bits and paddrs lists across to the init frame */
     memcpy(env.init->untyped_size_bits_list, untyped_size_bits_list, sizeof(uint8_t) * num_untypeds);
-    memcpy(env.init->untyped_paddr_list, untyped_paddr_list, sizeof(uint32_t) * num_untypeds);
+    memcpy(env.init->untyped_paddr_list, untyped_paddr_list, sizeof(uintptr_t) * num_untypeds);
 
     /* get the caps we need to set up a timer and serial interrupts */
     init_timer_caps(&env);
@@ -550,7 +561,7 @@ int main(void)
     /* Check rump kernel config string length */
     compile_time_assert(rump_config_is_too_long, sizeof(RUMPCONFIG) < RUMP_CONFIG_MAX);
     /* We provide two pages to transfer init data */
-    compile_time_assert(init_data_fits, sizeof(test_init_data_t) < (PAGE_SIZE_4K*INIT_DATA_NUM_FRAMES));
+    compile_time_assert(init_data_fits, sizeof(init_data_t) < (PAGE_SIZE_4K*INIT_DATA_NUM_FRAMES));
     /* initialise libsel4simple, which abstracts away which kernel version
      * we are running on */
     simple_default_init_bootinfo(&env.simple, info);
@@ -563,7 +574,7 @@ int main(void)
 
     /* switch to a bigger, safer stack with a guard page
      * before starting the tests, resume on main_continued() */
-    printf("Switching to a safer, bigger stack... ");
+    ZF_LOGI("Switching to a safer, bigger stack... ");
     fflush(stdout);
     void *res;
     sel4utils_run_on_stack(&env.vspace, main_continued, NULL, &res);

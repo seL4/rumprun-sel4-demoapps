@@ -10,12 +10,13 @@
  * @TAG(D61_BSD)
  */
 
-#include <sel4/sel4.h>
-#include <sel4/benchmark_utilisation_types.h>
 #include <stdio.h>
 #include <stdint.h>
 
 int main(int argc, char *argv[]){
     printf("Hello %s\n", argv[1]);
-
+    sleep(1);
+    printf("1sec\n");
+    sleep(10);
+    printf("10sec\n");
 }

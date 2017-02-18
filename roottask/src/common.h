@@ -43,7 +43,7 @@ struct env {
 
     cspacepath_t serial_irq;
     /* init data frame vaddr */
-    test_init_data_t *init;
+    init_data_t *init;
     /* extra cap to the init data frame for mapping into the remote vspace */
     seL4_CPtr init_frame_cap_copy[INIT_DATA_NUM_FRAMES];
 };
@@ -58,7 +58,7 @@ void init_timer_caps(env_t env);
 void init_serial_caps(env_t env);
 void count_idle(void);
 
-void arch_copy_timer_caps(test_init_data_t *init, env_t env, sel4utils_process_t *test_process);
+void arch_copy_timer_caps(init_data_t *init, env_t env, sel4utils_process_t *test_process);
 seL4_CPtr copy_cap_to_process(sel4utils_process_t *process, seL4_CPtr cap);
 void serial_interrupt(void);
 #ifdef CONFIG_ARM_SMMU

@@ -12,16 +12,17 @@
 pushd ./rumprun
 git submodule init
 git submodule update
-pushd ./buildrump.sh
-git apply ../buildrump.sh.diff
-popd
 pushd ./src-netbsd
-git apply ../src-netbsd.diff
+git am ../src-netbsd.patches/*
 popd
 popd
 pushd ./apps
 echo "" > Kconfig
 echo "" > Kbuild
+# For each app in apps.txt symlink the app from userapps
+# Then also populate the Kbuild and Kconfig files
+# This populates code responsible for creating root filesystems for
+# each app based on a path in the apps directory.txt. 
 for i in `cat ../projects/rumprun-sel4-demoapps/apps.txt`; do
     ln -s ../projects/rumprun-sel4-demoapps/userapps/$i .
     dir="$i"
