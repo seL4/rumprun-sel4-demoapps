@@ -22,7 +22,7 @@ For running benchmarks:
 repo init -u $(GIT URL TO MANIFEST)
 repo sync
 source scripts/init-all.sh
-make iperf-rumprun-ia32_defconfig
+make helloworld-rumprun-ia32_defconfig
 make
 ```
 
