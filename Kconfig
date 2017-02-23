@@ -8,7 +8,7 @@
 # @TAG(DATA61_BSD)
 #
 
-mainmenu "CAmkES project configuration"
+mainmenu "Rumprun project configuration"
 
 config COMMON_PATH
     string

@@ -15,6 +15,8 @@
 #include <sel4platsupport/plat/pit.h>
 #include <sel4platsupport/plat/timer.h>
 #include <platsupport/plat/serial.h>
+#include <utils/fence.h>
+#include <platsupport/arch/tsc.h>
 
 /* copy the caps required to set up the sel4platsupport default timer */
 void
@@ -24,24 +26,19 @@ arch_copy_timer_caps(init_data_t *init, env_t env, sel4utils_process_t *test_pro
     init->io_port = copy_cap_to_process(test_process, env->io_port_cap);
 }
 
-uint32_t hi, lo;
 uint64_t ccount = 0;
 uint64_t prev;
 uint64_t ts;
 
 void count_idle(void)
 {
-    static int i = 0;
-    __asm__ __volatile__ ( "rdtsc" : "=a" (lo), "=d" (hi));
-    prev = ((uint64_t) hi) << 32llu | (uint64_t) lo;
+    prev = rdtsc_pure();
     while (true) {
-        __asm__ __volatile__ ( "rdtsc" : "=a" (lo), "=d" (hi));
-        ts = ((uint64_t) hi) << 32llu | (uint64_t) lo;
-        //
+        ts = rdtsc_pure();
         if ((ts - prev) < 150) {
-            asm volatile("" ::: "memory");
+            COMPILER_MEMORY_FENCE();
             ccount += (unsigned long long)(ts - prev);
-            asm volatile("" ::: "memory");
+            COMPILER_MEMORY_FENCE();
         }
         prev = ts;
     }

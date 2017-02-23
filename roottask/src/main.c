@@ -171,10 +171,10 @@ populate_untypeds(vka_object_t *untypeds)
     uint32_t total_mem = 0;
     for (unsigned int i = 0; i < num_untypeds; i++) {
         untyped_size_bits_list[i] = untypeds[i].size_bits;
-        total_mem += 1 << untypeds[i].size_bits;
+        total_mem += BIT(untypeds[i].size_bits);
         untyped_paddr_list[i] = vka_utspace_paddr(&env.vka, untypeds[i].ut, seL4_UntypedObject, untypeds[i].size_bits);
     }
-    ZF_LOGI("Totalsize: 0x%x, im mb: %d\n", total_mem, total_mem / 1024 / 1024);
+    ZF_LOGI("Totalsize: 0x%x, im mb: %d\n", total_mem, BYTES_TO_SIZE_BITS_PAGES(total_mem, 20));
     /* Return reserve memory */
     free_objects(reserve, reserve_num);
 
@@ -214,7 +214,7 @@ move_cap_to_process(sel4utils_process_t *process, seL4_CPtr cap)
 
     vka_cspace_make_path(&env.vka, cap, &path);
     cspacepath_t dest = { 0 };
-    if (process->cspace_next_free >= (1 << process->cspace_size)) {
+    if (process->cspace_next_free >= (BIT(process->cspace_size))) {
         ZF_LOGE("Can't allocate slot, cspace is full.\n");
         return -1;
     }
