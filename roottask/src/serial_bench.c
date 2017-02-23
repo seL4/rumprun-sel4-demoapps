@@ -7,7 +7,7 @@
  * the BSD 2-Clause license. Note that NO WARRANTY is provided.
  * See "LICENSE_BSD2.txt" for details.
  *
- * @TAG(D61_BSD)
+ * @TAG(DATA61_BSD)
  */
 
 #include <rumprun/init_data.h>
@@ -39,7 +39,7 @@ seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, ui
     uint64_t interrupt_time = 0;
     uint64_t userlevelfault_time = 0;
     uint64_t vmfault_time = 0;
-    uint64_t ksTotalKernelTime =0;
+    uint64_t ksTotalKernelTime = 0;
     uint64_t ksOtherKernelTime = 0;
 
     memset((void *)syscall_entries, 0, 32);
@@ -59,7 +59,7 @@ seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, ui
             int syscall_no = logBuffer[index].entry.syscall_no;
             if (syscall_no == 7 ) {
                 cap_entries[logBuffer[index].entry.cap_type]++;
-                cap_time[logBuffer[index].entry.cap_type]+= logBuffer[index].duration;
+                cap_time[logBuffer[index].entry.cap_type] += logBuffer[index].duration;
                 if (logBuffer[index].entry.cap_type == 2) {
                     printf("invoc: %d\n", logBuffer[index].entry.invocation_tag);
                 }
@@ -67,19 +67,19 @@ seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, ui
             }
 
             syscall_entries[syscall_no]++;
-            syscall_time[syscall_no]+= logBuffer[index].duration;
+            syscall_time[syscall_no] += logBuffer[index].duration;
 
         } else if (logBuffer[index].entry.path == Entry_Interrupt) {
             interrupt_entries++;
-            interrupt_time+= logBuffer[index].duration;
+            interrupt_time += logBuffer[index].duration;
 
         } else if (logBuffer[index].entry.path == Entry_UserLevelFault) {
             userlevelfault_entries++;
-            userlevelfault_time+= logBuffer[index].duration;
+            userlevelfault_time += logBuffer[index].duration;
 
         } else if (logBuffer[index].entry.path == Entry_VMFault) {
             vmfault_entries++;
-            vmfault_time+= logBuffer[index].duration;
+            vmfault_time += logBuffer[index].duration;
 
         }
         index++;
@@ -100,7 +100,8 @@ seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, ui
 uint64_t cpucount;
 uint64_t cpucount2;
 
-void serial_interrupt(void) {
+void serial_interrupt(void)
+{
     vka_object_t serial_notification;
     int error = vka_alloc_notification(&env.vka, &serial_notification);
     if (error != 0) {
@@ -122,7 +123,7 @@ void serial_interrupt(void) {
         int c;
         seL4_Recv(serial_notification.cptr, &sender_badge);
         seL4_IRQHandler_Ack(env.serial_irq.capPtr);
-        while(true) {
+        while (true) {
             uint32_t hi1, lo1;
             /* get next character */
             c = __arch_getchar();

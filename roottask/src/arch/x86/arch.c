@@ -7,7 +7,7 @@
  * the BSD 2-Clause license. Note that NO WARRANTY is provided.
  * See "LICENSE_BSD2.txt" for details.
  *
- * @TAG(D61_BSD)
+ * @TAG(DATA61_BSD)
  */
 
 #include "../../common.h"
@@ -34,7 +34,7 @@ void count_idle(void)
     static int i = 0;
     __asm__ __volatile__ ( "rdtsc" : "=a" (lo), "=d" (hi));
     prev = ((uint64_t) hi) << 32llu | (uint64_t) lo;
-    while(true) {
+    while (true) {
         __asm__ __volatile__ ( "rdtsc" : "=a" (lo), "=d" (hi));
         ts = ((uint64_t) hi) << 32llu | (uint64_t) lo;
         //
@@ -49,7 +49,8 @@ void count_idle(void)
 
 
 void
-init_serial_caps(env_t env) {
+init_serial_caps(env_t env)
+{
     /* get the irq control cap */
     seL4_CPtr cap;
     int error = vka_cspace_alloc(&env->vka, &cap);
