@@ -28,6 +28,9 @@
         fetch="https://github.com/rumpkernel/"
     />
 
+    <remote name="iperf"
+        fetch="https://github.com/esnet/"
+    />
 
     <!-- default revision for each project, and name of the remote -->
     <default revision="master"
@@ -84,4 +87,6 @@
 
     <project name="rumprun-packages" remote="rumprun-packages" path="projects/rumprun-packages"/>
 
+    <!-- Revision for version 3.1.3 -->
+    <project name="iperf" remote="iperf" path="projects/iperf" revision="refs/tags/3.1.3"/>
 </manifest>
