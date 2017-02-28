@@ -5,3 +5,4 @@ redis
 python
 lmbench
 iperf3
+rust
