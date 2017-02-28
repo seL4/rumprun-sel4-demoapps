@@ -10,12 +10,19 @@
 
 ifeq ($(RTARGET), sel4)
 OBJECTBASE = sel4-obj
+ifeq ($(SEL4_ARCH), ia32)
+RRTOOLCHAIN= i486-rumprun-netbsdelf
+endif
+ifeq ($(SEL4_ARCH), x86_64)
+RRTOOLCHAIN= x86_64-rumprun-netbsd
+endif
 else
 OBJECTBASE = hw-obj
+RRTOOLCHAIN= i486-rumprun-netbsdelf
 endif
 
 
-$(STAGE_DIR)/bin/$(RTARGET)/$(ARCHIVE): $(BAKE_TARGET) $(PROJECT_BASE)/build2/$(OBJECTBASE)/rumprun.o | $(BAKE_TARGET)_
+$(STAGE_DIR)/bin/$(RTARGET)/$(ARCHIVE): $(BAKE_TARGET) $(PROJECT_BASE)/build2/$(SEL4_ARCH)/$(OBJECTBASE)/rumprun.o | $(BAKE_TARGET)_
 	mkdir -p $(STAGE_DIR)/bin/$(RTARGET)
 ifeq ($(RTARGET), sel4)
 	rumprun-bake sel4_generic $@ $<

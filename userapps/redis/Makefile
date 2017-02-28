@@ -14,4 +14,4 @@ include $(PROJECT_BASE)/apps/rumpcommon.mk
 
 .PHONY: $(BAKE_TARGET)_
 $(BAKE_TARGET)_:
-	cd $(PROJECT_BASE)/projects/rumprun-packages/redis && CC=i486-rumprun-netbsdelf-gcc make cache
+	cd $(PROJECT_BASE)/projects/rumprun-packages/redis && CC=$(RRTOOLCHAIN)-gcc make cache

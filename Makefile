@@ -19,14 +19,14 @@ export RTARGET
 all: app-images
 export PROJECT_BASE = $(PWD)
 
+-include .config
+include tools/common/project.mk
+
 ifeq ($(RTARGET), sel4)
-export PATH = $(PWD)/build2/rumprun2/bin:$(shell printenv PATH)
+export PATH = $(PWD)/build2/$(SEL4_ARCH)/rumprun/bin:$(shell printenv PATH)
 else
 export PATH = $(PWD)/build2/rumprun/bin:$(shell printenv PATH)
 endif
-
--include .config
-include tools/common/project.mk
 
 
 simulate-ia32:

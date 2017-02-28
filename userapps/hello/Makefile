@@ -17,4 +17,4 @@ include $(PROJECT_BASE)/apps/rumpcommon.mk
 
 .PHONY: $(BAKE_TARGET)_
 $(BAKE_TARGET)_:
-	i486-rumprun-netbsdelf-gcc -I$(STAGE_DIR)/include -lsel4 -L$(STAGE_DIR)/lib $(CFILES) -o hello
+	$(RRTOOLCHAIN)-gcc -Wl,-v -v -I$(STAGE_DIR)/include -lsel4 -L$(STAGE_DIR)/lib $(CFILES) -o hello

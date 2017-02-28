@@ -16,10 +16,10 @@ include $(PROJECT_BASE)/apps/rumpcommon.mk
 .PHONY: $(BAKE_TARGET)_
 $(BAKE_TARGET)_: $(RTARGET)/config.h
 	mkdir -p $(BUILD_DIR)/$(RTARGET)/
-	cd $(BUILD_DIR)/$(RTARGET) && CC=i486-rumprun-netbsdelf-gcc make
+	cd $(BUILD_DIR)/$(RTARGET) && CC=$(RRTOOLCHAIN)-gcc make
 
 
 $(RTARGET)/config.h:
 	mkdir -p $(BUILD_DIR)/$(RTARGET)/
-	cd $(BUILD_DIR)/$(RTARGET) && CC=i486-rumprun-netbsdelf-gcc ac_cv_func_setpgrp_void=yes \
-	$(PROJECT_BASE)/projects/benchmarks/netperf-2.7.0/configure --host=i486-rumprun-netbsdelf --enable-intervals \
+	cd $(BUILD_DIR)/$(RTARGET) && CC=$(RRTOOLCHAIN)-gcc ac_cv_func_setpgrp_void=yes \
+	$(PROJECT_BASE)/projects/benchmarks/netperf-2.7.0/configure --host=$(RRTOOLCHAIN) --enable-intervals \
