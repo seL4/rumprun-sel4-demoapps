@@ -10,8 +10,11 @@
 
 ARCHIVE = redis
 BAKE_TARGET = $(PROJECT_BASE)/projects/rumprun-packages/redis/bin/redis-server
+PATH2 := ${PATH}
+
 include $(PROJECT_BASE)/apps/rumpcommon.mk
 
 .PHONY: $(BAKE_TARGET)_
 $(BAKE_TARGET)_:
-	cd $(PROJECT_BASE)/projects/rumprun-packages/redis && CC=$(RRTOOLCHAIN)-gcc make cache
+	cd $(PROJECT_BASE)/projects/rumprun-packages/redis && \
+	env -i PATH=${PATH2} RUMPRUN_TOOLCHAIN_TUPLE=$(RRTOOLCHAIN) make cache

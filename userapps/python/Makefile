@@ -10,8 +10,11 @@
 
 ARCHIVE = python
 BAKE_TARGET = $(PROJECT_BASE)/projects/rumprun-packages/python3/build/python
+PATH2 := ${PATH}
+
 include $(PROJECT_BASE)/apps/rumpcommon.mk
 
 .PHONY: $(BAKE_TARGET)_
 $(BAKE_TARGET)_:
-	cd $(PROJECT_BASE)/projects/rumprun-packages/python3 && make
+	cd $(PROJECT_BASE)/projects/rumprun-packages/python3 && \
+	env -i PATH=${PATH2} RUMPRUN_TOOLCHAIN_TUPLE=$(RRTOOLCHAIN) make
