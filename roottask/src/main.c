@@ -99,7 +99,7 @@ init_env(env_t env)
      * it knows the address and will add it as a reserved region */
     error = sel4utils_bootstrap_vspace_with_bootinfo_leaky(&env->vspace,
                                                            &data, simple_get_pd(&env->simple),
-                                                           &env->vka, seL4_GetBootInfo());
+                                                           &env->vka, platsupport_get_bootinfo());
     if (error) {
         ZF_LOGF("Failed to bootstrap vspace");
     }
@@ -555,7 +555,7 @@ void *main_continued(void *arg UNUSED)
 /* entry point of root task */
 int main(void)
 {
-    info = seL4_GetBootInfo();
+    info = platsupport_get_bootinfo();
 
 #ifdef SEL4_DEBUG_KERNEL
     seL4_DebugNameThread(seL4_CapInitThreadTCB, "sel4test-driver");
