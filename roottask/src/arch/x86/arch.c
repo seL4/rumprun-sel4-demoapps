@@ -23,7 +23,7 @@ void
 arch_copy_timer_caps(init_data_t *init, env_t env, sel4utils_process_t *test_process)
 {
     /* io port cap (since the default timer on ia32 is the PIT) */
-    init->io_port = copy_cap_to_process(test_process, env->io_port_cap);
+    init->io_port = sel4utils_copy_cap_to_process(test_process, &env->vka, env->io_port_cap);
 }
 
 uint64_t ccount = 0;

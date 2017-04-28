@@ -184,21 +184,6 @@ populate_untypeds(vka_object_t *untypeds)
     return num_untypeds;
 }
 
-/* copy a cap to a process, returning the cptr in the process' cspace */
-seL4_CPtr
-copy_cap_to_process(sel4utils_process_t *process, seL4_CPtr cap)
-{
-    seL4_CPtr copied_cap;
-    cspacepath_t path;
-
-    vka_cspace_make_path(&env.vka, cap, &path);
-    copied_cap = sel4utils_copy_cap_to_process(process, path);
-    if (copied_cap == 0) {
-        ZF_LOGF("Failed to copy cap to process");
-    }
-
-    return copied_cap;
-}
 /* copy a cap to a process, returning the cptr in the process' cspace
         XXX: This currently copies the code directly out of libsel4utils
         but doesn't free the capslot because the vka isn't tracking the
@@ -246,7 +231,7 @@ copy_untypeds_to_process(sel4utils_process_t *process, vka_object_t *untypeds, i
     seL4_SlotRegion range = {0};
 
     for (int i = 0; i < num_untypeds; i++) {
-        seL4_CPtr slot = copy_cap_to_process(process, untypeds[i].cptr);
+        seL4_CPtr slot = sel4utils_copy_cap_to_process(process, &env.vka, untypeds[i].cptr);
 
         /* set up the cap range */
         if (i == 0) {
@@ -279,7 +264,7 @@ copy_device_frames_to_process(sel4utils_process_t *process)
         cspacepath_t path;
 
         vka_cspace_make_path(&env.vka, cap, &path);
-        copied_cap = sel4utils_copy_cap_to_process(process, path);
+        copied_cap = sel4utils_copy_path_to_process(process, path);
 
         if (copied_cap == 0) {
             printf("Failed to copy cap to process");
@@ -319,7 +304,7 @@ static void
 copy_timer_caps(init_data_t *init, env_t env, sel4utils_process_t *test_process)
 {
     /* irq cap for the timer irq */
-    init->timer_irq = copy_cap_to_process(test_process, env->irq_path.capPtr);
+    init->timer_irq = sel4utils_copy_cap_to_process(test_process, &env->vka, env->irq_path.capPtr);
     assert(init->timer_irq != 0);
 
     arch_copy_timer_caps(init, env, test_process);
@@ -377,16 +362,16 @@ run_rr(void)
     /* set up init_data process info */
     env.init->stack_pages = CONFIG_SEL4UTILS_STACK_SIZE / PAGE_SIZE_4K;
     env.init->stack = test_process.thread.stack_top - CONFIG_SEL4UTILS_STACK_SIZE;
-    env.init->page_directory = copy_cap_to_process(&test_process, test_process.pd.cptr);
+    env.init->page_directory = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.pd.cptr);
 
     env.init->root_cnode = SEL4UTILS_CNODE_SLOT;
-    env.init->tcb = copy_cap_to_process(&test_process, test_process.thread.tcb.cptr);
-    env.init->domain = copy_cap_to_process(&test_process, simple_get_init_cap(&env.simple, seL4_CapDomain));
-    env.init->asid_pool = copy_cap_to_process(&test_process, simple_get_init_cap(&env.simple, seL4_CapInitThreadASIDPool));
-    env.init->asid_ctrl = copy_cap_to_process(&test_process, simple_get_init_cap(&env.simple, seL4_CapASIDControl));
+    env.init->tcb = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.thread.tcb.cptr);
+    env.init->domain = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapDomain));
+    env.init->asid_pool = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapInitThreadASIDPool));
+    env.init->asid_ctrl = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapASIDControl));
 
 #ifdef CONFIG_IOMMU
-    env.init->io_space = copy_cap_to_process(&test_process, simple_get_init_cap(&env.simple, seL4_CapIOSpace));
+    env.init->io_space = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapIOSpace));
 #endif /* CONFIG_IOMMU */
 #ifdef CONFIG_ARM_SMMU
     env.init->io_space_caps = arch_copy_iospace_caps_to_process(&test_process, &env);
@@ -402,8 +387,9 @@ run_rr(void)
     env.init->tsc_freq = simple_get_arch_info(&env.simple);
     /* copy the fault endpoint - we wait on the endpoint for a message
      * or a fault to see when the test finishes */
-    seL4_CPtr endpoint = copy_cap_to_process(&test_process, test_process.fault_endpoint.cptr);
+    seL4_CPtr endpoint = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.fault_endpoint.cptr);
     printf("endpoint: %d\n", endpoint);
+
     /* WARNING: DO NOT COPY MORE CAPS TO THE PROCESS BEYOND THIS POINT,
      * AS THE SLOTS WILL BE CONSIDERED FREE AND OVERRIDDEN BY THE TEST PROCESS. */
     /* set up free slot range */
