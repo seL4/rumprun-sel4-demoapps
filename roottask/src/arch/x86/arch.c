@@ -30,7 +30,7 @@ uint64_t ccount = 0;
 uint64_t prev;
 uint64_t ts;
 
-void count_idle(void)
+void count_idle(void *_arg1, void *_arg2, void *_arg3)
 {
     prev = rdtsc_pure();
     while (true) {

@@ -67,7 +67,6 @@ static vka_object_t untypeds[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
 /* list of sizes (in bits) corresponding to untyped */
 static uint8_t untyped_size_bits_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
 static uintptr_t untyped_paddr_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
-static bool untyped_device_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
 
 
 seL4_SlotRegion devices;
@@ -174,7 +173,7 @@ populate_untypeds(vka_object_t *untypeds)
         total_mem += BIT(untypeds[i].size_bits);
         untyped_paddr_list[i] = vka_utspace_paddr(&env.vka, untypeds[i].ut, seL4_UntypedObject, untypeds[i].size_bits);
     }
-    ZF_LOGI("Totalsize: 0x%x, im mb: %d\n", total_mem, BYTES_TO_SIZE_BITS_PAGES(total_mem, 20));
+    ZF_LOGI("Totalsize: 0x%"PRIx32", im mb: %zd\n", total_mem, BYTES_TO_SIZE_BITS_PAGES(total_mem, 20));
     /* Return reserve memory */
     free_objects(reserve, reserve_num);
 
@@ -308,7 +307,7 @@ send_init_data(env_t env, seL4_CPtr endpoint, sel4utils_process_t *process)
     assert(remote_vaddr != 0);
 
     /* now send a message telling the process what address the data is at */
-    seL4_MessageInfo_t info = seL4_MessageInfo_new(seL4_NoFault, 0, 0, 1);
+    seL4_MessageInfo_t info = seL4_MessageInfo_new(seL4_Fault_NullFault, 0, 0, 1);
     seL4_SetMR(0, (seL4_Word) remote_vaddr);
     seL4_Send(endpoint, info);
 
@@ -420,7 +419,6 @@ run_rr(void)
 #endif
     /* set up args for the test process */
     char endpoint_string[WORD_STRING_SIZE];
-    char zero_string[] = {"0"};
     char *argv[] = {(char *)myname, endpoint_string};
     snprintf(endpoint_string, WORD_STRING_SIZE, "%lu", (unsigned long)endpoint);
     /* spawn the process */
@@ -435,7 +433,7 @@ run_rr(void)
     seL4_MessageInfo_t info = seL4_Recv(test_process.fault_endpoint.cptr, NULL);
 
     int result = seL4_GetMR(0);
-    if (seL4_MessageInfo_get_label(info) != seL4_NoFault) {
+    if (seL4_MessageInfo_get_label(info) != seL4_Fault_NullFault) {
         sel4utils_print_fault_message(info, "rumprun");
         sel4debug_dump_registers(test_process.thread.tcb.cptr);
         result = FAILURE;
@@ -459,7 +457,7 @@ run_rr(void)
 
 
 int
-create_thread_handler(void (*handler)(void), int priority)
+create_thread_handler(sel4utils_thread_entry_fn handler, int priority)
 {
     sel4utils_thread_t new_thread;
 

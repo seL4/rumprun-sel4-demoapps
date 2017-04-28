@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <unistd.h>
 
 int main(int argc, char *argv[]){
     printf("Hello %s\n", argv[1]);

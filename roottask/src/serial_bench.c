@@ -100,7 +100,7 @@ seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, ui
 uint64_t cpucount;
 uint64_t cpucount2;
 
-void serial_interrupt(void)
+void serial_interrupt(void *_arg1, void *_arg2, void *_arg3)
 {
     vka_object_t serial_notification;
     int error = vka_alloc_notification(&env.vka, &serial_notification);
