@@ -312,7 +312,6 @@ copy_timer_caps(init_data_t *init, env_t env, sel4utils_process_t *test_process)
 }
 
 extern char _cpio_archive[];
-const char* myname;
 
 /* Run a single test.
  * Each test is launched as its own process. */
@@ -326,18 +325,19 @@ run_rr(void)
     /* Unpack elf file from cpio */
     struct cpio_info info2;
     cpio_info(_cpio_archive, &info2);
+    const char* bin_name;
     for (int i = 0; i < info2.file_count; i++) {
         unsigned long size;
-        cpio_get_entry(_cpio_archive, i, &myname, &size);
-        ZF_LOGV("name %d: %s\n", i, myname);
+        cpio_get_entry(_cpio_archive, i, &bin_name, &size);
+        ZF_LOGV("name %d: %s\n", i, bin_name);
     }
 
     /* parse elf region data about the test image to pass to the tests app */
-    num_elf_regions = sel4utils_elf_num_regions(myname);
+    num_elf_regions = sel4utils_elf_num_regions(bin_name);
     if (num_elf_regions >= MAX_REGIONS) {
         ZF_LOGF("Invalid num elf regions");
     }
-    sel4utils_elf_reserve(NULL, myname, elf_regions);
+    sel4utils_elf_reserve(NULL, bin_name, elf_regions);
     /* copy the region list for the process to clone itself */
     memcpy(env.init->elf_regions, elf_regions, sizeof(sel4utils_elf_region_t) * num_elf_regions);
     env.init->num_elf_regions = num_elf_regions;
@@ -355,7 +355,7 @@ run_rr(void)
 
     /* Set up rumprun process */
     error = sel4utils_configure_process(&test_process, &env.vka, &env.vspace,
-                                        env.init->priority, myname);
+                                        env.init->priority, bin_name);
     if (error) {
         ZF_LOGF("Failed to configure process");
     }
@@ -389,7 +389,6 @@ run_rr(void)
     /* copy the fault endpoint - we wait on the endpoint for a message
      * or a fault to see when the test finishes */
     seL4_CPtr endpoint = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.fault_endpoint.cptr);
-    printf("endpoint: %d\n", endpoint);
 
     /* WARNING: DO NOT COPY MORE CAPS TO THE PROCESS BEYOND THIS POINT,
      * AS THE SLOTS WILL BE CONSIDERED FREE AND OVERRIDDEN BY THE TEST PROCESS. */
@@ -398,15 +397,13 @@ run_rr(void)
     env.init->free_slots.start = endpoint + 1;
     env.init->free_slots.end = (1u << CONFIG_SEL4UTILS_CSPACE_SIZE_BITS);
     assert(env.init->free_slots.start < env.init->free_slots.end);
-    /* copy test name */
-    strncpy(env.init->name, "blah", 12);
     strncpy(env.init->cmdline, RUMPCONFIG, RUMP_CONFIG_MAX);
 #ifdef SEL4_DEBUG_KERNEL
-    seL4_DebugNameThread(test_process.thread.tcb.cptr, env.init->name);
+    seL4_DebugNameThread(test_process.thread.tcb.cptr, bin_name);
 #endif
     /* set up args for the test process */
     char endpoint_string[WORD_STRING_SIZE];
-    char *argv[] = {(char *)myname, endpoint_string};
+    char *argv[] = {(char *)bin_name, endpoint_string};
     snprintf(endpoint_string, WORD_STRING_SIZE, "%lu", (unsigned long)endpoint);
     /* spawn the process */
     error = sel4utils_spawn_process_v(&test_process, &env.vka, &env.vspace,
@@ -414,7 +411,7 @@ run_rr(void)
     assert(error == 0);
     printf("process spawned\n");
     /* send env.init_data to the new process */
-    void *remote_vaddr = send_init_data(&env, test_process.fault_endpoint.cptr, &test_process);
+    send_init_data(&env, test_process.fault_endpoint.cptr, &test_process);
 
     /* wait on it to finish or fault, report result */
     seL4_MessageInfo_t info = seL4_Recv(test_process.fault_endpoint.cptr, NULL);
@@ -425,20 +422,6 @@ run_rr(void)
         sel4debug_dump_registers(test_process.thread.tcb.cptr);
         result = FAILURE;
     }
-
-    /* unmap the env.init data frame */
-    vspace_unmap_pages(&test_process.vspace, remote_vaddr, 2, PAGE_BITS_4K, NULL);
-
-    /* reset all the untypeds for the next test */
-    for (int i = 0; i < num_untypeds; i++) {
-        cspacepath_t path;
-        vka_cspace_make_path(&env.vka, untypeds[i].cptr, &path);
-        vka_cnode_revoke(&path);
-    }
-
-    /* destroy the process */
-    sel4utils_destroy_process(&test_process, &env.vka);
-
     return result;
 }
 
