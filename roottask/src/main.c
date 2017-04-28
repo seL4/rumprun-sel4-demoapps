@@ -19,6 +19,7 @@
 #include <simple-default/simple-default.h>
 #include <sel4platsupport/platsupport.h>
 #include <sel4platsupport/plat/timer.h>
+#include <sel4platsupport/serial.h>
 #include <sel4platsupport/arch/io.h>
 #include <sel4debug/register_dump.h>
 #include <cpio/cpio.h>
@@ -517,7 +518,7 @@ void *main_continued(void *arg UNUSED)
 
     /* get the caps we need to set up a timer and serial interrupts */
     init_timer_caps(&env);
-    init_serial_caps(&env);
+    sel4platsupport_init_default_serial_caps(&env.vka, &env.vspace, &env.simple, &env.serial_objects);
 
     /* Create serial thread */
     int err = create_thread_handler(serial_interrupt, seL4_MaxPrio);

@@ -45,26 +45,6 @@ void count_idle(void *_arg1, void *_arg2, void *_arg3)
 }
 
 
-void
-init_serial_caps(env_t env)
-{
-    /* get the irq control cap */
-    seL4_CPtr cap;
-    int error = vka_cspace_alloc(&env->vka, &cap);
-    if (error != 0) {
-        ZF_LOGF("Failed to allocate cslot, error %d", error);
-    }
-    vka_cspace_make_path(&env->vka, cap, &env->serial_irq);
-    error = simple_get_IRQ_handler(&env->simple, SERIAL_CONSOLE_COM1_IRQ, env->serial_irq);
-    if (error != 0) {
-        ZF_LOGF("Failed to get IRQ control, error %d", error);
-    }
-    error = seL4_IRQHandler_Ack(env->serial_irq.capPtr);
-    if (error != 0) {
-        ZF_LOGF("Failed to ack IRQ , error %d", error);
-    }
-
-}
 
 void
 init_timer_caps(env_t env)

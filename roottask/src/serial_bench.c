@@ -109,7 +109,7 @@ void serial_interrupt(void *_arg1, void *_arg2, void *_arg3)
     }
 
 
-    error = seL4_IRQHandler_SetNotification(env.serial_irq.capPtr, serial_notification.cptr);
+    error = seL4_IRQHandler_SetNotification(env.serial_objects.serial_irq_path.capPtr, serial_notification.cptr);
     if (error != 0) {
         ZF_LOGF("Failed to do the thing2\n");
     }
@@ -122,7 +122,7 @@ void serial_interrupt(void *_arg1, void *_arg2, void *_arg3)
         seL4_Word sender_badge;
         int c;
         seL4_Recv(serial_notification.cptr, &sender_badge);
-        seL4_IRQHandler_Ack(env.serial_irq.capPtr);
+        seL4_IRQHandler_Ack(env.serial_objects.serial_irq_path.capPtr);
         while (true) {
             uint32_t hi1, lo1;
             /* get next character */

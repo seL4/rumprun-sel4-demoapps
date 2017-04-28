@@ -22,6 +22,7 @@
 #include <simple/simple.h>
 #include <vspace/vspace.h>
 #include <rumprun/init_data.h>
+#include <sel4platsupport/serial.h>
 typedef struct env *env_t;
 
 /* max test name size */
@@ -40,8 +41,7 @@ struct env {
     cspacepath_t frame_path;
     /* io port for the default timer */
     seL4_CPtr io_port_cap;
-
-    cspacepath_t serial_irq;
+    serial_objects_t serial_objects;
     /* init data frame vaddr */
     init_data_t *init;
     /* extra cap to the init data frame for mapping into the remote vspace */
