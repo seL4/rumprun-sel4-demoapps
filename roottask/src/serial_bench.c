@@ -10,6 +10,7 @@
  * @TAG(DATA61_BSD)
  */
 
+#include <autoconf.h>
 #include <rumprun/init_data.h>
 #include <platsupport/plat/pit.h>
 #include <platsupport/io.h>
@@ -99,6 +100,7 @@ seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, ui
 #endif // CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
 uint64_t cpucount;
 uint64_t cpucount2;
+int __plat_serial_init(ps_io_ops_t* io_ops);
 
 void serial_interrupt(void *_arg1, void *_arg2, void *_arg3)
 {
@@ -111,13 +113,22 @@ void serial_interrupt(void *_arg1, void *_arg2, void *_arg3)
 
     error = seL4_IRQHandler_SetNotification(env.serial_objects.serial_irq_path.capPtr, serial_notification.cptr);
     if (error != 0) {
-        ZF_LOGF("Failed to do the thing2\n");
+        ZF_LOGF("seL4_IRQHandler_SetNotification failed\n");
     }
-    printf("a:%c\n", __arch_getchar());
+    ps_io_ops_t io_ops;
+    sel4platsupport_get_io_port_ops(&io_ops.io_port_ops, &env.simple);
+
+#if defined(CONFIG_LIB_SEL4_PLAT_SUPPORT_USE_SEL4_DEBUG_PUTCHAR) && defined(CONFIG_DEBUG_BUILD)
+    /* We need to initialise the platform serial if CONFIG_LIB_SEL4_PLAT_SUPPORT_USE_SEL4_DEBUG_PUTCHAR
+    is set as it won't have happened yet and is a prerequisite for using __arch_getchar() */
+    error = __plat_serial_init(&io_ops);
+    if (error != 0) {
+        ZF_LOGF("__plat_serial_init failed\n");
+    }
+#endif
+
     char reset_buffer[] = "reset";
     int pos = 0;
-    ps_io_port_ops_t ops;
-    sel4platsupport_get_io_port_ops(&ops, &env.simple);
     while (true) {
         seL4_Word sender_badge;
         int c;
@@ -135,7 +146,7 @@ void serial_interrupt(void *_arg1, void *_arg2, void *_arg3)
             if (c == reset_buffer[pos]) {
                 pos++;
                 if (pos == 5) {
-                    ps_io_port_out(&ops, 0x64, 1, 0xFE);
+                    ps_io_port_out(&io_ops.io_port_ops, 0x64, 1, 0xFE);
                 }
             } else {
                 pos = 0;
