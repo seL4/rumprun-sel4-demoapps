@@ -185,42 +185,17 @@ populate_untypeds(vka_object_t *untypeds)
     return num_untypeds;
 }
 
-/* copy a cap to a process, returning the cptr in the process' cspace
-        XXX: This currently copies the code directly out of libsel4utils
-        but doesn't free the capslot because the vka isn't tracking the
-        slots from the bootinfo.  Should probably find a way to add those
-        slots so that they are tracked in order to call the proper sel4utils
-        move cap to process function */
-seL4_CPtr
-move_cap_to_process(sel4utils_process_t *process, seL4_CPtr cap)
+static seL4_CPtr
+move_init_cap_to_process(sel4utils_process_t *process, seL4_CPtr cap)
 {
     seL4_CPtr copied_cap;
     cspacepath_t path;
 
     vka_cspace_make_path(&env.vka, cap, &path);
-    cspacepath_t dest = { 0 };
-    if (process->cspace_next_free >= (BIT(process->cspace_size))) {
-        ZF_LOGE("Can't allocate slot, cspace is full.\n");
-        return -1;
-    }
 
-    dest.root = process->cspace.cptr;
-    dest.capPtr = process->cspace_next_free;
-    dest.capDepth = process->cspace_size;
-    int error = vka_cnode_move(&dest, &path);
-    if (error != seL4_NoError) {
-        ZF_LOGE("Failed to move cap\n");
-        return 0;
-    }
-
-
-    /* success */
-    assert(process->cspace_next_free < (1 << process->cspace_size));
-    process->cspace_next_free++;
-    copied_cap = dest.capPtr;
-    // copied_cap = sel4utils_move_cap_to_process(process, path, &env.vka);
+    copied_cap = sel4utils_move_cap_to_process(process, path, NULL);
     if (copied_cap == 0) {
-        ZF_LOGF("Failed to copy cap to process");
+        ZF_LOGF("Failed to move cap to process");
     }
 
     return copied_cap;
@@ -377,7 +352,7 @@ run_rr(void)
 #ifdef CONFIG_ARM_SMMU
     env.init->io_space_caps = arch_copy_iospace_caps_to_process(&test_process, &env);
 #endif
-    env.init->irq_control = move_cap_to_process(&test_process, simple_get_init_cap(&env.simple, seL4_CapIRQControl ));
+    env.init->irq_control = move_init_cap_to_process(&test_process, simple_get_init_cap(&env.simple, seL4_CapIRQControl ));
     /* setup data about untypeds */
     env.init->untypeds = copy_untypeds_to_process(&test_process, untypeds, num_untypeds);
     copy_timer_caps(env.init, &env, &test_process);
