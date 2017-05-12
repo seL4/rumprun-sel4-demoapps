@@ -236,7 +236,7 @@ copy_device_frames_to_process(sel4utils_process_t *process)
         device_size_bits_list[num_regions] = size_bits;
         device_paddr_list[num_regions] = paddr;
 
-        printf("basepaddr 0x%x framesize: %d, \n", paddr, size_bits);
+        printf("basepaddr 0x%zx framesize: %zd, \n", paddr, size_bits);
         cspacepath_t path;
 
         vka_cspace_make_path(&env.vka, cap, &path);
@@ -324,7 +324,7 @@ run_rr(void)
     UNUSED int error;
     sel4utils_process_t test_process;
     char* a = RUMPCONFIG;
-    printf("%d %s\n", sizeof(RUMPCONFIG), a);
+    printf("%zd %s\n", sizeof(RUMPCONFIG), a);
     /* Test intro banner. */
     printf("  starting app\n");
 

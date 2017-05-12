@@ -62,7 +62,7 @@ seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, ui
                 cap_entries[logBuffer[index].entry.cap_type]++;
                 cap_time[logBuffer[index].entry.cap_type] += logBuffer[index].duration;
                 if (logBuffer[index].entry.cap_type == 2) {
-                    printf("invoc: %d\n", logBuffer[index].entry.invocation_tag);
+                    printf("invoc: %"PRId32"\n", logBuffer[index].entry.invocation_tag);
                 }
 
             }
@@ -85,17 +85,17 @@ seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, ui
         }
         index++;
     }
-    printf("kt: %llx\n ot: %llx\n", ksTotalKernelTime, ksOtherKernelTime);
+    printf("kt: %"PRIx64"\n ot: %"PRIx64"\n", ksTotalKernelTime, ksOtherKernelTime);
 
     for (int i = 0; i < 8; i++) {
-        printf("sc: %d i: %d c: %llx\n", i, syscall_entries[i], syscall_time[i]);
+        printf("sc: %"PRId32" i: %"PRId32" c: %"PRIx64"\n", i, syscall_entries[i], syscall_time[i]);
     }
     for (int i = 0; i < 32; i++) {
-        printf("scc: %d i: %d c: %llx\n", i, cap_entries[i], cap_time[i]);
+        printf("scc: %"PRId32" i: %"PRId32" c: %"PRIx64"\n", i, cap_entries[i], cap_time[i]);
     }
-    printf("int: %d c: %llx\n", interrupt_entries, interrupt_time);
-    printf("ulf: %d c: %llx\n", userlevelfault_entries, userlevelfault_time);
-    printf("vmf: %d c: %llx\n", vmfault_entries, vmfault_time);
+    printf("int: %"PRId32" c: %"PRIx64"\n", interrupt_entries, interrupt_time);
+    printf("ulf: %"PRId32" c: %"PRIx64"\n", userlevelfault_entries, userlevelfault_time);
+    printf("vmf: %"PRId32" c: %"PRIx64"\n", vmfault_entries, vmfault_time);
 }
 #endif // CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
 uint64_t cpucount;
@@ -183,12 +183,12 @@ void serial_interrupt(void *_arg1, void *_arg2, void *_arg3)
                 logIndexFinalized = seL4_BenchmarkFinalizeLog();
 #endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
                 /* Print total cycles and idle cycles to serial */
-                printf("tot: %llx\n idle: %llx\n", cpucount2 - cpucount, ccount);
+                printf("tot: %"PRIx64"\n idle: %"PRIx64"\n", cpucount2 - cpucount, ccount);
             }
             if (c == 'c') {
 #ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
                 benchmark_track_kernel_entry_t *ksLog = (benchmark_track_kernel_entry_t *) log_buffer;
-                printf("dumping log: %d, %d %d\n", logIndexFinalized, sizeof(benchmark_track_kernel_entry_t), sizeof(kernel_entry_t));
+                printf("dumping log: %"PRId32", %zd %zd\n", logIndexFinalized, sizeof(benchmark_track_kernel_entry_t), sizeof(kernel_entry_t));
                 seL4_BenchmarkTrackDumpSummary_pri(ksLog, logIndexFinalized);//ksLogIndexFinalized);
 #endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
             }
