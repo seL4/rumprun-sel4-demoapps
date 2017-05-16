@@ -27,7 +27,6 @@
 
 typedef struct env *env_t;
 
-/* max test name size */
 #define INIT_DATA_NUM_FRAMES 2
 
 

@@ -10,7 +10,6 @@
  * @TAG(DATA61_BSD)
  */
 
-/* Include Kconfig variables. */
 #include <autoconf.h>
 #include <allocman/bootstrap.h>
 #include <allocman/vka.h>
@@ -24,6 +23,7 @@
 #include <cpio/cpio.h>
 #include <sel4/bootinfo.h>
 #include <sel4utils/stack.h>
+#include <sel4utils/util.h>
 #include <vka/object.h>
 #include <platsupport/plat/pit.h>
 #include <platsupport/io.h>
@@ -34,9 +34,6 @@
 #include "common.h"
 #include <rumprun/init_data.h>
 
-// #define TESTS_APP RUMPAPPNAME
-#define SUCCESS true
-#define FAILURE false
 
 #define RUMP_UNTYPED_MEMORY (1 << 25)
 /* Number of untypeds to try and use to allocate the driver memory.
@@ -49,7 +46,6 @@
 /* Number of untypeds to try and use to allocate the driver memory.
  * if we cannot get 32mb with 16 untypeds then something is probably wrong */
 #define RUMP_NUM_DEV_RAM_UNTYPEDS 20
-
 
 /* dimensions of virtual memory for the allocator to use */
 #define ALLOCATOR_VIRTUAL_POOL_SIZE ((1 << seL4_PageBits) * 1000)
@@ -65,11 +61,11 @@ static sel4utils_alloc_data_t data;
 /* environment encapsulating allocation interfaces etc */
 struct env env;
 
-seL4_BootInfo *info;
-
 extern vspace_t *muslc_this_vspace;
 extern reservation_t muslc_brk_reservation;
 extern void *muslc_brk_reservation_start;
+extern char _cpio_archive[];
+
 /* initialise our runtime environment */
 static void
 init_env(env_t env)
@@ -80,9 +76,7 @@ init_env(env_t env)
 
     /* create an allocator */
     allocman = bootstrap_use_current_simple(&env->simple, ALLOCATOR_STATIC_POOL_SIZE, allocator_mem_pool);
-    if (allocman == NULL) {
-        ZF_LOGF("Failed to create allocman");
-    }
+    ZF_LOGF_IF(allocman == NULL, "Failed to create allocman");
 
     /* create a vka (interface for interacting with the underlying allocator) */
     allocman_make_vka(&env->vka, allocman);
@@ -93,15 +87,12 @@ init_env(env_t env)
     error = sel4utils_bootstrap_vspace_with_bootinfo_leaky(&env->vspace,
                                                            &data, simple_get_pd(&env->simple),
                                                            &env->vka, platsupport_get_bootinfo());
-    if (error) {
-        ZF_LOGF("Failed to bootstrap vspace");
-    }
+    ZF_LOGF_IF(error, "Failed to bootstrap vspace");
 
     sel4utils_res_t muslc_brk_reservation_memory;
     error = sel4utils_reserve_range_no_alloc(&env->vspace, &muslc_brk_reservation_memory, 1048576, seL4_AllRights, 1, &muslc_brk_reservation_start);
-    if (error) {
-        ZF_LOGF("Failed to reserve_range");
-    }
+    ZF_LOGF_IF(error, "Failed to reserve_range");
+
     muslc_this_vspace = &env->vspace;
     muslc_brk_reservation.res = &muslc_brk_reservation_memory;
 
@@ -109,9 +100,7 @@ init_env(env_t env)
     void *vaddr;
     virtual_reservation = vspace_reserve_range(&env->vspace,
                                                ALLOCATOR_VIRTUAL_POOL_SIZE, seL4_AllRights, 1, &vaddr);
-    if (virtual_reservation.res == 0) {
-        ZF_LOGF("Failed to provide virtual memory for allocator");
-    }
+    ZF_LOGF_IF(virtual_reservation.res == 0, "Failed to provide virtual memory for allocator");
 
     bootstrap_configure_virtual_pool(allocman, vaddr,
                                      ALLOCATOR_VIRTUAL_POOL_SIZE, simple_get_pd(&env->simple));
@@ -149,9 +138,7 @@ move_init_cap_to_process(sel4utils_process_t *process, seL4_CPtr cap)
     vka_cspace_make_path(&env.vka, cap, &path);
 
     copied_cap = sel4utils_move_cap_to_process(process, path, NULL);
-    if (copied_cap == 0) {
-        ZF_LOGF("Failed to move cap to process");
-    }
+    ZF_LOGF_IF(copied_cap == 0, "Failed to move cap to process");
 
     return copied_cap;
 }
@@ -217,22 +204,7 @@ copy_timer_caps(rump_process_data_t *proc_data, env_t env, sel4utils_process_t *
     proc_data->init->timer_slot_index = current_index;
     proc_data->num_untypeds_dev++;
     arch_copy_timer_caps(proc_data->init, env, test_process);
-
-
 }
-
-extern char _cpio_archive[];
-
-int alloc_device_untyped(uintptr_t paddr, size_t size_bits, vka_object_t *ut) {
-    int error = vka_alloc_object_at_maybe_dev(&env.vka, seL4_UntypedObject, size_bits, paddr,
-                    true, ut);
-    if (error != 0) {
-        ZF_LOGF("Could not allocate untyped");
-    }
-    return error;
-
-}
-
 
 int alloc_untypeds(rump_process_data_t *proc_data) {
 
@@ -247,18 +219,14 @@ int alloc_untypeds(rump_process_data_t *proc_data) {
 
     int num_untypeds = 0;
     for (int i = 0; i < ARRAY_SIZE(mmios); i++) {
-        int error = alloc_device_untyped(mmios[i].paddr, mmios[i].size_bits, proc_data->untypeds+current_index+num_untypeds);
-        if (error != 0) {
-            ZF_LOGF("Could not allocate untyped");
-        }
+        int error = vka_alloc_object_at_maybe_dev(&env.vka, seL4_UntypedObject, mmios[i].size_bits, mmios[i].paddr,
+                        true, proc_data->untypeds+current_index+num_untypeds);
+        ZF_LOGF_IF(error, "Could not allocate untyped");
         num_untypeds++;
     }
     proc_data->num_untypeds_dev = num_untypeds;
-
     return 0;
-
 }
-
 
 
 /* Run a single test.
@@ -282,9 +250,8 @@ run_rr(void)
 
     /* parse elf region data about the test image to pass to the tests app */
     num_elf_regions = sel4utils_elf_num_regions(bin_name);
-    if (num_elf_regions >= MAX_REGIONS) {
-        ZF_LOGF("Invalid num elf regions");
-    }
+    ZF_LOGF_IF(num_elf_regions >= MAX_REGIONS, "Invalid num elf regions");
+
     sel4utils_elf_reserve(NULL, bin_name, elf_regions);
     /* copy the region list for the process to clone itself */
     memcpy(env.rump_process.init->elf_regions, elf_regions, sizeof(sel4utils_elf_region_t) * num_elf_regions);
@@ -304,9 +271,7 @@ run_rr(void)
     /* Set up rumprun process */
     error = sel4utils_configure_process(&test_process, &env.vka, &env.vspace,
                                         env.rump_process.init->priority, bin_name);
-    if (error) {
-        ZF_LOGF("Failed to configure process");
-    }
+    ZF_LOGF_IF(error, "Failed to configure process");
 
     /* set up init_data process info */
     env.rump_process.init->stack_pages = CONFIG_SEL4UTILS_STACK_SIZE / PAGE_SIZE_4K;
@@ -366,7 +331,7 @@ run_rr(void)
     if (seL4_MessageInfo_get_label(info) != seL4_Fault_NullFault) {
         sel4utils_print_fault_message(info, "rumprun");
         sel4debug_dump_registers(test_process.thread.tcb.cptr);
-        result = FAILURE;
+        result = -1;
     }
     return result;
 }
@@ -403,39 +368,27 @@ void *main_continued(void *arg UNUSED)
 #ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
     /* Create 1MB page to use for benchmarking and give to kernel */
     log_buffer = vspace_new_pages(&env.vspace, seL4_AllRights, 1, seL4_LargePageBits);
-    if (log_buffer == NULL) {
-        ZF_LOGF("Could not map 1MB page");
-    }
+    ZF_LOGF_IF(log_buffer == NULL, "Could not map 1MB page");
     seL4_CPtr buffer_cap = vspace_get_cap(&env.vspace, log_buffer);
-    if (buffer_cap == NULL) {
-        ZF_LOGF("Could not get cap");
-    }
+    ZF_LOGF_IF(buffer_cap == NULL, "Could not get cap");
     int res_buf = seL4_BenchmarkSetLogBuffer(buffer_cap);
-    if (res_buf) {
-        ZF_LOGF("Could not set log buffer");
-    }
+    ZF_LOGF_IFERR(res_buf, "Could not set log buffer");
 #endif //CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
 
     /* create a frame that will act as the init data, we can then map
      * into target processes */
     env.rump_process.init = (init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, INIT_DATA_NUM_FRAMES, PAGE_BITS_4K);
-    if (env.rump_process.init == NULL) {
-        ZF_LOGF("Could not create init_data frame");
-    }
+    ZF_LOGF_IF(env.rump_process.init == NULL, "Could not create init_data frame");
 
     for (int i = 0; i < INIT_DATA_NUM_FRAMES; i++) {
         cspacepath_t src, dest;
         vka_cspace_make_path(&env.vka, vspace_get_cap(&env.vspace, (((char *)env.rump_process.init) + i * PAGE_SIZE_4K)), &src);
 
         int error = vka_cspace_alloc(&env.vka, &env.init_frame_cap_copy[i]);
-        if (error) {
-            ZF_LOGF("Failed to alloc cap");
-        }
+        ZF_LOGF_IF(error, "Failed to alloc cap");
         vka_cspace_make_path(&env.vka, env.init_frame_cap_copy[i], &dest);
         error = vka_cnode_copy(&dest, &src, seL4_AllRights);
-        if (error) {
-            ZF_LOGF("Failed to copy cap");
-        }
+        ZF_LOGF_IF(error, "Failed to copy cap");
     }
 
 
@@ -445,20 +398,13 @@ void *main_continued(void *arg UNUSED)
 
 
     int err = seL4_TCB_SetPriority(simple_init_cap(&env.simple, seL4_CapInitThreadTCB), seL4_MaxPrio - 1);
-    if (err != 0) {
-        ZF_LOGF("seL4_TCB_SetPriority thread failed");
-    }
-
+    ZF_LOGF_IFERR(err, "seL4_TCB_SetPriority thread failed");
     /* Create serial thread */
     err = create_thread_handler(serial_interrupt, seL4_MaxPrio);
-    if (err) {
-        ZF_LOGF("Could not create serial thread");
-    }
+    ZF_LOGF_IF(err, "Could not create serial thread");
     /* Create idle thread */
     err = create_thread_handler(count_idle, 0);
-    if (err) {
-        ZF_LOGF("Could not create idle thread");
-    }
+    ZF_LOGF_IF(err, "Could not create idle thread");
 
     /* now set up and run rumprun */
     run_rr();
@@ -469,6 +415,7 @@ void *main_continued(void *arg UNUSED)
 /* entry point of root task */
 int main(void)
 {
+    seL4_BootInfo *info;
     info = platsupport_get_bootinfo();
 
 #ifdef SEL4_DEBUG_KERNEL
