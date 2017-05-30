@@ -437,8 +437,14 @@ void *main_continued(void *arg UNUSED)
     init_timer_caps(&env);
     sel4platsupport_init_default_serial_caps(&env.vka, &env.vspace, &env.simple, &env.serial_objects);
 
+
+    int err = seL4_TCB_SetPriority(simple_init_cap(&env.simple, seL4_CapInitThreadTCB), seL4_MaxPrio - 1);
+    if (err != 0) {
+        ZF_LOGF("seL4_TCB_SetPriority thread failed");
+    }
+
     /* Create serial thread */
-    int err = create_thread_handler(serial_interrupt, seL4_MaxPrio);
+    err = create_thread_handler(serial_interrupt, seL4_MaxPrio);
     if (err) {
         ZF_LOGF("Could not create serial thread");
     }
