@@ -10,7 +10,6 @@
  * @TAG(DATA61_BSD)
  */
 
-
 /* Include Kconfig variables. */
 #include <autoconf.h>
 #include <allocman/bootstrap.h>
@@ -39,11 +38,17 @@
 #define SUCCESS true
 #define FAILURE false
 
-/* ammount of untyped memory to reserve for the driver (32mb) */
-#define DRIVER_UNTYPED_MEMORY (1 << 25)
+#define RUMP_UNTYPED_MEMORY (1 << 25)
 /* Number of untypeds to try and use to allocate the driver memory.
  * if we cannot get 32mb with 16 untypeds then something is probably wrong */
-#define DRIVER_NUM_UNTYPEDS 16
+#define RUMP_NUM_UNTYPEDS 16
+
+
+/* ammount of dev_ram memory to give to Rump kernel (2gb) */
+#define RUMP_DEV_RAM_MEMORY (1 << 31)
+/* Number of untypeds to try and use to allocate the driver memory.
+ * if we cannot get 32mb with 16 untypeds then something is probably wrong */
+#define RUMP_NUM_DEV_RAM_UNTYPEDS 20
 
 
 /* dimensions of virtual memory for the allocator to use */
@@ -60,19 +65,7 @@ static sel4utils_alloc_data_t data;
 /* environment encapsulating allocation interfaces etc */
 struct env env;
 
-/* the number of untyped objects we have to give out to processes */
-static int num_untypeds;
 seL4_BootInfo *info;
-/* list of untypeds to give out to test processes */
-static vka_object_t untypeds[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
-/* list of sizes (in bits) corresponding to untyped */
-static uint8_t untyped_size_bits_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
-static uintptr_t untyped_paddr_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
-
-
-seL4_SlotRegion devices;
-uint8_t device_size_bits_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
-uintptr_t device_paddr_list[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
 
 extern vspace_t *muslc_this_vspace;
 extern reservation_t muslc_brk_reservation;
@@ -86,14 +79,9 @@ init_env(env_t env)
     int error;
 
     /* create an allocator */
-    allocman = bootstrap_use_current_1level(simple_get_cnode(&env->simple), simple_get_cnode_size_bits(&env->simple), simple_last_valid_cap(&env->simple) +1, BIT(simple_get_cnode_size_bits(&env->simple)), ALLOCATOR_STATIC_POOL_SIZE, allocator_mem_pool);
+    allocman = bootstrap_use_current_simple(&env->simple, ALLOCATOR_STATIC_POOL_SIZE, allocator_mem_pool);
     if (allocman == NULL) {
         ZF_LOGF("Failed to create allocman");
-    }
-    pmem_region_t region_list[1] = {0};
-    error = allocman_add_simple_untypeds_with_regions(allocman, &env->simple, 0, region_list);
-    if (error) {
-        ZF_LOGF("Failed to add simple untypeds");
     }
 
     /* create a vka (interface for interacting with the underlying allocator) */
@@ -129,63 +117,25 @@ init_env(env_t env)
                                      ALLOCATOR_VIRTUAL_POOL_SIZE, simple_get_pd(&env->simple));
 }
 
-
-/* Free a list of objects */
-static void
-free_objects(vka_object_t *objects, unsigned int num)
-{
-    for (unsigned int i = 0; i < num; i++) {
-        vka_free_object(&env.vka, &objects[i]);
-    }
-}
-
 /* Allocate untypeds till either a certain number of bytes is allocated
  * or a certain number of untyped objects */
 static unsigned int
-allocate_untypeds(vka_object_t *untypeds, size_t bytes, unsigned int max_untypeds)
+allocate_untypeds(vka_object_t *untypeds, size_t bytes, unsigned int max_untypeds, bool can_use_dev)
 {
     unsigned int num_untypeds = 0;
     size_t allocated = 0;
 
     /* try to allocate as many of each possible untyped size as possible */
-    for (uint8_t size_bits = seL4_WordBits - 1; size_bits > PAGE_BITS_4K; size_bits--) {
+    for (uint8_t size_bits = seL4_MaxUntypedBits; size_bits > PAGE_BITS_4K; size_bits--) {
         /* keep allocating until we run out, or if allocating would
          * cause us to allocate too much memory*/
         while (num_untypeds < max_untypeds &&
                 allocated + BIT(size_bits) <= bytes &&
-                vka_alloc_untyped(&env.vka, size_bits, &untypeds[num_untypeds]) == 0) {
+                vka_alloc_object_at_maybe_dev(&env.vka, seL4_UntypedObject, size_bits, VKA_NO_PADDR,
+                                can_use_dev, &untypeds[num_untypeds]) == 0) {
             allocated += BIT(size_bits);
             num_untypeds++;
         }
-    }
-    return num_untypeds;
-}
-
-/* extract a large number of untypeds from the allocator */
-static unsigned int
-populate_untypeds(vka_object_t *untypeds)
-{
-    /* First reserve some memory for the root task */
-    vka_object_t reserve[DRIVER_NUM_UNTYPEDS];
-    unsigned int reserve_num = allocate_untypeds(reserve, DRIVER_UNTYPED_MEMORY, DRIVER_NUM_UNTYPEDS);
-
-    /* Now allocate everything else for rumprun */
-    unsigned int num_untypeds = allocate_untypeds(untypeds, UINT_MAX, ARRAY_SIZE(untyped_size_bits_list));
-
-    /* Fill out the size_bits list */
-    uint32_t total_mem = 0;
-    for (unsigned int i = 0; i < num_untypeds; i++) {
-        untyped_size_bits_list[i] = untypeds[i].size_bits;
-        total_mem += BIT(untypeds[i].size_bits);
-        untyped_paddr_list[i] = vka_utspace_paddr(&env.vka, untypeds[i].ut, seL4_UntypedObject, untypeds[i].size_bits);
-    }
-    ZF_LOGI("Totalsize: 0x%"PRIx32", im mb: %zd\n", total_mem, BYTES_TO_SIZE_BITS_PAGES(total_mem, 20));
-    /* Return reserve memory */
-    free_objects(reserve, reserve_num);
-
-    /* Return number of untypeds for tests */
-    if (num_untypeds == 0) {
-        ZF_LOGF("No untypeds for rump!");
     }
     return num_untypeds;
 }
@@ -206,61 +156,35 @@ move_init_cap_to_process(sel4utils_process_t *process, seL4_CPtr cap)
     return copied_cap;
 }
 /* copy untyped caps into a processes cspace, return the cap range they can be found in */
-static seL4_SlotRegion
-copy_untypeds_to_process(sel4utils_process_t *process, vka_object_t *untypeds, int num_untypeds)
+static int
+copy_untypeds_to_process(sel4utils_process_t *process, rump_process_data_t *proc_data)
 {
     seL4_SlotRegion range = {0};
-
-    for (int i = 0; i < num_untypeds; i++) {
-        seL4_CPtr slot = sel4utils_copy_cap_to_process(process, &env.vka, untypeds[i].cptr);
-
+    int total_caps = proc_data->num_untypeds_devram + proc_data->num_untypeds + proc_data->num_untypeds_dev;
+    for (int i = 0; i < total_caps; i++) {
+        seL4_CPtr slot = sel4utils_copy_cap_to_process(process, &env.vka, proc_data->untypeds[i].cptr);
+        /* ALLOCMAN_UT_KERNEL, ALLOCMAN_UT_DEV, ALLOCMAN_UT_DEV_MEM */
+        uint8_t untyped_is_device;
+        if (i < proc_data->num_untypeds_devram) {
+            untyped_is_device = ALLOCMAN_UT_DEV_MEM;
+        } else if (i < proc_data->num_untypeds_devram + proc_data->num_untypeds) {
+            untyped_is_device = ALLOCMAN_UT_KERNEL;
+        } else {
+            untyped_is_device = ALLOCMAN_UT_DEV;
+        }
+        proc_data->init->untyped_list[i].untyped_size_bits = proc_data->untypeds[i].size_bits;
+        proc_data->init->untyped_list[i].untyped_is_device = untyped_is_device;
+        proc_data->init->untyped_list[i].untyped_paddr = vka_utspace_paddr(&env.vka, proc_data->untypeds[i].ut, seL4_UntypedObject, proc_data->untypeds[i].size_bits);
         /* set up the cap range */
         if (i == 0) {
             range.start = slot;
         }
         range.end = slot;
     }
-    assert((range.end - range.start) + 1 == num_untypeds);
-    return range;
-}
-static void
-copy_device_frames_to_process(sel4utils_process_t *process)
-{
-    // printf("total frames: %d, captype: %d\n", info->numDeviceRegions, seL4_DebugCapIdentify(info->deviceRegions[0].frames.start));
-    int k = 0;
-    uint32_t num_regions = 0;
-    seL4_CPtr copied_cap = 0;
-    for (int i = 0; i < simple_get_untyped_count(&env.simple); i++) {
-        size_t size_bits;
-        uintptr_t paddr;
-        bool device;
-        seL4_CPtr cap = simple_get_nth_untyped(&env.simple, i, &size_bits, &paddr, &device);
-        if (!device) {
-            continue;
-        }
-        device_size_bits_list[num_regions] = size_bits;
-        device_paddr_list[num_regions] = paddr;
-
-        printf("basepaddr 0x%zx framesize: %zd, \n", paddr, size_bits);
-        cspacepath_t path;
-
-        vka_cspace_make_path(&env.vka, cap, &path);
-        copied_cap = sel4utils_copy_path_to_process(process, path);
-
-        if (copied_cap == 0) {
-            printf("Failed to copy cap to process");
-        }
-        if (num_regions == 0) {
-            devices.start = copied_cap;
-        }
-        num_regions++;
-        k++;
-
-    }
-    devices.end = copied_cap + 1 ;
-
-    printf("copied caps:%d\n", k);
-
+    range.end++;
+    ZF_LOGF_IF((range.end - range.start) != total_caps, "Invalid number of caps");
+    proc_data->init->untypeds = range;
+    return 0;
 }
 
 
@@ -293,6 +217,44 @@ copy_timer_caps(init_data_t *init, env_t env, sel4utils_process_t *test_process)
 
 extern char _cpio_archive[];
 
+int alloc_device_untyped(uintptr_t paddr, size_t size_bits, vka_object_t *ut) {
+    int error = vka_alloc_object_at_maybe_dev(&env.vka, seL4_UntypedObject, size_bits, paddr,
+                    true, ut);
+    if (error != 0) {
+        ZF_LOGF("Could not allocate untyped");
+    }
+    return error;
+
+}
+
+
+int alloc_untypeds(rump_process_data_t *proc_data) {
+
+    // Allocate DEV_MEM memory.
+    bool can_be_dev = true;
+    proc_data->num_untypeds_devram = allocate_untypeds(proc_data->untypeds, RUMP_DEV_RAM_MEMORY, RUMP_NUM_DEV_RAM_UNTYPEDS, can_be_dev);
+    int current_index = proc_data->num_untypeds_devram;
+    can_be_dev = false;
+    proc_data->num_untypeds = allocate_untypeds(proc_data->untypeds+current_index, RUMP_UNTYPED_MEMORY, RUMP_NUM_UNTYPEDS, can_be_dev);
+    current_index += proc_data->num_untypeds;
+    proc_data->num_untypeds_dev = 0;
+
+    int num_untypeds = 0;
+    for (int i = 0; i < ARRAY_SIZE(mmios); i++) {
+        int error = alloc_device_untyped(mmios[i].paddr, mmios[i].size_bits, proc_data->untypeds+current_index+num_untypeds);
+        if (error != 0) {
+            ZF_LOGF("Could not allocate untyped");
+        }
+        num_untypeds++;
+    }
+    proc_data->num_untypeds_dev = num_untypeds;
+
+    return 0;
+
+}
+
+
+
 /* Run a single test.
  * Each test is launched as its own process. */
 int
@@ -319,12 +281,12 @@ run_rr(void)
     }
     sel4utils_elf_reserve(NULL, bin_name, elf_regions);
     /* copy the region list for the process to clone itself */
-    memcpy(env.init->elf_regions, elf_regions, sizeof(sel4utils_elf_region_t) * num_elf_regions);
-    env.init->num_elf_regions = num_elf_regions;
+    memcpy(env.rump_process.init->elf_regions, elf_regions, sizeof(sel4utils_elf_region_t) * num_elf_regions);
+    env.rump_process.init->num_elf_regions = num_elf_regions;
 
     /* setup init priority.  Reduce by 2 so that we can have higher priority serial thread
         for benchmarking */
-    env.init->priority = seL4_MaxPrio - 2;
+    env.rump_process.init->priority = seL4_MaxPrio - 2;
 
     UNUSED int error;
     sel4utils_process_t test_process;
@@ -335,49 +297,47 @@ run_rr(void)
 
     /* Set up rumprun process */
     error = sel4utils_configure_process(&test_process, &env.vka, &env.vspace,
-                                        env.init->priority, bin_name);
+                                        env.rump_process.init->priority, bin_name);
     if (error) {
         ZF_LOGF("Failed to configure process");
     }
 
     /* set up init_data process info */
-    env.init->stack_pages = CONFIG_SEL4UTILS_STACK_SIZE / PAGE_SIZE_4K;
-    env.init->stack = test_process.thread.stack_top - CONFIG_SEL4UTILS_STACK_SIZE;
-    env.init->page_directory = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.pd.cptr);
+    env.rump_process.init->stack_pages = CONFIG_SEL4UTILS_STACK_SIZE / PAGE_SIZE_4K;
+    env.rump_process.init->stack = test_process.thread.stack_top - CONFIG_SEL4UTILS_STACK_SIZE;
+    env.rump_process.init->page_directory = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.pd.cptr);
 
-    env.init->root_cnode = SEL4UTILS_CNODE_SLOT;
-    env.init->tcb = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.thread.tcb.cptr);
-    env.init->domain = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapDomain));
-    env.init->asid_pool = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapInitThreadASIDPool));
-    env.init->asid_ctrl = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapASIDControl));
+    env.rump_process.init->root_cnode = SEL4UTILS_CNODE_SLOT;
+    env.rump_process.init->tcb = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.thread.tcb.cptr);
+    env.rump_process.init->domain = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapDomain));
+    env.rump_process.init->asid_pool = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapInitThreadASIDPool));
+    env.rump_process.init->asid_ctrl = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapASIDControl));
 
 #ifdef CONFIG_IOMMU
-    env.init->io_space = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapIOSpace));
+    env.rump_process.init->io_space = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapIOSpace));
 #endif /* CONFIG_IOMMU */
 #ifdef CONFIG_ARM_SMMU
-    env.init->io_space_caps = arch_copy_iospace_caps_to_process(&test_process, &env);
+    env.rump_process.init->io_space_caps = arch_copy_iospace_caps_to_process(&test_process, &env);
 #endif
-    env.init->irq_control = move_init_cap_to_process(&test_process, simple_get_init_cap(&env.simple, seL4_CapIRQControl ));
+    env.rump_process.init->irq_control = move_init_cap_to_process(&test_process, simple_get_init_cap(&env.simple, seL4_CapIRQControl ));
     /* setup data about untypeds */
-    env.init->untypeds = copy_untypeds_to_process(&test_process, untypeds, num_untypeds);
-    copy_timer_caps(env.init, &env, &test_process);
-    copy_device_frames_to_process(&test_process);
-    memcpy(env.init->device_size_bits_list, device_size_bits_list, sizeof(uint8_t) * (devices.end - devices.start));
-    memcpy(env.init->device_paddr_list, device_paddr_list, sizeof(uintptr_t) * (devices.end - devices.start));
-    env.init->devices = devices;
-    env.init->tsc_freq = simple_get_arch_info(&env.simple);
+
+    alloc_untypeds(&env.rump_process);
+    copy_untypeds_to_process(&test_process, &env.rump_process);
+    copy_timer_caps(env.rump_process.init, &env, &test_process);
+
+    env.rump_process.init->tsc_freq = simple_get_arch_info(&env.simple);
     /* copy the fault endpoint - we wait on the endpoint for a message
      * or a fault to see when the test finishes */
     seL4_CPtr endpoint = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.fault_endpoint.cptr);
-
     /* WARNING: DO NOT COPY MORE CAPS TO THE PROCESS BEYOND THIS POINT,
      * AS THE SLOTS WILL BE CONSIDERED FREE AND OVERRIDDEN BY THE TEST PROCESS. */
     /* set up free slot range */
-    env.init->cspace_size_bits = CONFIG_SEL4UTILS_CSPACE_SIZE_BITS;
-    env.init->free_slots.start = endpoint + 1;
-    env.init->free_slots.end = (1u << CONFIG_SEL4UTILS_CSPACE_SIZE_BITS);
-    assert(env.init->free_slots.start < env.init->free_slots.end);
-    strncpy(env.init->cmdline, RUMPCONFIG, RUMP_CONFIG_MAX);
+    env.rump_process.init->cspace_size_bits = CONFIG_SEL4UTILS_CSPACE_SIZE_BITS;
+    env.rump_process.init->free_slots.start = endpoint + 1;
+    env.rump_process.init->free_slots.end = (1u << CONFIG_SEL4UTILS_CSPACE_SIZE_BITS);
+    assert(env.rump_process.init->free_slots.start < env.rump_process.init->free_slots.end);
+    strncpy(env.rump_process.init->cmdline, RUMPCONFIG, RUMP_CONFIG_MAX);
 #ifdef SEL4_DEBUG_KERNEL
     seL4_DebugNameThread(test_process.thread.tcb.cptr, bin_name);
 #endif
@@ -450,19 +410,16 @@ void *main_continued(void *arg UNUSED)
     }
 #endif //CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
 
-    /* allocate lots of untyped memory for tests to use */
-    num_untypeds = populate_untypeds(untypeds);
-
     /* create a frame that will act as the init data, we can then map
      * into target processes */
-    env.init = (init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, INIT_DATA_NUM_FRAMES, PAGE_BITS_4K);
-    if (env.init == NULL) {
+    env.rump_process.init = (init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, INIT_DATA_NUM_FRAMES, PAGE_BITS_4K);
+    if (env.rump_process.init == NULL) {
         ZF_LOGF("Could not create init_data frame");
     }
 
     for (int i = 0; i < INIT_DATA_NUM_FRAMES; i++) {
         cspacepath_t src, dest;
-        vka_cspace_make_path(&env.vka, vspace_get_cap(&env.vspace, (((char *)env.init) + i * PAGE_SIZE_4K)), &src);
+        vka_cspace_make_path(&env.vka, vspace_get_cap(&env.vspace, (((char *)env.rump_process.init) + i * PAGE_SIZE_4K)), &src);
 
         int error = vka_cspace_alloc(&env.vka, &env.init_frame_cap_copy[i]);
         if (error) {
@@ -475,9 +432,6 @@ void *main_continued(void *arg UNUSED)
         }
     }
 
-    /* copy the untyped size bits and paddrs lists across to the init frame */
-    memcpy(env.init->untyped_size_bits_list, untyped_size_bits_list, sizeof(uint8_t) * num_untypeds);
-    memcpy(env.init->untyped_paddr_list, untyped_paddr_list, sizeof(uintptr_t) * num_untypeds);
 
     /* get the caps we need to set up a timer and serial interrupts */
     init_timer_caps(&env);

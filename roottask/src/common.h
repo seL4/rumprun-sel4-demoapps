@@ -28,6 +28,28 @@ typedef struct env *env_t;
 /* max test name size */
 #define INIT_DATA_NUM_FRAMES 2
 
+
+struct mmio {
+    uintptr_t paddr;
+    size_t size_bits;
+};
+
+/* TODO replace this with querying PCI_config to find correct hardware info */
+static const struct mmio mmios[] = {
+    {.paddr = 0xf7f00000, .size_bits = 17}, // e1000e on haswells
+    {.paddr = 0xf7f39000, .size_bits = 12}, // e1000e on haswells
+    {.paddr = 0xfebc0000, .size_bits = 17}, // e1000e on qemu
+};
+
+
+typedef struct rump_process_data {
+    init_data_t *init;
+    vka_object_t untypeds[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
+    int num_untypeds_devram;
+    int num_untypeds;
+    int num_untypeds_dev;
+} rump_process_data_t;
+
 struct env {
     /* An initialised vka that may be used by the test. */
     vka_t vka;
@@ -42,8 +64,7 @@ struct env {
     /* io port for the default timer */
     seL4_CPtr io_port_cap;
     serial_objects_t serial_objects;
-    /* init data frame vaddr */
-    init_data_t *init;
+    rump_process_data_t rump_process;
     /* extra cap to the init data frame for mapping into the remote vspace */
     seL4_CPtr init_frame_cap_copy[INIT_DATA_NUM_FRAMES];
 };
