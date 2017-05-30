@@ -20,12 +20,12 @@ else
 OBJECTBASE = hw-obj
 RRTOOLCHAIN= i486-rumprun-netbsdelf
 endif
-
+include ${PWD}/rumprun/platform/sel4/rumprunlibs.mk
 
 $(STAGE_DIR)/bin/$(RTARGET)/$(ARCHIVE): $(BAKE_TARGET) $(PROJECT_BASE)/build2/$(SEL4_ARCH)/$(OBJECTBASE)/rumprun.o | $(BAKE_TARGET)_
 	mkdir -p $(STAGE_DIR)/bin/$(RTARGET)
 ifeq ($(RTARGET), sel4)
-	rumprun-bake sel4_generic $@ $<
+	RUMPRUN_BASEDIR=$(dir $(BASEFILE)) rumprun-bake sel4_generic $@ $<
 else
 	rumprun-bake hw_generic $@ $<
 	cp -a $@ $(PROJECT_BASE)/images/$(ARCHIVE)-hw
