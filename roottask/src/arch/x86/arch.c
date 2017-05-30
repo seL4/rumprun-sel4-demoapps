@@ -22,8 +22,12 @@
 void
 arch_copy_timer_caps(init_data_t *init, env_t env, sel4utils_process_t *test_process)
 {
+    seL4_CPtr io_port_cap = simple_get_IOPort_cap(&env->simple, PIT_IO_PORT_MIN, PIT_IO_PORT_MAX);
+    if (io_port_cap == 0) {
+        ZF_LOGF("Failed to get IO port cap for range %x to %x\n", PIT_IO_PORT_MIN, PIT_IO_PORT_MAX);
+    }
     /* io port cap (since the default timer on ia32 is the PIT) */
-    init->io_port = sel4utils_copy_cap_to_process(test_process, &env->vka, env->io_port_cap);
+    init->io_port = sel4utils_copy_cap_to_process(test_process, &env->vka, io_port_cap);
 }
 
 uint64_t ccount = 0;
@@ -41,28 +45,5 @@ void count_idle(void *_arg1, void *_arg2, void *_arg3)
             COMPILER_MEMORY_FENCE();
         }
         prev = ts;
-    }
-}
-
-
-
-void
-init_timer_caps(env_t env)
-{
-    /* get the irq control cap */
-    seL4_CPtr cap;
-    int error = vka_cspace_alloc(&env->vka, &cap);
-    if (error != 0) {
-        ZF_LOGF("Failed to allocate cslot, error %d", error);
-    }
-    vka_cspace_make_path(&env->vka, cap, &env->irq_path);
-    error = simple_get_IRQ_handler(&env->simple, PIT_INTERRUPT, env->irq_path);
-    if (error != 0) {
-        ZF_LOGF("Failed to get IRQ control, error %d", error);
-    }
-
-    env->io_port_cap = simple_get_IOPort_cap(&env->simple, PIT_IO_PORT_MIN, PIT_IO_PORT_MAX);
-    if (env->io_port_cap == 0) {
-        ZF_LOGF("Failed to get IO port cap for range %x to %x\n", PIT_IO_PORT_MIN, PIT_IO_PORT_MAX);
     }
 }

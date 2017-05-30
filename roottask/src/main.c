@@ -206,13 +206,19 @@ send_init_data(env_t env, seL4_CPtr endpoint, sel4utils_process_t *process)
 
 /* copy the caps required to set up the sel4platsupport default timer */
 static void
-copy_timer_caps(init_data_t *init, env_t env, sel4utils_process_t *test_process)
+copy_timer_caps(rump_process_data_t *proc_data, env_t env, sel4utils_process_t *test_process)
 {
     /* irq cap for the timer irq */
-    init->timer_irq = sel4utils_copy_cap_to_process(test_process, &env->vka, env->irq_path.capPtr);
-    assert(init->timer_irq != 0);
+    proc_data->init->timer_irq = sel4utils_copy_cap_to_process(test_process, &env->vka, env->timer_objects.timer_irq_path.capPtr);
+    assert(proc_data->init->timer_irq != 0);
+    // Copy hpet structure
+    int current_index = proc_data->num_untypeds_devram + proc_data->num_untypeds +proc_data->num_untypeds_dev;
+    proc_data->untypeds[current_index] = env->timer_objects.timer_dev_ut_obj;
+    proc_data->init->timer_slot_index = current_index;
+    proc_data->num_untypeds_dev++;
+    arch_copy_timer_caps(proc_data->init, env, test_process);
 
-    arch_copy_timer_caps(init, env, test_process);
+
 }
 
 extern char _cpio_archive[];
@@ -323,8 +329,8 @@ run_rr(void)
     /* setup data about untypeds */
 
     alloc_untypeds(&env.rump_process);
+    copy_timer_caps(&env.rump_process, &env, &test_process);
     copy_untypeds_to_process(&test_process, &env.rump_process);
-    copy_timer_caps(env.rump_process.init, &env, &test_process);
 
     env.rump_process.init->tsc_freq = simple_get_arch_info(&env.simple);
     /* copy the fault endpoint - we wait on the endpoint for a message
@@ -434,7 +440,7 @@ void *main_continued(void *arg UNUSED)
 
 
     /* get the caps we need to set up a timer and serial interrupts */
-    init_timer_caps(&env);
+    sel4platsupport_init_default_timer_caps(&env.vka, &env.vspace, &env.simple, &env.timer_objects);
     sel4platsupport_init_default_serial_caps(&env.vka, &env.vspace, &env.simple, &env.serial_objects);
 
 

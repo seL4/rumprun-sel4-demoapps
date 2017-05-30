@@ -23,6 +23,8 @@
 #include <vspace/vspace.h>
 #include <rumprun/init_data.h>
 #include <sel4platsupport/serial.h>
+#include <sel4platsupport/timer.h>
+
 typedef struct env *env_t;
 
 /* max test name size */
@@ -57,12 +59,7 @@ struct env {
     vspace_t vspace;
     /* abtracts over kernel version and boot environment */
     simple_t simple;
-    /* path for the default timer irq handler */
-    cspacepath_t irq_path;
-    /* frame for the default timer */
-    cspacepath_t frame_path;
-    /* io port for the default timer */
-    seL4_CPtr io_port_cap;
+    timer_objects_t timer_objects;
     serial_objects_t serial_objects;
     rump_process_data_t rump_process;
     /* extra cap to the init data frame for mapping into the remote vspace */
