@@ -45,7 +45,7 @@
 
 
 /* ammount of dev_ram memory to give to Rump kernel (2gb) */
-#define RUMP_DEV_RAM_MEMORY (1 << 31)
+#define RUMP_DEV_RAM_MEMORY (1UL << 31)
 /* Number of untypeds to try and use to allocate the driver memory.
  * if we cannot get 32mb with 16 untypeds then something is probably wrong */
 #define RUMP_NUM_DEV_RAM_UNTYPEDS 20
