@@ -86,9 +86,14 @@ init_env(env_t env)
     int error;
 
     /* create an allocator */
-    allocman = bootstrap_use_current_simple(&env->simple, ALLOCATOR_STATIC_POOL_SIZE, allocator_mem_pool);
+    allocman = bootstrap_use_current_1level(simple_get_cnode(&env->simple), simple_get_cnode_size_bits(&env->simple), simple_last_valid_cap(&env->simple) +1, BIT(simple_get_cnode_size_bits(&env->simple)), ALLOCATOR_STATIC_POOL_SIZE, allocator_mem_pool);
     if (allocman == NULL) {
         ZF_LOGF("Failed to create allocman");
+    }
+    pmem_region_t region_list[1] = {0};
+    error = allocman_add_simple_untypeds_with_regions(allocman, &env->simple, 0, region_list);
+    if (error) {
+        ZF_LOGF("Failed to add simple untypeds");
     }
 
     /* create a vka (interface for interacting with the underlying allocator) */
