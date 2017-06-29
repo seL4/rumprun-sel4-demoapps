@@ -193,17 +193,17 @@ send_init_data(env_t env, seL4_CPtr endpoint, sel4utils_process_t *process)
 
 /* copy the caps required to set up the sel4platsupport default timer */
 static void
-copy_timer_caps(rump_process_data_t *proc_data, env_t env, sel4utils_process_t *test_process)
+copy_timer_caps(rump_process_data_t *proc_data, env_t env, sel4utils_process_t *process)
 {
     /* irq cap for the timer irq */
-    proc_data->init->timer_irq = sel4utils_copy_cap_to_process(test_process, &env->vka, env->timer_objects.timer_irq_path.capPtr);
+    proc_data->init->timer_irq = sel4utils_copy_cap_to_process(process, &env->vka, env->timer_objects.timer_irq_path.capPtr);
     assert(proc_data->init->timer_irq != 0);
     // Copy hpet structure
     int current_index = proc_data->num_untypeds_devram + proc_data->num_untypeds +proc_data->num_untypeds_dev;
     proc_data->untypeds[current_index] = env->timer_objects.timer_dev_ut_obj;
     proc_data->init->timer_slot_index = current_index;
     proc_data->num_untypeds_dev++;
-    arch_copy_timer_caps(proc_data->init, env, test_process);
+    arch_copy_timer_caps(proc_data->init, env, process);
 }
 
 int alloc_untypeds(rump_process_data_t *proc_data) {
@@ -229,8 +229,7 @@ int alloc_untypeds(rump_process_data_t *proc_data) {
 }
 
 
-/* Run a single test.
- * Each test is launched as its own process. */
+/* Boot Rumprun process. */
 int
 run_rr(void)
 {
@@ -248,7 +247,7 @@ run_rr(void)
         ZF_LOGV("name %d: %s\n", i, bin_name);
     }
 
-    /* parse elf region data about the test image to pass to the tests app */
+    /* parse elf region data about the image to pass to the app */
     num_elf_regions = sel4utils_elf_num_regions(bin_name);
     ZF_LOGF_IF(num_elf_regions >= MAX_REGIONS, "Invalid num elf regions");
 
@@ -262,47 +261,47 @@ run_rr(void)
     env.rump_process.init->priority = seL4_MaxPrio - 2;
 
     UNUSED int error;
-    sel4utils_process_t test_process;
+    sel4utils_process_t process;
     char* a = RUMPCONFIG;
     printf("%zd %s\n", sizeof(RUMPCONFIG), a);
     /* Test intro banner. */
     printf("  starting app\n");
 
     /* Set up rumprun process */
-    error = sel4utils_configure_process(&test_process, &env.vka, &env.vspace,
+    error = sel4utils_configure_process(&process, &env.vka, &env.vspace,
                                         env.rump_process.init->priority, bin_name);
     ZF_LOGF_IF(error, "Failed to configure process");
 
     /* set up init_data process info */
     env.rump_process.init->stack_pages = CONFIG_SEL4UTILS_STACK_SIZE / PAGE_SIZE_4K;
-    env.rump_process.init->stack = test_process.thread.stack_top - CONFIG_SEL4UTILS_STACK_SIZE;
-    env.rump_process.init->page_directory = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.pd.cptr);
+    env.rump_process.init->stack = process.thread.stack_top - CONFIG_SEL4UTILS_STACK_SIZE;
+    env.rump_process.init->page_directory = sel4utils_copy_cap_to_process(&process, &env.vka, process.pd.cptr);
 
     env.rump_process.init->root_cnode = SEL4UTILS_CNODE_SLOT;
-    env.rump_process.init->tcb = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.thread.tcb.cptr);
-    env.rump_process.init->domain = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapDomain));
-    env.rump_process.init->asid_pool = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapInitThreadASIDPool));
-    env.rump_process.init->asid_ctrl = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapASIDControl));
+    env.rump_process.init->tcb = sel4utils_copy_cap_to_process(&process, &env.vka, process.thread.tcb.cptr);
+    env.rump_process.init->domain = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapDomain));
+    env.rump_process.init->asid_pool = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapInitThreadASIDPool));
+    env.rump_process.init->asid_ctrl = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapASIDControl));
 
 #ifdef CONFIG_IOMMU
-    env.rump_process.init->io_space = sel4utils_copy_cap_to_process(&test_process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapIOSpace));
+    env.rump_process.init->io_space = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapIOSpace));
 #endif /* CONFIG_IOMMU */
 #ifdef CONFIG_ARM_SMMU
-    env.rump_process.init->io_space_caps = arch_copy_iospace_caps_to_process(&test_process, &env);
+    env.rump_process.init->io_space_caps = arch_copy_iospace_caps_to_process(&process, &env);
 #endif
-    env.rump_process.init->irq_control = move_init_cap_to_process(&test_process, simple_get_init_cap(&env.simple, seL4_CapIRQControl ));
+    env.rump_process.init->irq_control = move_init_cap_to_process(&process, simple_get_init_cap(&env.simple, seL4_CapIRQControl ));
     /* setup data about untypeds */
 
     alloc_untypeds(&env.rump_process);
-    copy_timer_caps(&env.rump_process, &env, &test_process);
-    copy_untypeds_to_process(&test_process, &env.rump_process);
+    copy_timer_caps(&env.rump_process, &env, &process);
+    copy_untypeds_to_process(&process, &env.rump_process);
 
     env.rump_process.init->tsc_freq = simple_get_arch_info(&env.simple);
     /* copy the fault endpoint - we wait on the endpoint for a message
-     * or a fault to see when the test finishes */
-    seL4_CPtr endpoint = sel4utils_copy_cap_to_process(&test_process, &env.vka, test_process.fault_endpoint.cptr);
+     * or a fault to see when the process finishes */
+    seL4_CPtr endpoint = sel4utils_copy_cap_to_process(&process, &env.vka, process.fault_endpoint.cptr);
     /* WARNING: DO NOT COPY MORE CAPS TO THE PROCESS BEYOND THIS POINT,
-     * AS THE SLOTS WILL BE CONSIDERED FREE AND OVERRIDDEN BY THE TEST PROCESS. */
+     * AS THE SLOTS WILL BE CONSIDERED FREE AND OVERRIDDEN BY THE PROCESS. */
     /* set up free slot range */
     env.rump_process.init->cspace_size_bits = CONFIG_SEL4UTILS_CSPACE_SIZE_BITS;
     env.rump_process.init->free_slots.start = endpoint + 1;
@@ -310,27 +309,27 @@ run_rr(void)
     assert(env.rump_process.init->free_slots.start < env.rump_process.init->free_slots.end);
     strncpy(env.rump_process.init->cmdline, RUMPCONFIG, RUMP_CONFIG_MAX);
 #ifdef SEL4_DEBUG_KERNEL
-    seL4_DebugNameThread(test_process.thread.tcb.cptr, bin_name);
+    seL4_DebugNameThread(process.thread.tcb.cptr, bin_name);
 #endif
-    /* set up args for the test process */
+    /* set up args for the process */
     char endpoint_string[WORD_STRING_SIZE];
     char *argv[] = {(char *)bin_name, endpoint_string};
     snprintf(endpoint_string, WORD_STRING_SIZE, "%lu", (unsigned long)endpoint);
     /* spawn the process */
-    error = sel4utils_spawn_process_v(&test_process, &env.vka, &env.vspace,
+    error = sel4utils_spawn_process_v(&process, &env.vka, &env.vspace,
                                       ARRAY_SIZE(argv), argv, 1);
     assert(error == 0);
     printf("process spawned\n");
     /* send env.init_data to the new process */
-    send_init_data(&env, test_process.fault_endpoint.cptr, &test_process);
+    send_init_data(&env, process.fault_endpoint.cptr, &process);
 
     /* wait on it to finish or fault, report result */
-    seL4_MessageInfo_t info = seL4_Recv(test_process.fault_endpoint.cptr, NULL);
+    seL4_MessageInfo_t info = seL4_Recv(process.fault_endpoint.cptr, NULL);
 
     int result = seL4_GetMR(0);
     if (seL4_MessageInfo_get_label(info) != seL4_Fault_NullFault) {
         sel4utils_print_fault_message(info, "rumprun");
-        sel4debug_dump_registers(test_process.thread.tcb.cptr);
+        sel4debug_dump_registers(process.thread.tcb.cptr);
         result = -1;
     }
     return result;
@@ -419,7 +418,7 @@ int main(void)
     info = platsupport_get_bootinfo();
 
 #ifdef SEL4_DEBUG_KERNEL
-    seL4_DebugNameThread(seL4_CapInitThreadTCB, "sel4test-driver");
+    seL4_DebugNameThread(seL4_CapInitThreadTCB, "roottask");
 #endif
     /* Check rump kernel config string length */
     compile_time_assert(rump_config_is_too_long, sizeof(RUMPCONFIG) < RUMP_CONFIG_MAX);
@@ -429,14 +428,14 @@ int main(void)
      * we are running on */
     simple_default_init_bootinfo(&env.simple, info);
 
-    /* initialise the test environment - allocator, cspace manager, vspace manager, timer */
+    /* initialise the environment - allocator, cspace manager, vspace manager, timer */
     init_env(&env);
 
     /* enable serial driver */
     platsupport_serial_setup_simple(NULL, &env.simple, &env.vka);
 
     /* switch to a bigger, safer stack with a guard page
-     * before starting the tests, resume on main_continued() */
+     * before starting Rumprun, resume on main_continued() */
     ZF_LOGI("Switching to a safer, bigger stack... ");
     fflush(stdout);
     void *res;
