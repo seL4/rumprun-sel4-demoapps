@@ -14,3 +14,10 @@ menuconfig APP_ROOTTASK
     default y
     help
         rr roottask application
+
+    config RUMPRUN_MEMORY_MiB
+        int "Number of MiB to give Rumprun instance"
+        default 16
+    depends on APP_ROOTTASK
+    help
+        Amount of memory to initialise the Rumprun instance with.

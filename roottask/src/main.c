@@ -41,8 +41,8 @@
 #define RUMP_NUM_UNTYPEDS 16
 
 
-/* ammount of dev_ram memory to give to Rump kernel (2gb) */
-#define RUMP_DEV_RAM_MEMORY (1UL << 31)
+/* ammount of dev_ram memory to give to Rump kernel */
+#define RUMP_DEV_RAM_MEMORY MiB_TO_BYTES(CONFIG_RUMPRUN_MEMORY_MiB)
 /* Number of untypeds to try and use to allocate the driver memory.
  * if we cannot get 32mb with 16 untypeds then something is probably wrong */
 #define RUMP_NUM_DEV_RAM_UNTYPEDS 20
@@ -259,6 +259,7 @@ run_rr(void)
     /* setup init priority.  Reduce by 2 so that we can have higher priority serial thread
         for benchmarking */
     env.rump_process.init->priority = seL4_MaxPrio - 2;
+    env.rump_process.init->rumprun_memory_size = RUMP_DEV_RAM_MEMORY;
 
     UNUSED int error;
     sel4utils_process_t process;
