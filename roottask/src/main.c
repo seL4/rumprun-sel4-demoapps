@@ -120,7 +120,7 @@ allocate_untypeds(vka_object_t *untypeds, size_t bytes, unsigned int max_untyped
         while (num_untypeds < max_untypeds &&
                 allocated + BIT(size_bits) <= bytes &&
                 vka_alloc_object_at_maybe_dev(&env.vka, seL4_UntypedObject, size_bits, VKA_NO_PADDR,
-                                can_use_dev, &untypeds[num_untypeds]) == 0) {
+                                              can_use_dev, &untypeds[num_untypeds]) == 0) {
             allocated += BIT(size_bits);
             num_untypeds++;
         }
@@ -198,28 +198,29 @@ copy_timer_caps(rump_process_data_t *proc_data, env_t env, sel4utils_process_t *
     proc_data->init->timer_irq = sel4utils_copy_cap_to_process(process, &env->vka, env->timer_objects.timer_irq_path.capPtr);
     assert(proc_data->init->timer_irq != 0);
     // Copy hpet structure
-    int current_index = proc_data->num_untypeds_devram + proc_data->num_untypeds +proc_data->num_untypeds_dev;
+    int current_index = proc_data->num_untypeds_devram + proc_data->num_untypeds + proc_data->num_untypeds_dev;
     proc_data->untypeds[current_index] = env->timer_objects.timer_dev_ut_obj;
     proc_data->init->timer_slot_index = current_index;
     proc_data->num_untypeds_dev++;
     arch_copy_timer_caps(proc_data->init, env, process);
 }
 
-int alloc_untypeds(rump_process_data_t *proc_data) {
+int alloc_untypeds(rump_process_data_t *proc_data)
+{
 
     // Allocate DEV_MEM memory.
     bool can_be_dev = true;
     proc_data->num_untypeds_devram = allocate_untypeds(proc_data->untypeds, RUMP_DEV_RAM_MEMORY, RUMP_NUM_DEV_RAM_UNTYPEDS, can_be_dev);
     int current_index = proc_data->num_untypeds_devram;
     can_be_dev = false;
-    proc_data->num_untypeds = allocate_untypeds(proc_data->untypeds+current_index, RUMP_UNTYPED_MEMORY, RUMP_NUM_UNTYPEDS, can_be_dev);
+    proc_data->num_untypeds = allocate_untypeds(proc_data->untypeds + current_index, RUMP_UNTYPED_MEMORY, RUMP_NUM_UNTYPEDS, can_be_dev);
     current_index += proc_data->num_untypeds;
     proc_data->num_untypeds_dev = 0;
 
     int num_untypeds = 0;
     for (int i = 0; i < ARRAY_SIZE(mmios); i++) {
         int error = vka_alloc_object_at_maybe_dev(&env.vka, seL4_UntypedObject, mmios[i].size_bits, mmios[i].paddr,
-                        true, proc_data->untypeds+current_index+num_untypeds);
+                                                  true, proc_data->untypeds + current_index + num_untypeds);
         ZF_LOGF_IF(error, "Could not allocate untyped");
         num_untypeds++;
     }

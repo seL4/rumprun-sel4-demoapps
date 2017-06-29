@@ -14,7 +14,8 @@
 #include <stdint.h>
 #include <unistd.h>
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[])
+{
     printf("Hello %s\n", argv[1]);
     sleep(1);
     printf("1sec\n");
