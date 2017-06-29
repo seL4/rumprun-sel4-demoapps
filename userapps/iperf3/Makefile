@@ -5,6 +5,9 @@ PATH2 := ${PATH}
 
 ARCHIVE = iperf3
 BAKE_TARGET = $(BUILD_DIR)/$(RTARGET)/src/iperf3
+
+RR_CONFIG = sel4_ethernet
+
 include $(PROJECT_BASE)/apps/rumpcommon.mk
 
 .PHONY: $(BAKE_TARGET)_

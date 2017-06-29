@@ -12,6 +12,8 @@ ARCHIVE = redis
 BAKE_TARGET = $(PROJECT_BASE)/projects/rumprun-packages/redis/bin/redis-server
 PATH2 := ${PATH}
 
+RR_CONFIG = sel4_ethernet
+
 include $(PROJECT_BASE)/apps/rumpcommon.mk
 
 .PHONY: $(BAKE_TARGET)_
