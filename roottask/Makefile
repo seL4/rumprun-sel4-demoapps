@@ -31,8 +31,9 @@ COMPONENTS2 := $(COMPONENTS)
 endif
 
 CMDLINE := cmdline.h
+HFILES += $(CMDLINE)
 # Need to foce main.c to recompile incase -DRUMPAPPNAME below is different.
-CFLAGS += -I$(BUILD_DIR) -DRUMPINCLUDE=\"$(CMDLINE)\"
+CFLAGS += -I$(BUILD_DIR)
 ASMFILES := $(patsubst $(SOURCE_DIR)/%,%,$(wildcard $(SOURCE_DIR)/src/arch/${ARCH}/*.S))
 ASMFILES += $(patsubst $(SOURCE_DIR)/%,%,$(wildcard $(SOURCE_DIR)/src/plat/${PLAT}/*.S))
 
@@ -44,13 +45,6 @@ LIBS = c sel4 cpio elf sel4muslcsys sel4vka sel4allocman \
 LIBS += sel4simple-default
 
 
-ifeq ($(RTARGET), sel4)
-mine: installcmdline default
-else
-mine:
-	true
-endif
-
 include $(SEL4_COMMON)/common.mk
 
 # targets to generate CPIO archive of elf files
@@ -58,11 +52,10 @@ ${COMPONENTS2}:
 	false
 
 
-.PHONY: installcmdline
-installcmdline:
-	@echo " [cmdline.h] installing cmdline.h"
+$(CMDLINE): $(PROJECT_BASE)/apps/$(notdir $(COMPONENTS2))/$(CMDLINE)
+	@echo " [$(CMDLINE)] installing $(CMDLINE)"
 	$(Q)mkdir -p $(dir $@)
-	rsync --checksum $(PROJECT_BASE)/apps/$(notdir $(COMPONENTS2))/cmdline.h cmdline.h
+	rsync --checksum $(PROJECT_BASE)/apps/$(notdir $(COMPONENTS2))/$(CMDLINE) $@
 
 
 archive.o: ${COMPONENTS2}
