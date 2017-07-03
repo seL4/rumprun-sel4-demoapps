@@ -158,9 +158,9 @@ copy_untypeds_to_process(sel4utils_process_t *process, rump_process_data_t *proc
         } else {
             untyped_is_device = ALLOCMAN_UT_DEV;
         }
-        proc_data->init->untyped_list[i].untyped_size_bits = proc_data->untypeds[i].size_bits;
-        proc_data->init->untyped_list[i].untyped_is_device = untyped_is_device;
-        proc_data->init->untyped_list[i].untyped_paddr = vka_utspace_paddr(&env.vka, proc_data->untypeds[i].ut, seL4_UntypedObject, proc_data->untypeds[i].size_bits);
+        proc_data->init->untyped_list[i].size_bits = proc_data->untypeds[i].size_bits;
+        proc_data->init->untyped_list[i].is_device = untyped_is_device;
+        proc_data->init->untyped_list[i].paddr = vka_utspace_paddr(&env.vka, proc_data->untypeds[i].ut, seL4_UntypedObject, proc_data->untypeds[i].size_bits);
         /* set up the cap range */
         if (i == 0) {
             range.start = slot;
