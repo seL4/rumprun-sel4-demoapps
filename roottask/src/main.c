@@ -35,9 +35,8 @@
 #include <rumprun/init_data.h>
 #include "cmdline.h"
 
-#define RUMP_UNTYPED_MEMORY (1 << 25)
-/* Number of untypeds to try and use to allocate the driver memory.
- * if we cannot get 32mb with 16 untypeds then something is probably wrong */
+#define RUMP_UNTYPED_MEMORY (BIT(25))
+/* Number of untypeds to try and use to allocate the driver memory. */
 #define RUMP_NUM_UNTYPEDS 16
 
 
@@ -48,10 +47,10 @@
 #define RUMP_NUM_DEV_RAM_UNTYPEDS 20
 
 /* dimensions of virtual memory for the allocator to use */
-#define ALLOCATOR_VIRTUAL_POOL_SIZE ((1 << seL4_PageBits) * 1000)
+#define ALLOCATOR_VIRTUAL_POOL_SIZE (BIT(seL4_PageBits) * 1000)
 
 /* static memory for the allocator to bootstrap with */
-#define ALLOCATOR_STATIC_POOL_SIZE ((1 << seL4_PageBits) * 20)
+#define ALLOCATOR_STATIC_POOL_SIZE (BIT(seL4_PageBits) * 20)
 static char allocator_mem_pool[ALLOCATOR_STATIC_POOL_SIZE];
 
 /* static memory for virtual memory bootstrapping */
@@ -306,7 +305,7 @@ run_rr(void)
     /* set up free slot range */
     env.rump_process.init->cspace_size_bits = CONFIG_SEL4UTILS_CSPACE_SIZE_BITS;
     env.rump_process.init->free_slots.start = endpoint + 1;
-    env.rump_process.init->free_slots.end = (1u << CONFIG_SEL4UTILS_CSPACE_SIZE_BITS);
+    env.rump_process.init->free_slots.end = BIT(CONFIG_SEL4UTILS_CSPACE_SIZE_BITS);
     assert(env.rump_process.init->free_slots.start < env.rump_process.init->free_slots.end);
     strncpy(env.rump_process.init->cmdline, RUMPCONFIG, RUMP_CONFIG_MAX);
 #ifdef SEL4_DEBUG_KERNEL
