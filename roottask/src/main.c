@@ -268,9 +268,10 @@ run_rr(void)
     /* Test intro banner. */
     printf("  starting app\n");
 
+    sel4utils_process_config_t config = process_config_default_simple(&env.simple, bin_name, env.rump_process.init->priority);
+    config = process_config_mcp(config, env.rump_process.init->priority);
     /* Set up rumprun process */
-    error = sel4utils_configure_process(&process, &env.vka, &env.vspace,
-                                        env.rump_process.init->priority, bin_name);
+    error = sel4utils_configure_process_custom(&process, &env.vka, &env.vspace, config);
     ZF_LOGF_IF(error, "Failed to configure process");
 
     /* set up init_data process info */
@@ -340,11 +341,11 @@ run_rr(void)
 int
 create_thread_handler(sel4utils_thread_entry_fn handler, int priority)
 {
-    sel4utils_thread_t new_thread;
+    sel4utils_thread_config_t thread_config = thread_config_default(&env.simple,
+        seL4_CapInitThreadCNode, seL4_NilData, seL4_CapNull, priority);
 
-    int error = sel4utils_configure_thread(&env.vka, &env.vspace, &env.vspace, seL4_CapNull,
-                                           priority, seL4_CapInitThreadCNode, seL4_NilData,
-                                           &new_thread);
+    sel4utils_thread_t new_thread;
+    int error = sel4utils_configure_thread_config(&env.vka, &env.vspace, &env.vspace, thread_config, &new_thread);
     if (error) {
         return error;
     }
