@@ -7,3 +7,4 @@ lmbench
 iperf3
 rust
 multicore_pthread
+memcached
