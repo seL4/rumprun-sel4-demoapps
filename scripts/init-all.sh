@@ -18,7 +18,7 @@ popd
 popd
 pushd ./apps
 echo "" > Kconfig
-echo "" > Kbuild
+echo "include \${PWD}/rumprun/platform/sel4/rumprunlibs.mk" > Kbuild
 # For each app in apps.txt symlink the app from userapps
 # Then also populate the Kbuild and Kconfig files
 # This populates code responsible for creating root filesystems for
@@ -45,8 +45,8 @@ for i in `cat ../projects/rumprun-sel4-demoapps/apps.txt`; do
     echo "else" >> Kbuild
     echo "FULLDIRPATH := \$(PROJECT_BASE)/\$(dirpath)" >> Kbuild
     echo "endif" >> Kbuild
-    echo "$dir-dir := \$(shell rsync -av \$(FULLDIRPATH) \\" >> Kbuild
-    echo "	\$(PROJECT_BASE)/rumprun/lib/librumprunfs_base/rootfs/ \$(PROJECT_BASE)/rumprun/lib/librumprunfs_base/rootfs2/ --delete | wc -l)" >> Kbuild
+    echo "$dir-dir := \$(shell mkdir -p \$(SEL4_RROBJ)/rootfs/ && rsync -av \$(FULLDIRPATH) \\" >> Kbuild
+    echo "	\$(PROJECT_BASE)/rumprun/lib/librumprunfs_base/rootfs/ \$(SEL4_RROBJ)/rootfs/ --delete | wc -l)" >> Kbuild
     echo "ifneq (\$($dir-dir), 4)" >> Kbuild
     echo "	export RUMPSTALE = 1" >> Kbuild
     echo "endif" >> Kbuild
