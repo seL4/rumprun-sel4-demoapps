@@ -33,24 +33,14 @@ for i in `cat ../projects/rumprun-sel4-demoapps/apps.txt`; do
     echo "  help" >> Kconfig
     echo "      Rumprun Application: $dir" >> Kconfig
 
+    echo "  config RUMPRUN_COOKFS_DIR" >> Kconfig
+    echo "  string \"cookfs directory\"" >> Kconfig
+    echo "  default \"\"" >> Kconfig
+    echo "  depends on APP_${dir^^}" >> Kconfig
+
     echo "components-\$(CONFIG_APP_${dir^^}) += $dir" >> Kbuild
     echo "roottask-components-\$(CONFIG_APP_${dir^^}) += $dir" >> Kbuild
     echo "$dir-y = rumprun" >> Kbuild
-    echo "" >> Kbuild
-    echo "ifeq (\$(CONFIG_APP_${dir^^}), y)" >> Kbuild
-    echo "dirpath:= \$(shell cat \$(PROJECT_BASE)/apps/$dir/directory.txt)" >> Kbuild
-    echo "dirpathlen := \$(shell cat \$(PROJECT_BASE)/apps/$dir/directory.txt|wc -l)" >> Kbuild
-
-    echo "ifneq (\$(dirpathlen), 1)" >> Kbuild
-    echo "else" >> Kbuild
-    echo "FULLDIRPATH := \$(PROJECT_BASE)/\$(dirpath)" >> Kbuild
-    echo "endif" >> Kbuild
-    echo "$dir-dir := \$(shell mkdir -p \$(SEL4_RROBJ)/rootfs/ && rsync -av \$(FULLDIRPATH) \\" >> Kbuild
-    echo "	\$(PROJECT_BASE)/rumprun/lib/librumprunfs_base/rootfs/ \$(SEL4_RROBJ)/rootfs/ --delete | wc -l)" >> Kbuild
-    echo "ifneq (\$($dir-dir), 4)" >> Kbuild
-    echo "	export RUMPSTALE = 1" >> Kbuild
-    echo "endif" >> Kbuild
-    echo "endif" >> Kbuild
     echo "" >> Kbuild
     echo "$dir: \$($dir-y)" >> Kbuild
     echo "" >> Kbuild

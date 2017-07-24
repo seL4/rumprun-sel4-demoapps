@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Rumprun project configuration
-# Fri Jul 14 16:11:14 2017
+# Mon Jul 24 16:35:14 2017
 #
 
 #
@@ -180,6 +180,7 @@ CONFIG_LIB_ETHDRIVER_TX_DESC_COUNT=128
 CONFIG_LIB_SEL4_ALLOCMAN=y
 CONFIG_HAVE_LIB_SEL4_ALLOCMAN=y
 CONFIG_RUMPRUN=y
+CONFIG_RUMPRUN_TMPFS_NUM_MiB=1
 CONFIG_HAVE_RUMPRUN=y
 
 #
@@ -188,6 +189,7 @@ CONFIG_HAVE_RUMPRUN=y
 CONFIG_APP_ROOTTASK=y
 CONFIG_RUMPRUN_MEMORY_MiB=64
 # CONFIG_APP_NGINX is not set
+CONFIG_RUMPRUN_COOKFS_DIR="projects/rumprun-packages/redis/images/data"
 # CONFIG_APP_HELLO is not set
 # CONFIG_APP_NETSERVER is not set
 CONFIG_APP_REDIS=y
@@ -197,6 +199,7 @@ CONFIG_APP_REDIS=y
 # CONFIG_APP_RUST is not set
 # CONFIG_APP_MULTICORE_PTHREAD is not set
 # CONFIG_APP_MEMCACHED is not set
+# CONFIG_APP_LEVELDB is not set
 
 #
 # Toolchain Options
