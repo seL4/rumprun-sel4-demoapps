@@ -9,13 +9,6 @@
 # @TAG(DATA61_BSD)
 #
 
-pushd ./rumprun
-git submodule init
-git submodule update
-pushd ./src-netbsd
-git am ../src-netbsd.patches/*
-popd
-popd
 pushd ./apps
 echo "" > Kconfig
 echo "include \${PWD}/rumprun/platform/sel4/rumprunlibs.mk" > Kbuild
