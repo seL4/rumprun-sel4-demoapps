@@ -26,11 +26,6 @@ for i in `cat ../projects/rumprun-sel4-demoapps/apps.txt`; do
     echo "  help" >> Kconfig
     echo "      Rumprun Application: $dir" >> Kconfig
 
-    echo "  config RUMPRUN_COOKFS_DIR" >> Kconfig
-    echo "  string \"cookfs directory\"" >> Kconfig
-    echo "  default \"\"" >> Kconfig
-    echo "  depends on APP_${dir^^}" >> Kconfig
-
     echo "components-\$(CONFIG_APP_${dir^^}) += $dir" >> Kbuild
     echo "roottask-components-\$(CONFIG_APP_${dir^^}) += $dir" >> Kbuild
     echo "$dir-y = rumprun" >> Kbuild

@@ -13,8 +13,6 @@ BAKE_TARGET = $(PROJECT_BASE)/projects/rumprun-packages/nginx/bin/nginx
 # Save the path
 PATH2 := ${PATH}
 
-RR_CONFIG = sel4_ethernet
-
 include $(PROJECT_BASE)/apps/rumpcommon.mk
 
 .PHONY: $(BAKE_TARGET)_

@@ -22,7 +22,13 @@ RRTOOLCHAIN= i486-rumprun-netbsdelf
 endif
 include ${PWD}/rumprun/platform/sel4/rumprunlibs.mk
 
+-include .config
+
+ifdef CONFIG_RUMPRUN_USE_PCI_ETHERNET
+RR_CONFIG ?= sel4_ethernet
+else
 RR_CONFIG ?= sel4_generic
+endif
 
 $(STAGE_DIR)/bin/$(RTARGET)/$(ARCHIVE): $(BAKE_TARGET) $(PROJECT_BASE)/build2/$(SEL4_ARCH)/$(OBJECTBASE)/rumprun.o | $(BAKE_TARGET)_
 	mkdir -p $(STAGE_DIR)/bin/$(RTARGET)

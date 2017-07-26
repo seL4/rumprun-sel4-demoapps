@@ -11,8 +11,6 @@
 ARCHIVE = rust
 BAKE_TARGET = $(SOURCE_DIR)/target/x86_64-rumprun-netbsd/debug/rust
 
-RR_CONFIG = sel4_ethernet
-
 include $(PROJECT_BASE)/apps/rumpcommon.mk
 
 .PHONY: $(BAKE_TARGET)_

@@ -30,10 +30,8 @@
 #include <vka/object_capops.h>
 
 #include <vspace/vspace.h>
-#include <cmdline.h>
 #include "common.h"
 #include <rumprun/init_data.h>
-#include "cmdline.h"
 
 #define RUMP_UNTYPED_MEMORY (BIT(25))
 /* Number of untypeds to try and use to allocate the driver memory. */

@@ -30,8 +30,7 @@ else
 COMPONENTS2 := $(COMPONENTS)
 endif
 
-CMDLINE := cmdline.h
-HFILES += $(CMDLINE)
+HDRFILES += $(wildcard $(SOURCE_DIR)/include/*)
 # Need to foce main.c to recompile incase -DRUMPAPPNAME below is different.
 CFLAGS += -I$(BUILD_DIR)
 ASMFILES := $(patsubst $(SOURCE_DIR)/%,%,$(wildcard $(SOURCE_DIR)/src/arch/${ARCH}/*.S))
@@ -50,13 +49,6 @@ include $(SEL4_COMMON)/common.mk
 # targets to generate CPIO archive of elf files
 ${COMPONENTS2}:
 	false
-
-
-$(CMDLINE): $(PROJECT_BASE)/apps/$(notdir $(COMPONENTS2))/$(CMDLINE)
-	@echo " [$(CMDLINE)] installing $(CMDLINE)"
-	$(Q)mkdir -p $(dir $@)
-	rsync --checksum $(PROJECT_BASE)/apps/$(notdir $(COMPONENTS2))/$(CMDLINE) $@
-
 
 archive.o: ${COMPONENTS2}
 	@echo " [archive.o] $(COMPONENTS2)"

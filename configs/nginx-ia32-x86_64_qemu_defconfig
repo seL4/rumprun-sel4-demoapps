@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Rumprun project configuration
-# Tue Jul 25 20:56:49 2017
+# Wed Jul 26 21:30:44 2017
 #
 
 #
@@ -186,14 +186,20 @@ CONFIG_HAVE_RUMPRUN=y
 #
 CONFIG_APP_ROOTTASK=y
 CONFIG_RUMPRUN_MEMORY_MiB=16
-# CONFIG_APP_NGINX is not set
-CONFIG_RUMPRUN_COOKFS_DIR=""
+CONFIG_RUMPRUN_COMMAND_LINE="./nginx.bin -c /data/conf/nginx.conf"
+CONFIG_RUMPRUN_COOKFS_DIR="projects/rumprun-packages/nginx/images/data"
+CONFIG_RUMPRUN_PLATFORM="x86_64_qemu.h"
+CONFIG_RUMPRUN_USE_PCI_ETHERNET=y
+CONFIG_RUMPRUN_NETWORK_IFNAME="wm0"
+CONFIG_RUMPRUN_DHCP=y
+# CONFIG_RUMPRUN_STATIC is not set
+CONFIG_APP_NGINX=y
 # CONFIG_APP_HELLO is not set
 # CONFIG_APP_NETSERVER is not set
 # CONFIG_APP_REDIS is not set
 # CONFIG_APP_PYTHON is not set
 # CONFIG_APP_LMBENCH is not set
-CONFIG_APP_IPERF3=y
+# CONFIG_APP_IPERF3 is not set
 # CONFIG_APP_RUST is not set
 # CONFIG_APP_MULTICORE_PTHREAD is not set
 # CONFIG_APP_MEMCACHED is not set

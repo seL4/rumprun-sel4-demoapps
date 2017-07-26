@@ -21,3 +21,61 @@ menuconfig APP_ROOTTASK
     depends on APP_ROOTTASK
     help
         Amount of memory to initialise the Rumprun instance with.
+
+    config RUMPRUN_COMMAND_LINE
+    string "App Command line"
+    default ""
+    depends on APP_ROOTTASK
+
+    config RUMPRUN_COOKFS_DIR
+    string "cookfs directory"
+    default ""
+    depends on APP_ROOTTASK
+
+    config RUMPRUN_PLATFORM
+        prompt "Configuration"
+        string
+        depends on APP_ROOTTASK
+        default "x86_64_qemu.h"
+        help
+            Specify which of the machines (in apps/roottask/include/roottask_platform_config) to use
+            You can add additional configurations by adding a new .h file.
+
+    config RUMPRUN_USE_PCI_ETHERNET
+        bool "PCI Ethernet"
+        depends on APP_ROOTTASK
+        default n
+        help
+            Whether to use PCI ethernet devices
+
+    config RUMPRUN_NETWORK_IFNAME
+        prompt "Interface name"
+        string
+        depends on RUMPRUN_USE_PCI_ETHERNET
+        default "wm0"
+        help
+            Network Interface name su ch as "wm0"
+
+    choice
+        prompt "Connection method"
+        default RUMPRUN_DHCP
+        depends on RUMPRUN_USE_PCI_ETHERNET
+        help
+            Select how to initialise network interface.
+        config RUMPRUN_DHCP
+            bool "DHCP"
+            help
+                Try use DHCP
+        config RUMPRUN_STATIC
+            bool "Static IP"
+            help
+                Use a static IP
+    endchoice
+
+        config RUMPRUN_NETWORK_STATIC_IP
+            prompt "Interface name"
+            string
+            depends on RUMPRUN_USE_PCI_ETHERNET && RUMPRUN_STATIC
+            default "10.0.120.101"
+            help
+                Static IP Address to use

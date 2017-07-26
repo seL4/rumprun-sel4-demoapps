@@ -24,23 +24,17 @@
 #include <rumprun/init_data.h>
 #include <sel4platsupport/serial.h>
 #include <sel4platsupport/timer.h>
+#include <roottask_platform_config/config.h>
 
 typedef struct env *env_t;
 
 #define INIT_DATA_NUM_FRAMES 2
 
 
-struct mmio {
-    uintptr_t paddr;
-    size_t size_bits;
-};
+
 
 /* TODO replace this with querying PCI_config to find correct hardware info */
-static const struct mmio mmios[] = {
-    {.paddr = 0xf7f00000, .size_bits = 17}, // e1000e on haswells
-    {.paddr = 0xf7f39000, .size_bits = 12}, // e1000e on haswells
-    {.paddr = 0xfebc0000, .size_bits = 17}, // e1000e on qemu
-};
+static const struct mmio mmios[] = CONFIG_RUMPRUN_PLATFORM_MMIOS;
 
 
 typedef struct rump_process_data {
