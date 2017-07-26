@@ -29,9 +29,10 @@ export PATH = $(PWD)/build2/rumprun/bin:$(shell printenv PATH)
 endif
 
 
-simulate-ia32:
-	qemu-system-i386 \
-		-m 512 -nographic -net nic,model=e1000 -net tap,script=no,ifname=tap0 -kernel images/kernel-ia32-pc99 \
-		-initrd images/${apps}-image-ia32-pc99 ${GDB_ATTACH}
-mqrun:
-	mq.sh run -s sandy -c "All is well" -f images/kernel-ia32-pc99 -f images/${apps}-image-ia32-pc99
+simulate:
+	qemu-system-x86_64 \
+		-m 512 -nographic -net nic,model=e1000 -net tap,script=no,ifname=tap0 -kernel images/kernel-$(SEL4_ARCH)-$(PLAT) \
+		-initrd images/${apps}-image-$(SEL4_ARCH)-$(PLAT)
+
+update_config:
+	cp .config  configs/$(roottask-components-y)-$(SEL4_ARCH)-$(CONFIG_RUMPRUN_PLATFORM:"%.h"=%)_defconfig
