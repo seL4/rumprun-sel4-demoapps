@@ -12,19 +12,19 @@
 
 #include "../../common.h"
 #include <rumprun/init_data.h>
-#include <sel4platsupport/plat/pit.h>
-#include <sel4platsupport/plat/timer.h>
-#include <platsupport/plat/serial.h>
 #include <utils/fence.h>
 #include <platsupport/arch/tsc.h>
 
+/* The current simple we use doesn't break up the ioport cap */
+#define IO_PORT_MIN 0
+#define IO_PORT_MAX 0
 /* copy the caps required to set up the sel4platsupport default timer */
 void
-arch_copy_timer_caps(init_data_t *init, env_t env, sel4utils_process_t *test_process)
+arch_copy_IOPort_cap(init_data_t *init, env_t env, sel4utils_process_t *test_process)
 {
-    seL4_CPtr io_port_cap = simple_get_IOPort_cap(&env->simple, PIT_IO_PORT_MIN, PIT_IO_PORT_MAX);
+    seL4_CPtr io_port_cap = simple_get_IOPort_cap(&env->simple, IO_PORT_MIN, IO_PORT_MAX);
     if (io_port_cap == 0) {
-        ZF_LOGF("Failed to get IO port cap for range %x to %x\n", PIT_IO_PORT_MIN, PIT_IO_PORT_MAX);
+        ZF_LOGF("Failed to get IO port cap for range %x to %x\n", IO_PORT_MIN, IO_PORT_MAX);
     }
     /* io port cap (since the default timer on ia32 is the PIT) */
     init->io_port = sel4utils_copy_cap_to_process(test_process, &env->vka, io_port_cap);

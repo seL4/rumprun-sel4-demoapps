@@ -16,7 +16,6 @@
 #include <simple/simple.h>
 #include <simple-default/simple-default.h>
 #include <sel4platsupport/platsupport.h>
-#include <sel4platsupport/plat/timer.h>
 #include <sel4platsupport/serial.h>
 #include <sel4platsupport/arch/io.h>
 #include <sel4debug/register_dump.h>
@@ -25,7 +24,6 @@
 #include <sel4utils/stack.h>
 #include <sel4utils/util.h>
 #include <vka/object.h>
-#include <platsupport/plat/pit.h>
 #include <platsupport/io.h>
 #include <vka/object_capops.h>
 
@@ -188,21 +186,6 @@ send_init_data(env_t env, seL4_CPtr endpoint, sel4utils_process_t *process)
     return remote_vaddr;
 }
 
-/* copy the caps required to set up the sel4platsupport default timer */
-static void
-copy_timer_caps(rump_process_data_t *proc_data, env_t env, sel4utils_process_t *process)
-{
-    /* irq cap for the timer irq */
-    proc_data->init->timer_irq = sel4utils_copy_cap_to_process(process, &env->vka, env->timer_objects.timer_irq_path.capPtr);
-    assert(proc_data->init->timer_irq != 0);
-    // Copy hpet structure
-    int current_index = proc_data->num_untypeds_devram + proc_data->num_untypeds + proc_data->num_untypeds_dev;
-    proc_data->untypeds[current_index] = env->timer_objects.timer_dev_ut_obj;
-    proc_data->init->timer_slot_index = current_index;
-    proc_data->num_untypeds_dev++;
-    arch_copy_timer_caps(proc_data->init, env, process);
-}
-
 int alloc_untypeds(rump_process_data_t *proc_data)
 {
 
@@ -293,7 +276,10 @@ run_rr(void)
     /* setup data about untypeds */
 
     alloc_untypeds(&env.rump_process);
-    copy_timer_caps(&env.rump_process, &env, &process);
+    error = sel4utils_copy_timer_caps_to_process(&env.rump_process.init->to, &env.timer_objects, &env.vka, &process);
+    ZF_LOGF_IF(error, "sel4utils_copy_timer_caps_to_process failed");
+
+    arch_copy_IOPort_cap(env.rump_process.init, &env, &process);
     copy_untypeds_to_process(&process, &env.rump_process);
 
     env.rump_process.init->tsc_freq = simple_get_arch_info(&env.simple);

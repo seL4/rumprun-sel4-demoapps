@@ -15,7 +15,6 @@
 #include <platsupport/plat/pit.h>
 #include <platsupport/io.h>
 #include <sel4platsupport/platsupport.h>
-#include <sel4platsupport/plat/timer.h>
 #include <sel4platsupport/arch/io.h>
 #include <sel4utils/benchmark_track.h>
 #include "common.h"
