@@ -32,7 +32,7 @@ endif
 simulate:
 	qemu-system-x86_64 \
 		-m 512 -nographic -net nic,model=e1000 -net tap,script=no,ifname=tap0 -kernel images/kernel-$(SEL4_ARCH)-$(PLAT) \
-		-initrd images/${apps}-image-$(SEL4_ARCH)-$(PLAT)
+		-initrd images/${apps}-image-$(SEL4_ARCH)-$(PLAT) -cpu Haswell
 
 update_config:
 	cp .config  configs/$(roottask-components-y)-$(SEL4_ARCH)-$(CONFIG_RUMPRUN_PLATFORM:"%.h"=%)_defconfig
