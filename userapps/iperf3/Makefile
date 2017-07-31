@@ -16,5 +16,6 @@ $(BAKE_TARGET)_: $(RTARGET)/src/iperf_config.h
 
 $(RTARGET)/src/iperf_config.h:
 	mkdir -p $(BUILD_DIR)/$(RTARGET)/
+	cd $(PROJECT_BASE)/projects/iperf && git checkout refs/tags/3.1.3 && git am $(SOURCE_DIR)/patches/*
 	cd $(BUILD_DIR)/$(RTARGET) && env -i PATH=${PATH2} CC=$(RRTOOLCHAIN)-gcc ac_cv_header_netinet_sctp_h=no \
 	$(PROJECT_BASE)/projects/iperf/configure --host=$(RRTOOLCHAIN) --enable-shared=no
