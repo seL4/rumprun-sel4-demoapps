@@ -10,20 +10,29 @@ be run the same as any other seL4 binaries.
 
 [Blogpost](https://research.csiro.au/tsblog/using-rump-kernels-to-run-unmodified-netbsd-drivers-on-sel4/)
 
-# Currently supported apps
-Where supported means you can select the config, build the project and then run the project.
-* helloworld-rumprun-ia32_defconfig
-* helloworld-rumprun-x64_defconfig
-* redis-rumprun-ia32_defconfig
-* [rust-rumprun-x64_defconfig](userapps/rust/README.md)
+# Configurations
 
-## Partially supported apps
-Where something is required after applying the config to make the app work.
-* [nginx-rumprun-ia32_defconfig](userapps/nginx/README.md)
-* [iperf-rumprun-ia32_defconfig](userapps/iperf3/README.md)
+Configurations can be found in the configs folder.  A configuration filename follows the pattern
+`$(appname)-$(seL4 architecture)-$(platform config)_defconfig`.  The configuration file contains
+built in command line arguments, networking configuration and certain memory configurations.  These
+can be changed by applying a config, and then editing the values using the visual ncurses menuconfig tool, or
+editing the .config file directly.
+
+# Currently supported apps
+(This list may be out of date.  For a more up to date list check the configs folder)
+* hello
+* iperf3
+* leveldb
+* memcached
+* multicore_pthread
+* nginx
+* redis
+* rust
 
 ## Apps that are currently broken
 * [Python](userapps/python/README.md)
+* lmbench
+* netserver
 
 # Dependencies
 * https://github.com/SEL4PROJ/sel4-tutorials/blob/master/Prerequisites.md
@@ -35,20 +44,21 @@ Where something is required after applying the config to make the app work.
 repo init -u $(GIT URL TO MANIFEST)
 repo sync
 source scripts/init-all.sh
-make helloworld-rumprun-ia32_defconfig
+make hello-x86_64-x86_64_qemu_defconfig
 make
 ```
 
-Making a bmk image (not seL4)
-```
-make RTARGET=hw
-```
 
 # Running the image
 https://wiki.sel4.systems/Hardware/IA32
 
 QEMU:
+You can run by running `make simulate` or more specifically: 
 ```
-qemu-system-i386 -m 512 -nographic -kernel images/kernel-ia32-pc99 -initrd images/roottask-image-ia32-pc99
+qemu-system-x86_64 \
+		-m 512 -nographic  -kernel images/kernel-$(SEL4_ARCH)-$(PLAT) \
+		-initrd images/roottask-image-$(SEL4_ARCH)-$(PLAT) -cpu Haswell
 # quit with Ctrl-A X
 ```
+To add QEMU networking you will also need: `-net nic,model=e1000 -net tap,script=no,ifname=tap0` which requires
+a tap network interface configured.
