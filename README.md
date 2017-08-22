@@ -28,6 +28,7 @@ editing the .config file directly.
 * nginx
 * redis
 * rust
+* [erlang](userapps/erlang/README.md)
 
 ## Apps that are currently broken
 * [Python](userapps/python/README.md)
