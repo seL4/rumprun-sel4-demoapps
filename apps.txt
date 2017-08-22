@@ -9,3 +9,4 @@ rust
 multicore_pthread
 memcached
 leveldb
+erlang
