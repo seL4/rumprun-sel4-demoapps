@@ -35,4 +35,7 @@ struct mmio {
 #define NETWORK ""
 #endif
 
-#define RUMPCONFIG "{"NETWORK", \"cmdline\": \""CONFIG_RUMPRUN_COMMAND_LINE"\",},"
+#define RUMP_ENV_VARS "\"env\": \""CONFIG_RUMPRUN_ENV_STRING"\""
+#define RUMP_CMDLINE "\"cmdline\": \""CONFIG_RUMPRUN_COMMAND_LINE"\""
+
+#define RUMPCONFIG "{"RUMP_ENV_VARS", "NETWORK", "CONFIG_RUMPRUN_EXTRA_CONFIG", "RUMP_CMDLINE",},"

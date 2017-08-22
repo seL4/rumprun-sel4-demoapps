@@ -27,6 +27,21 @@ menuconfig APP_ROOTTASK
     default ""
     depends on APP_ROOTTASK
 
+    config RUMPRUN_ENV_STRING
+    string "App environment variables"
+    default "RUMPRUN_PLATFORM=seL4"
+    depends on APP_ROOTTASK
+    help
+        Specify environment variables for your application.  Note: You need at least one environment variable
+        for the config to parse correctly.
+
+    config RUMPRUN_EXTRA_CONFIG
+    string "Extra config"
+    default ""
+    depends on APP_ROOTTASK
+    help
+        Extra configuration that will be forwarded to Rumprun.
+
     config RUMPRUN_COOKFS_DIR
     string "cookfs directory"
     default ""
