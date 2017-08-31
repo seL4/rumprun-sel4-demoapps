@@ -9,7 +9,6 @@
  *
  * @TAG(DATA61_BSD)
  */
-
 #include <autoconf.h>
 #include <rumprun/init_data.h>
 #include <platsupport/plat/pit.h>

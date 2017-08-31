@@ -9,7 +9,6 @@
  *
  * @TAG(DATA61_BSD)
  */
-
 #pragma once
 
 #define CONFIG_RUMPRUN_PLATFORM_MMIOS {{0xf7f00000, 17}, {0xf7f39000, 12}}

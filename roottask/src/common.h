@@ -10,7 +10,6 @@
  * @TAG(DATA61_BSD)
  */
 
-
 #pragma once
 #include <autoconf.h>
 #include <sel4/bootinfo.h>

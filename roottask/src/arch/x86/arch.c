@@ -9,7 +9,6 @@
  *
  * @TAG(DATA61_BSD)
  */
-
 #include "../../common.h"
 #include <rumprun/init_data.h>
 #include <utils/fence.h>

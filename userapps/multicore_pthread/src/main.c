@@ -9,7 +9,6 @@
  *
  * @TAG(DATA61_BSD)
  */
-
 #define _NETBSD_SOURCE          
 
 #include <stdio.h>

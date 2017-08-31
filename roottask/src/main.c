@@ -9,7 +9,6 @@
  *
  * @TAG(DATA61_BSD)
  */
-
 #include <autoconf.h>
 #include <allocman/bootstrap.h>
 #include <allocman/vka.h>
