@@ -10,7 +10,6 @@
 
      @TAG(DATA61_BSD)
 -->
-  -->
 
 <manifest>
     <remote name="seL4"
