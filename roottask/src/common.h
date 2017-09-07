@@ -61,6 +61,8 @@ struct env {
 extern void *log_buffer;
 #endif //CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
 
+void hog_thread(void *_arg1, void *_arg2, void *_arg3);
+
 extern uint64_t ccount;
 
 extern struct env env;

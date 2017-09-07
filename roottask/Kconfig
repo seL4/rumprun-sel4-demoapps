@@ -95,3 +95,21 @@ menuconfig APP_ROOTTASK
             default "10.0.120.101"
             help
                 Static IP Address to use
+
+    config USE_HOG_THREAD
+    bool "Use hog thread or not"
+    default n
+    depends on APP_ROOTTASK
+    help
+        This enables a thread which tries to hog the CPU.  It spins in a
+        loop and never yields.  Its purpose is for schedular related benchmarking.
+
+    config HOG_BANDWIDTH
+    range 1 100
+    int "Hog Thread bandwidth"
+    default 25
+    depends on KERNEL_RT && USE_HOG_THREAD && APP_ROOTTASK
+    help
+        This sets the periodic budget of the hog thread on the mcs version of the kernel.
+        The value is a percentage the period that the thread gets as its budget.
+        25 means that the thread's budget will be 25% of the period.

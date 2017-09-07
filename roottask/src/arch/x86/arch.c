@@ -46,3 +46,11 @@ void count_idle(void *_arg1, void *_arg2, void *_arg3)
         prev = ts;
     }
 }
+
+void __attribute__((optimize("O0"))) hog_thread(void *_arg1, void *_arg2, void *_arg3)
+{
+    while (true) {
+        COMPILER_MEMORY_FENCE();
+        asm volatile ("nop");
+    }
+}

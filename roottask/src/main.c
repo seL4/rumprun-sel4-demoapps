@@ -323,12 +323,17 @@ run_rr(void)
 }
 
 
-int
-create_thread_handler(sel4utils_thread_entry_fn handler, int priority)
+static int
+create_thread_handler(sel4utils_thread_entry_fn handler, int priority, int UNUSED timeslice)
 {
     sel4utils_thread_config_t thread_config = thread_config_default(&env.simple,
         seL4_CapInitThreadCNode, seL4_NilData, seL4_CapNull, priority);
-
+    if(config_set(CONFIG_KERNEL_RT)) {
+        thread_config.sched_params = sched_params_periodic(thread_config.sched_params, &env.simple,
+                        0, CONFIG_BOOT_THREAD_TIME_SLICE * US_IN_MS,
+                        timeslice * CONFIG_BOOT_THREAD_TIME_SLICE * (US_IN_MS /100),
+                        0, 0);
+    }
     sel4utils_thread_t new_thread;
     int error = sel4utils_configure_thread_config(&env.vka, &env.vspace, &env.vspace, thread_config, &new_thread);
     if (error) {
@@ -386,11 +391,23 @@ void *main_continued(void *arg UNUSED)
     int err = seL4_TCB_SetPriority(simple_init_cap(&env.simple, seL4_CapInitThreadTCB), seL4_MaxPrio - 1);
     ZF_LOGF_IFERR(err, "seL4_TCB_SetPriority thread failed");
     /* Create serial thread */
-    err = create_thread_handler(serial_interrupt, seL4_MaxPrio);
+    err = create_thread_handler(serial_interrupt, seL4_MaxPrio, 100);
     ZF_LOGF_IF(err, "Could not create serial thread");
     /* Create idle thread */
-    err = create_thread_handler(count_idle, 0);
+    err = create_thread_handler(count_idle, 0, 100);
     ZF_LOGF_IF(err, "Could not create idle thread");
+
+#ifdef CONFIG_USE_HOG_THREAD
+#ifndef CONFIG_HOG_BANDWIDTH
+#define CONFIG_HOG_BANDWIDTH 100
+#endif
+
+    /* Create hog thread */
+    err = create_thread_handler(hog_thread, seL4_MaxPrio - 1, CONFIG_HOG_BANDWIDTH);
+    if (err) {
+        ZF_LOGF("Could not create hog thread thread");
+    }
+#endif /* CONFIG_USE_HOG_THREAD */
 
     /* now set up and run rumprun */
     run_rr();
