@@ -272,6 +272,7 @@ run_rr(void)
     env.rump_process.init->io_space_caps = arch_copy_iospace_caps_to_process(&process, &env);
 #endif
     env.rump_process.init->irq_control = move_init_cap_to_process(&process, simple_get_init_cap(&env.simple, seL4_CapIRQControl ));
+    env.rump_process.init->sched_control = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_sched_ctrl(&env.simple, 0));
     /* setup data about untypeds */
 
     alloc_untypeds(&env.rump_process);
@@ -307,9 +308,10 @@ run_rr(void)
     printf("process spawned\n");
     /* send env.init_data to the new process */
     send_init_data(&env, process.fault_endpoint.cptr, &process);
-
+    vka_object_t reply_slot;
+    vka_alloc_reply(&env.vka, &reply_slot);
     /* wait on it to finish or fault, report result */
-    seL4_MessageInfo_t info = seL4_Recv(process.fault_endpoint.cptr, NULL);
+    seL4_MessageInfo_t info = api_recv(process.fault_endpoint.cptr, NULL, reply_slot.cptr);
 
     int result = seL4_GetMR(0);
     if (seL4_MessageInfo_get_label(info) != seL4_Fault_NullFault) {

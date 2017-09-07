@@ -130,7 +130,7 @@ void serial_interrupt(void *_arg1, void *_arg2, void *_arg3)
     while (true) {
         seL4_Word sender_badge;
         int c;
-        seL4_Recv(serial_notification.cptr, &sender_badge);
+        seL4_Wait(serial_notification.cptr, &sender_badge);
         seL4_IRQHandler_Ack(env.serial_objects.serial_irq_path.capPtr);
         while (true) {
             uint32_t hi1, lo1;
