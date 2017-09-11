@@ -12,16 +12,29 @@
 #pragma once
 
 #include <autoconf.h>
-#include CONFIG_RUMPRUN_PLATFORM
+#include <stdint.h>
+#include <stddef.h>
+#define MAX_DEVICE_NAME 20
 
 struct mmio {
     uintptr_t paddr;
     size_t size_bits;
 };
 
-#ifndef CONFIG_RUMPRUN_PLATFORM_MMIOS
-#define CONFIG_RUMPRUN_PLATFORM_MMIOS {{0xf7f00000, 17}, {0xf7f39000, 12},{0xfebc0000, 17},}
-#endif
+struct pci_addr {
+    uint32_t bus;
+    uint32_t dev;
+    uint32_t function;
+};
+
+typedef struct device {
+    char name[MAX_DEVICE_NAME];
+    int irq_num;
+    int num_mmios;
+    struct mmio *mmios;
+    struct pci_addr pci;
+} device_t;
+
 
 #ifdef CONFIG_RUMPRUN_USE_PCI_ETHERNET
 #ifdef CONFIG_RUMPRUN_STATIC
@@ -38,3 +51,6 @@ struct mmio {
 #define RUMP_CMDLINE "\"cmdline\": \""CONFIG_RUMPRUN_COMMAND_LINE"\""
 
 #define RUMPCONFIG "{"RUMP_ENV_VARS", "NETWORK", "CONFIG_RUMPRUN_EXTRA_CONFIG", "RUMP_CMDLINE",},"
+
+extern device_t devices[];
+extern int num_devices;

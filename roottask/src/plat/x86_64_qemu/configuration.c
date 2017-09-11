@@ -9,6 +9,12 @@
  *
  * @TAG(DATA61_BSD)
  */
-#pragma once
 
-#define CONFIG_RUMPRUN_PLATFORM_MMIOS {{0xf7f00000, 17}, {0xf7f39000, 12}}
+#include <utils/arith.h>
+#include <roottask_platform_config/config.h>
+
+
+struct mmio mmio0s[] = {{0xfebc0000, 17}};
+
+device_t devices[] = {{"wm0", 11, ARRAY_SIZE(mmio0s), mmio0s, {0,3,0}}};
+int num_devices = ARRAY_SIZE(devices);

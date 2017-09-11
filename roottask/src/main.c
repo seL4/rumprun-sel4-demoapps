@@ -195,14 +195,38 @@ int alloc_untypeds(rump_process_data_t *proc_data)
     can_be_dev = false;
     proc_data->num_untypeds = allocate_untypeds(proc_data->untypeds + current_index, RUMP_UNTYPED_MEMORY, RUMP_NUM_UNTYPEDS, can_be_dev);
     current_index += proc_data->num_untypeds;
-    proc_data->num_untypeds_dev = 0;
+    return 0;
+}
 
+int alloc_devices(rump_process_data_t *proc_data) {
+    proc_data->num_untypeds_dev = 0;
     int num_untypeds = 0;
-    for (int i = 0; i < ARRAY_SIZE(mmios); i++) {
-        int error = vka_alloc_object_at_maybe_dev(&env.vka, seL4_UntypedObject, mmios[i].size_bits, mmios[i].paddr,
-                                                  true, proc_data->untypeds + current_index + num_untypeds);
-        ZF_LOGF_IF(error, "Could not allocate untyped");
-        num_untypeds++;
+    int current_index = proc_data->num_untypeds_devram + proc_data->num_untypeds;
+    for (int i = 0; i < num_devices; i++) {
+        if (strcmp(CONFIG_RUMPRUN_NETWORK_IFNAME, devices[i].name) == 0) {
+            for (int j = 0; j < devices[i].num_mmios; j++) {
+                int error = vka_alloc_object_at_maybe_dev(&env.vka, seL4_UntypedObject, devices[i].mmios[j].size_bits, devices[i].mmios[j].paddr,
+                                                        true, proc_data->untypeds + current_index + num_untypeds);
+                ZF_LOGF_IF(error, "Could not allocate untyped");
+                num_untypeds++;
+            }
+            proc_data->init->interrupt_list[0].bus = devices[i].pci.bus;
+            proc_data->init->interrupt_list[0].dev = devices[i].pci.dev;
+            proc_data->init->interrupt_list[0].function = devices[i].pci.function;
+            ps_irq_t irq;
+            irq.type = PS_IOAPIC;
+            int irq_num = devices[i].irq_num;
+            irq.ioapic.vector = irq_num;
+            irq.ioapic.ioapic = 0;
+            if (irq_num >= 16) {
+                irq.ioapic.level = 1;
+                irq.ioapic.polarity = 1;
+            } else {
+                irq.ioapic.level = 0;
+                irq.ioapic.polarity = 0;
+            }
+            proc_data->init->interrupt_list[0].irq = irq;
+        }
     }
     proc_data->num_untypeds_dev = num_untypeds;
     return 0;
@@ -276,6 +300,7 @@ run_rr(void)
     /* setup data about untypeds */
 
     alloc_untypeds(&env.rump_process);
+    alloc_devices(&env.rump_process);
     error = sel4utils_copy_timer_caps_to_process(&env.rump_process.init->to, &env.timer_objects, &env.vka, &process);
     ZF_LOGF_IF(error, "sel4utils_copy_timer_caps_to_process failed");
 

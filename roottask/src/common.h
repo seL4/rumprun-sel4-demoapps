@@ -30,12 +30,6 @@ typedef struct env *env_t;
 #define INIT_DATA_NUM_FRAMES 2
 
 
-
-
-/* TODO replace this with querying PCI_config to find correct hardware info */
-static const struct mmio mmios[] = CONFIG_RUMPRUN_PLATFORM_MMIOS;
-
-
 typedef struct rump_process_data {
     init_data_t *init;
     vka_object_t untypeds[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];

@@ -198,7 +198,7 @@ CONFIG_RUMPRUN_COMMAND_LINE="bin/beam -- -no_epmd -root /opt/erlang/lib/erlang -
 CONFIG_RUMPRUN_ENV_STRING="ERL_INETRC=/opt/erlang/erl_inetrc"
 CONFIG_RUMPRUN_EXTRA_CONFIG="\"blk\":{\"source\":\"dev\",\"path\":\"/dev/ld0a\",\"fstype\":\"blk\",\"mountpoint\":\"/opt/erlang\",},\"blk\":{,\"source\":\"dev\",\"path\":\"/dev/ld1a\",\"fstype\":\"blk\",\"mountpoint\":\"/apps/erlang\",},"
 CONFIG_RUMPRUN_COOKFS_DIR="projects/rumprun-packages/redis/images/data"
-CONFIG_RUMPRUN_PLATFORM="x86_64_qemu.h"
+CONFIG_RUMPRUN_PLATFORM="x86_64_qemu"
 CONFIG_RUMPRUN_USE_PCI_ETHERNET=y
 CONFIG_RUMPRUN_NETWORK_IFNAME="wm0"
 # CONFIG_RUMPRUN_DHCP is not set

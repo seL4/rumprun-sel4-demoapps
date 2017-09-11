@@ -36,4 +36,4 @@ simulate:
 		-initrd images/${apps}-image-$(SEL4_ARCH)-$(PLAT) -cpu Haswell
 
 update_config:
-	cp .config  configs/$(roottask-components-y)-$(SEL4_ARCH)-$(CONFIG_RUMPRUN_PLATFORM:"%.h"=%)_defconfig
+	cp .config  configs/$(roottask-components-y)-$(SEL4_ARCH)-$(CONFIG_RUMPRUN_PLATFORM:"%"=%)_defconfig
