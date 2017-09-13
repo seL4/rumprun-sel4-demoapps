@@ -294,9 +294,8 @@ run_rr(void)
     env.rump_process.init->free_slots.end = BIT(CONFIG_SEL4UTILS_CSPACE_SIZE_BITS);
     assert(env.rump_process.init->free_slots.start < env.rump_process.init->free_slots.end);
     strncpy(env.rump_process.init->cmdline, RUMPCONFIG, RUMP_CONFIG_MAX);
-#ifdef SEL4_DEBUG_KERNEL
-    seL4_DebugNameThread(process.thread.tcb.cptr, bin_name);
-#endif
+    NAME_THREAD(process.thread.tcb.cptr, bin_name);
+
     /* set up args for the process */
     char endpoint_string[WORD_STRING_SIZE];
     char *argv[] = {(char *)bin_name, endpoint_string};
@@ -421,9 +420,8 @@ int main(void)
     seL4_BootInfo *info;
     info = platsupport_get_bootinfo();
 
-#ifdef SEL4_DEBUG_KERNEL
-    seL4_DebugNameThread(seL4_CapInitThreadTCB, "roottask");
-#endif
+    NAME_THREAD(seL4_CapInitThreadTCB, "roottask");
+
     /* Check rump kernel config string length */
     compile_time_assert(rump_config_is_too_long, sizeof(RUMPCONFIG) < RUMP_CONFIG_MAX);
     /* We provide two pages to transfer init data */
