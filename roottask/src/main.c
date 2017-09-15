@@ -34,6 +34,9 @@
 /* Number of untypeds to try and use to allocate the driver memory. */
 #define RUMP_NUM_UNTYPEDS 16
 
+#ifndef CONFIG_HOG_BANDWIDTH
+#define CONFIG_HOG_BANDWIDTH 100
+#endif
 
 /* ammount of dev_ram memory to give to Rump kernel */
 #define RUMP_DEV_RAM_MEMORY MiB_TO_BYTES(CONFIG_RUMPRUN_MEMORY_MiB)
@@ -417,17 +420,11 @@ void *main_continued(void *arg UNUSED)
     err = create_thread_handler(count_idle, 0, 100);
     ZF_LOGF_IF(err, "Could not create idle thread");
 
-#ifdef CONFIG_USE_HOG_THREAD
-#ifndef CONFIG_HOG_BANDWIDTH
-#define CONFIG_HOG_BANDWIDTH 100
-#endif
-
-    /* Create hog thread */
-    err = create_thread_handler(hog_thread, seL4_MaxPrio - 1, CONFIG_HOG_BANDWIDTH);
-    if (err) {
-        ZF_LOGF("Could not create hog thread thread");
+    if (config_set(CONFIG_USE_HOG_THREAD)) {
+        /* Create hog thread */
+        err = create_thread_handler(hog_thread, seL4_MaxPrio - 1, CONFIG_HOG_BANDWIDTH);
+        ZF_LOGF_IF(err, "Could not create hog thread thread");
     }
-#endif /* CONFIG_USE_HOG_THREAD */
 
     /* now set up and run rumprun */
     run_rr();
