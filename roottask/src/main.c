@@ -177,8 +177,10 @@ static void *
 send_init_data(env_t env, seL4_CPtr endpoint, sel4utils_process_t *process)
 {
     /* map the cap into remote vspace */
-    void *remote_vaddr = vspace_map_pages(&process->vspace, env->init_frame_cap_copy, NULL, seL4_AllRights, 2, PAGE_BITS_4K, 1);
-    assert(remote_vaddr != 0);
+    void *remote_vaddr = vspace_share_mem(&env->vspace, &process->vspace, env->rump_process.init,
+                                          INIT_DATA_NUM_FRAMES, PAGE_BITS_4K, seL4_AllRights, true);
+
+    ZF_LOGF_IF(remote_vaddr == NULL, "Failed to share memory with launched process");
 
     /* now send a message telling the process what address the data is at */
     seL4_MessageInfo_t info = seL4_MessageInfo_new(seL4_Fault_NullFault, 0, 0, 1);
@@ -396,16 +398,7 @@ void *main_continued(void *arg UNUSED)
     env.rump_process.init = (init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, INIT_DATA_NUM_FRAMES, PAGE_BITS_4K);
     ZF_LOGF_IF(env.rump_process.init == NULL, "Could not create init_data frame");
 
-    for (int i = 0; i < INIT_DATA_NUM_FRAMES; i++) {
-        cspacepath_t src, dest;
-        vka_cspace_make_path(&env.vka, vspace_get_cap(&env.vspace, (((char *)env.rump_process.init) + i * PAGE_SIZE_4K)), &src);
 
-        int error = vka_cspace_alloc(&env.vka, &env.init_frame_cap_copy[i]);
-        ZF_LOGF_IF(error, "Failed to alloc cap");
-        vka_cspace_make_path(&env.vka, env.init_frame_cap_copy[i], &dest);
-        error = vka_cnode_copy(&dest, &src, seL4_AllRights);
-        ZF_LOGF_IF(error, "Failed to copy cap");
-    }
 
 
     /* get the caps we need to set up a timer and serial interrupts */

@@ -48,8 +48,6 @@ struct env {
     timer_objects_t timer_objects;
     serial_objects_t serial_objects;
     rump_process_data_t rump_process;
-    /* extra cap to the init data frame for mapping into the remote vspace */
-    seL4_CPtr init_frame_cap_copy[INIT_DATA_NUM_FRAMES];
 };
 #ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
 extern void *log_buffer;
