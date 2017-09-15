@@ -56,7 +56,5 @@ typedef struct device {
 
 #define RUMPCONFIG "{"RUMP_ENV_VARS", "NETWORK", "CONFIG_RUMPRUN_EXTRA_CONFIG", "RUMP_CMDLINE",},"
 
-extern device_t devices[];
-
 int get_num_devices(void);
 device_t *get_devices(void);
