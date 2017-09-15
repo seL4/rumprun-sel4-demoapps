@@ -281,12 +281,8 @@ run_rr(void)
     /* set up init_data process info */
     env.rump_process.init->stack_pages = CONFIG_SEL4UTILS_STACK_SIZE / PAGE_SIZE_4K;
     env.rump_process.init->stack = process.thread.stack_top - CONFIG_SEL4UTILS_STACK_SIZE;
-    env.rump_process.init->page_directory = sel4utils_copy_cap_to_process(&process, &env.vka, process.pd.cptr);
 
-    env.rump_process.init->root_cnode = SEL4UTILS_CNODE_SLOT;
-    env.rump_process.init->tcb = sel4utils_copy_cap_to_process(&process, &env.vka, process.thread.tcb.cptr);
     env.rump_process.init->domain = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapDomain));
-    env.rump_process.init->asid_pool = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapInitThreadASIDPool));
     env.rump_process.init->asid_ctrl = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapASIDControl));
 
 #ifdef CONFIG_IOMMU
