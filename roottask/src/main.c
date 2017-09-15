@@ -202,36 +202,38 @@ int alloc_untypeds(rump_process_data_t *proc_data)
 }
 
 int alloc_devices(rump_process_data_t *proc_data) {
+    device_t *devices = get_devices();
     proc_data->num_untypeds_dev = 0;
-    int num_untypeds = 0;
     int current_index = proc_data->num_untypeds_devram + proc_data->num_untypeds;
-    for (int i = 0; i < num_devices; i++) {
-        if (strcmp(CONFIG_RUMPRUN_NETWORK_IFNAME, devices[i].name) == 0) {
-            for (int j = 0; j < devices[i].num_mmios; j++) {
-                int error = vka_alloc_object_at_maybe_dev(&env.vka, seL4_UntypedObject, devices[i].mmios[j].size_bits, devices[i].mmios[j].paddr,
-                                                        true, proc_data->untypeds + current_index + num_untypeds);
+    for (int i = 0; i < get_num_devices(); i++) {
+        if ((strlen(CONFIG_RUMPRUN_NETWORK_IFNAME) > 0) &&
+            (strcmp(CONFIG_RUMPRUN_NETWORK_IFNAME, devices[i].name) == 0)) {
+            int j;
+            for (j = 0; j < devices[i].num_mmios; j++) {
+                int error = vka_alloc_object_at_maybe_dev(&env.vka, seL4_UntypedObject,
+                                                          devices[i].mmios[j].size_bits,
+                                                          devices[i].mmios[j].paddr,
+                                                          true, proc_data->untypeds + current_index + j);
                 ZF_LOGF_IF(error, "Could not allocate untyped");
-                num_untypeds++;
             }
+            proc_data->num_untypeds_dev = j;
             proc_data->init->interrupt_list[0].bus = devices[i].pci.bus;
             proc_data->init->interrupt_list[0].dev = devices[i].pci.dev;
             proc_data->init->interrupt_list[0].function = devices[i].pci.function;
-            ps_irq_t irq;
-            irq.type = PS_IOAPIC;
-            int irq_num = devices[i].irq_num;
-            irq.ioapic.vector = irq_num;
-            irq.ioapic.ioapic = 0;
-            if (irq_num >= 16) {
+
+            ps_irq_t irq = {
+                .type = PS_IOAPIC,
+                .ioapic.vector = devices[i].irq_num,
+                .ioapic.ioapic = 0
+
+            };
+            if (irq.ioapic.vector >= 16) {
                 irq.ioapic.level = 1;
                 irq.ioapic.polarity = 1;
-            } else {
-                irq.ioapic.level = 0;
-                irq.ioapic.polarity = 0;
             }
             proc_data->init->interrupt_list[0].irq = irq;
         }
     }
-    proc_data->num_untypeds_dev = num_untypeds;
     return 0;
 }
 

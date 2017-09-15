@@ -36,6 +36,10 @@ typedef struct device {
 } device_t;
 
 
+#ifndef CONFIG_RUMPRUN_NETWORK_IFNAME
+#define CONFIG_RUMPRUN_NETWORK_IFNAME ""
+#endif
+
 #ifdef CONFIG_RUMPRUN_USE_PCI_ETHERNET
 #ifdef CONFIG_RUMPRUN_STATIC
 #define SUB_NETWORK "\"static\", \"addr\":\""CONFIG_RUMPRUN_NETWORK_STATIC_IP"\", \"mask\": \"24\","
@@ -53,4 +57,6 @@ typedef struct device {
 #define RUMPCONFIG "{"RUMP_ENV_VARS", "NETWORK", "CONFIG_RUMPRUN_EXTRA_CONFIG", "RUMP_CMDLINE",},"
 
 extern device_t devices[];
-extern int num_devices;
+
+int get_num_devices(void);
+device_t *get_devices(void);
