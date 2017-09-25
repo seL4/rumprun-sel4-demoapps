@@ -24,10 +24,11 @@
 #include <sel4platsupport/serial.h>
 #include <sel4platsupport/timer.h>
 #include <roottask_platform_config/config.h>
+#include <utils/page.h>
 
 typedef struct env *env_t;
 
-#define INIT_DATA_NUM_FRAMES 2
+#define INIT_DATA_NUM_FRAMES BYTES_TO_4K_PAGES(sizeof(init_data_t))
 
 
 typedef struct rump_process_data {

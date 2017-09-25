@@ -413,8 +413,7 @@ int main(void)
 
     /* Check rump kernel config string length */
     compile_time_assert(rump_config_is_too_long, sizeof(RUMPCONFIG) < RUMP_CONFIG_MAX);
-    /* We provide two pages to transfer init data */
-    compile_time_assert(init_data_fits, sizeof(init_data_t) < (PAGE_SIZE_4K * INIT_DATA_NUM_FRAMES));
+
     /* initialise libsel4simple, which abstracts away which kernel version
      * we are running on */
     simple_default_init_bootinfo(&env.simple, info);
