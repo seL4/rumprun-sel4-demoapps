@@ -74,8 +74,6 @@ void hog_thread(void *_arg1, void *_arg2, void *_arg3);
 extern uint64_t ccount;
 
 extern struct env env;
-void init_timer_caps(env_t env);
-void init_serial_caps(env_t env);
 void count_idle(void*, void*, void*);
 
 void arch_copy_IOPort_cap(init_data_t *init, env_t env, sel4utils_process_t *test_process);
