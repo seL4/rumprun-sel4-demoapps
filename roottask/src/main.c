@@ -244,28 +244,7 @@ int alloc_devices(rump_process_data_t *proc_data) {
 int
 run_rr(void)
 {
-    /* elf region data */
-    int num_elf_regions;
-    sel4utils_elf_region_t elf_regions[MAX_REGIONS];
 
-    /* Unpack elf file from cpio */
-    struct cpio_info info2;
-    cpio_info(_cpio_archive, &info2);
-    const char* bin_name;
-    for (int i = 0; i < info2.file_count; i++) {
-        unsigned long size;
-        cpio_get_entry(_cpio_archive, i, &bin_name, &size);
-        ZF_LOGV("name %d: %s\n", i, bin_name);
-    }
-
-    /* parse elf region data about the image to pass to the app */
-    num_elf_regions = sel4utils_elf_num_regions(bin_name);
-    ZF_LOGF_IF(num_elf_regions >= MAX_REGIONS, "Invalid num elf regions");
-
-    sel4utils_elf_reserve(NULL, bin_name, elf_regions);
-    /* copy the region list for the process to clone itself */
-    memcpy(env.rump_process.init->elf_regions, elf_regions, sizeof(sel4utils_elf_region_t) * num_elf_regions);
-    env.rump_process.init->num_elf_regions = num_elf_regions;
 
     /* setup init priority.  Reduce by 2 so that we can have higher priority serial thread
         for benchmarking */
@@ -288,9 +267,6 @@ run_rr(void)
     /* set up init_data process info */
     env.rump_process.init->stack_pages = CONFIG_SEL4UTILS_STACK_SIZE / PAGE_SIZE_4K;
     env.rump_process.init->stack = process.thread.stack_top - CONFIG_SEL4UTILS_STACK_SIZE;
-
-    env.rump_process.init->domain = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapDomain));
-    env.rump_process.init->asid_ctrl = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapASIDControl));
 
 #ifdef CONFIG_IOMMU
     env.rump_process.init->io_space = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapIOSpace));
