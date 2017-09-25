@@ -133,19 +133,6 @@ allocate_untypeds(vka_object_t *untypeds, size_t bytes, unsigned int max_untyped
     return num_untypeds;
 }
 
-static seL4_CPtr
-move_init_cap_to_process(sel4utils_process_t *process, seL4_CPtr cap)
-{
-    seL4_CPtr copied_cap;
-    cspacepath_t path;
-
-    vka_cspace_make_path(&env.vka, cap, &path);
-
-    copied_cap = sel4utils_move_cap_to_process(process, path, NULL);
-    ZF_LOGF_IF(copied_cap == 0, "Failed to move cap to process");
-
-    return copied_cap;
-}
 /* copy untyped caps into a processes cspace, return the cap range they can be found in */
 static int
 copy_untypeds_to_process(rump_process_t *process)
