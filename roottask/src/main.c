@@ -18,11 +18,13 @@
 #include <sel4platsupport/serial.h>
 #include <platsupport/local_time_manager.h>
 #include <sel4platsupport/arch/io.h>
+#include <sel4platsupport/io.h>
 #include <sel4debug/register_dump.h>
 #include <cpio/cpio.h>
 #include <sel4/bootinfo.h>
 #include <sel4utils/stack.h>
 #include <sel4utils/util.h>
+#include <sel4utils/time_server/client.h>
 #include <vka/object.h>
 #include <platsupport/io.h>
 #include <vka/object_capops.h>
@@ -241,12 +243,16 @@ void launch_process(const char *bin_name, int id)
     process->init = (init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, INIT_DATA_NUM_FRAMES, PAGE_BITS_4K);
     ZF_LOGF_IF(process->init == NULL, "Could not create init_data frame");
 
+    int error = tm_alloc_id_at(&env.time_manager, id);
+    ZF_LOGF_IF(error, "Failed to allocate timeout id");
 
     /* setup init priority.  Reduce by 2 so that we can have higher priority serial thread
        for benchmarking */
     process->init->priority = seL4_MaxPrio - 2;
     process->init->rumprun_memory_size = RUMP_DEV_RAM_MEMORY;
 
+    error = vka_alloc_notification(&env.vka, &process->timer_signal);
+    ZF_LOGF_IF(error, "Failed to allocate client notification");
 
     /* badge the fault endpoint to use for messages such that we can distinguish them */
     cspacepath_t badged_ep_path;
@@ -279,8 +285,9 @@ void launch_process(const char *bin_name, int id)
     vka_cspace_make_path(&env.vka, simple_get_irq_ctrl(&env.simple), &path);
     process->init->irq_control = sel4utils_move_cap_to_process(&process->process, path, NULL);
     process->init->sched_control = sel4utils_copy_cap_to_process(&process->process, &env.vka, simple_get_sched_ctrl(&env.simple, 0));
+    process->init->timer_signal = sel4utils_copy_cap_to_process(&process->process, &env.vka,
+                                                                        process->timer_signal.cptr);
 
-    error = sel4utils_copy_timer_caps_to_process(&process->process.init->to, &env.timer_objects, &env.vka, &process);
     arch_copy_IOPort_cap(process->init, &env, &process->process);
 
     /* setup data about untypeds */
@@ -323,8 +330,43 @@ void launch_process(const char *bin_name, int id)
 
     /* free the init ep */
     vka_free_object(&env.vka, &init_ep_obj);
+}
+
+static int timer_callback(uintptr_t id)
+{
+    assert(id < N_RUMP_PROCESSES);
+    /* wake up the client */
+    seL4_Signal(process_from_id(id)->timer_signal.cptr);
+    return 0;
+}
+
+static seL4_MessageInfo_t handle_timer_rpc(rump_process_t *process, int id, seL4_MessageInfo_t info)
+{
+    seL4_Word op = seL4_GetMR(0);
+    uint64_t time = 0;
+    seL4_Word error = 0;
+
+    switch (op) {
+    case SET_TIMEOUT:
+        time = sel4utils_64_get_mr(2);
+        timeout_type_t type = seL4_GetMR(1);
+        ZF_LOGF_IF(seL4_MessageInfo_get_length(info) != 2 + SEL4UTILS_64_WORDS, "invalid message length");
+        error = tm_register_cb(&env.time_manager, type, time, 0, id, timer_callback, id);
+        ZF_LOGF_IF(error, "Failed to set timeout");
+        info = seL4_MessageInfo_new(0, 0, 0, 1);
+        break;
+
+    case GET_TIME:
+        error = tm_get_time(&env.time_manager, &time);
+        ZF_LOGF_IF(error, "Failed to get time!");
+        sel4utils_64_set_mr(1, time);
+        info = seL4_MessageInfo_new(0, 0, 0, 1 + SEL4UTILS_64_WORDS);
+        break;
+    default:
+        ZF_LOGF("Unknown timer operation");
     }
-    return result;
+
+    return info;
 }
 
 /* Boot Rumprun process. */
@@ -365,14 +407,25 @@ run_rr(void)
         }
 
         seL4_Word label = seL4_MessageInfo_get_label(info);
-        if (label != seL4_Fault_NullFault) {
-            /* it's a fault */
-            sel4utils_print_fault_message(info, "rumprun");
-            sel4debug_dump_registers(rump_process->process.thread.tcb.cptr);
-            result = -1;
+        if (badge > 0 && badge <= N_RUMP_PROCESSES) {
+            reply = true;
+            rump_process_t *rump_process = process_from_id(badge);
+            if (label == TIMER_LABEL) {
+                info = handle_timer_rpc(rump_process, badge, info);
+            } else if (label != seL4_Fault_NullFault) {
+                /* it's a fault */
+                sel4utils_print_fault_message(info, "rumprun");
+                sel4debug_dump_registers(rump_process->process.thread.tcb.cptr);
+                result = -1;
+            } else {
+                ZF_LOGE("unknown message\n");
+                result = -1;
+            }
         } else {
-            ZF_LOGE("unknown message\n");
-            result = -1;
+           /* it's an irq */
+            sel4platsupport_handle_timer_irq(&env.timer, badge);
+            error = tm_update(&env.time_manager);
+            ZF_LOGF_IF(error, "failed to update time manager");
         }
     }
     return result;
@@ -430,14 +483,31 @@ void *main_continued(void *arg UNUSED)
         ZF_LOGF_IF(error, "Failed to allocate reply object");
     }
 
+    /* create a notification for the timer */
+    error = vka_alloc_notification(&env.vka, &env.timer_ntfn);
+    ZF_LOGF_IF(error, "Failed to allocate timer notification");
 
 
     /* get the caps we need to set up a timer and serial interrupts */
-    sel4platsupport_init_default_timer_caps(&env.vka, &env.vspace, &env.simple, &env.timer_objects);
     sel4platsupport_init_default_serial_caps(&env.vka, &env.vspace, &env.simple, &env.serial_objects);
 
 
-    int err = seL4_TCB_SetPriority(simple_init_cap(&env.simple, seL4_CapInitThreadTCB), seL4_MaxPrio - 1);
+    ps_io_ops_t ops = {0};
+    error = sel4platsupport_new_io_ops(env.vspace, env.vka, &ops);
+
+    ZF_LOGF_IF(error, "Failed to init malloc ops");
+    error = sel4platsupport_init_default_timer(&env.vka, &env.vspace, &env.simple, env.timer_ntfn.cptr,
+                                               &env.timer);
+
+    ZF_LOGF_IF(error, "Failed init default timer");
+
+    error = seL4_TCB_BindNotification(simple_get_tcb(&env.simple), env.timer_ntfn.cptr);
+    ZF_LOGF_IF(error, "Failed to bind timer notification and endpoint\n");
+
+    error = tm_init(&env.time_manager, &env.timer.ltimer, &ops, N_RUMP_PROCESSES);
+    ZF_LOGF_IF(error, "Failed to init time manager");
+
+    int err = seL4_TCB_SetPriority(simple_get_tcb(&env.simple), seL4_MaxPrio - 1);
     ZF_LOGF_IFERR(err, "seL4_TCB_SetPriority thread failed");
     /* Create serial thread */
     err = create_thread_handler(serial_interrupt, seL4_MaxPrio, 100);

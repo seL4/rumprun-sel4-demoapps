@@ -23,6 +23,7 @@
 #include <rumprun/init_data.h>
 #include <sel4platsupport/serial.h>
 #include <sel4platsupport/timer.h>
+#include <platsupport/time_manager.h>
 #include <roottask_platform_config/config.h>
 #include <utils/page.h>
 
@@ -38,6 +39,8 @@ typedef struct rump_process {
     int num_untypeds;
     int num_untypeds_dev;
     sel4utils_process_t process;
+    /* notification to signal client on when a timeout has expired */
+    vka_object_t timer_signal;
 } rump_process_t;
 
 struct env {
@@ -47,8 +50,14 @@ struct env {
     vspace_t vspace;
     /* abtracts over kernel version and boot environment */
     simple_t simple;
-    timer_objects_t timer_objects;
+    /* hardware timer */
+    seL4_timer_t timer;
+    /* timer manager - for timeouts */
+    time_manager_t time_manager;
+
     serial_objects_t serial_objects;
+    /* notification timer irqs come in on */
+    vka_object_t timer_ntfn;
     /* reply object to use for recv on the RT kernel */
     vka_object_t reply_obj;
     /* endpoint for root task to handle faults and rpcs on */
