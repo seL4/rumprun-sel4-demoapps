@@ -29,15 +29,16 @@
 typedef struct env *env_t;
 
 #define INIT_DATA_NUM_FRAMES BYTES_TO_4K_PAGES(sizeof(init_data_t))
+#define N_RUMP_PROCESSES 10
 
-
-typedef struct rump_process_data {
+typedef struct rump_process {
     init_data_t *init;
     vka_object_t untypeds[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
     int num_untypeds_devram;
     int num_untypeds;
     int num_untypeds_dev;
-} rump_process_data_t;
+    sel4utils_process_t process;
+} rump_process_t;
 
 struct env {
     /* An initialised vka that may be used by the test. */
@@ -48,7 +49,12 @@ struct env {
     simple_t simple;
     timer_objects_t timer_objects;
     serial_objects_t serial_objects;
-    rump_process_data_t rump_process;
+    /* reply object to use for recv on the RT kernel */
+    vka_object_t reply_obj;
+    /* endpoint for root task to handle faults and rpcs on */
+    vka_object_t ep;
+    /* list of processes */
+    rump_process_t processes[N_RUMP_PROCESSES];
 };
 #ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
 extern void *log_buffer;

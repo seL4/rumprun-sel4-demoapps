@@ -16,6 +16,7 @@
 #include <simple-default/simple-default.h>
 #include <sel4platsupport/platsupport.h>
 #include <sel4platsupport/serial.h>
+#include <platsupport/local_time_manager.h>
 #include <sel4platsupport/arch/io.h>
 #include <sel4debug/register_dump.h>
 #include <cpio/cpio.h>
@@ -62,6 +63,12 @@ extern vspace_t *muslc_this_vspace;
 extern reservation_t muslc_brk_reservation;
 extern void *muslc_brk_reservation_start;
 extern char _cpio_archive[];
+
+
+static inline rump_process_t *process_from_id(int id)
+{
+    return &env.processes[id - 1];
+}
 
 /* initialise our runtime environment */
 static void
@@ -141,24 +148,24 @@ move_init_cap_to_process(sel4utils_process_t *process, seL4_CPtr cap)
 }
 /* copy untyped caps into a processes cspace, return the cap range they can be found in */
 static int
-copy_untypeds_to_process(sel4utils_process_t *process, rump_process_data_t *proc_data)
+copy_untypeds_to_process(rump_process_t *process)
 {
     seL4_SlotRegion range = {0};
-    int total_caps = proc_data->num_untypeds_devram + proc_data->num_untypeds + proc_data->num_untypeds_dev;
+    int total_caps = process->num_untypeds_devram + process->num_untypeds + process->num_untypeds_dev;
     for (int i = 0; i < total_caps; i++) {
-        seL4_CPtr slot = sel4utils_copy_cap_to_process(process, &env.vka, proc_data->untypeds[i].cptr);
+        seL4_CPtr slot = sel4utils_copy_cap_to_process(&process->process, &env.vka, process->untypeds[i].cptr);
         /* ALLOCMAN_UT_KERNEL, ALLOCMAN_UT_DEV, ALLOCMAN_UT_DEV_MEM */
         uint8_t untyped_is_device;
-        if (i < proc_data->num_untypeds_devram) {
+        if (i < process->num_untypeds_devram) {
             untyped_is_device = ALLOCMAN_UT_DEV_MEM;
-        } else if (i < proc_data->num_untypeds_devram + proc_data->num_untypeds) {
+        } else if (i < process->num_untypeds_devram + process->num_untypeds) {
             untyped_is_device = ALLOCMAN_UT_KERNEL;
         } else {
             untyped_is_device = ALLOCMAN_UT_DEV;
         }
-        proc_data->init->untyped_list[i].size_bits = proc_data->untypeds[i].size_bits;
-        proc_data->init->untyped_list[i].is_device = untyped_is_device;
-        proc_data->init->untyped_list[i].paddr = vka_utspace_paddr(&env.vka, proc_data->untypeds[i].ut, seL4_UntypedObject, proc_data->untypeds[i].size_bits);
+        process->init->untyped_list[i].size_bits = process->untypeds[i].size_bits;
+        process->init->untyped_list[i].is_device = untyped_is_device;
+        process->init->untyped_list[i].paddr = vka_utspace_paddr(&env.vka, process->untypeds[i].ut, seL4_UntypedObject, process->untypeds[i].size_bits);
         /* set up the cap range */
         if (i == 0) {
             range.start = slot;
@@ -167,17 +174,17 @@ copy_untypeds_to_process(sel4utils_process_t *process, rump_process_data_t *proc
     }
     range.end++;
     ZF_LOGF_IF((range.end - range.start) != total_caps, "Invalid number of caps");
-    proc_data->init->untypeds = range;
+    process->init->untypeds = range;
     return 0;
 }
 
 
 /* map the init data into the process, and send the address via ipc */
 static void *
-send_init_data(env_t env, seL4_CPtr endpoint, sel4utils_process_t *process)
+send_init_data(env_t env, seL4_CPtr endpoint, rump_process_t *process)
 {
     /* map the cap into remote vspace */
-    void *remote_vaddr = vspace_share_mem(&env->vspace, &process->vspace, env->rump_process.init,
+    void *remote_vaddr = vspace_share_mem(&env->vspace, &process->process.vspace, process->init,
                                           INIT_DATA_NUM_FRAMES, PAGE_BITS_4K, seL4_AllRights, true);
 
     ZF_LOGF_IF(remote_vaddr == NULL, "Failed to share memory with launched process");
@@ -190,23 +197,23 @@ send_init_data(env_t env, seL4_CPtr endpoint, sel4utils_process_t *process)
     return remote_vaddr;
 }
 
-int alloc_untypeds(rump_process_data_t *proc_data)
+int alloc_untypeds(rump_process_t *process)
 {
 
     // Allocate DEV_MEM memory.
     bool can_be_dev = true;
-    proc_data->num_untypeds_devram = allocate_untypeds(proc_data->untypeds, RUMP_DEV_RAM_MEMORY, RUMP_NUM_DEV_RAM_UNTYPEDS, can_be_dev);
-    int current_index = proc_data->num_untypeds_devram;
+    process->num_untypeds_devram = allocate_untypeds(process->untypeds, RUMP_DEV_RAM_MEMORY, RUMP_NUM_DEV_RAM_UNTYPEDS, can_be_dev);
+    int current_index = process->num_untypeds_devram;
     can_be_dev = false;
-    proc_data->num_untypeds = allocate_untypeds(proc_data->untypeds + current_index, RUMP_UNTYPED_MEMORY, RUMP_NUM_UNTYPEDS, can_be_dev);
-    current_index += proc_data->num_untypeds;
+    process->num_untypeds = allocate_untypeds(process->untypeds + current_index, RUMP_UNTYPED_MEMORY, RUMP_NUM_UNTYPEDS, can_be_dev);
+    current_index += process->num_untypeds;
     return 0;
 }
 
-int alloc_devices(rump_process_data_t *proc_data) {
+int alloc_devices(rump_process_t *process) {
     device_t *devices = get_devices();
-    proc_data->num_untypeds_dev = 0;
-    int current_index = proc_data->num_untypeds_devram + proc_data->num_untypeds;
+    process->num_untypeds_dev = 0;
+    int current_index = process->num_untypeds_devram + process->num_untypeds;
     for (int i = 0; i < get_num_devices(); i++) {
         if ((strlen(CONFIG_RUMPRUN_NETWORK_IFNAME) > 0) &&
             (strcmp(CONFIG_RUMPRUN_NETWORK_IFNAME, devices[i].name) == 0)) {
@@ -215,13 +222,13 @@ int alloc_devices(rump_process_data_t *proc_data) {
                 int error = vka_alloc_object_at_maybe_dev(&env.vka, seL4_UntypedObject,
                                                           devices[i].mmios[j].size_bits,
                                                           devices[i].mmios[j].paddr,
-                                                          true, proc_data->untypeds + current_index + j);
+                                                          true, process->untypeds + current_index + j);
                 ZF_LOGF_IF(error, "Could not allocate untyped");
             }
-            proc_data->num_untypeds_dev = j;
-            proc_data->init->interrupt_list[0].bus = devices[i].pci.bus;
-            proc_data->init->interrupt_list[0].dev = devices[i].pci.dev;
-            proc_data->init->interrupt_list[0].function = devices[i].pci.function;
+            process->num_untypeds_dev = j;
+            process->init->interrupt_list[0].bus = devices[i].pci.bus;
+            process->init->interrupt_list[0].dev = devices[i].pci.dev;
+            process->init->interrupt_list[0].function = devices[i].pci.function;
 
             ps_irq_t irq = {
                 .type = PS_IOAPIC,
@@ -233,98 +240,156 @@ int alloc_devices(rump_process_data_t *proc_data) {
                 irq.ioapic.level = 1;
                 irq.ioapic.polarity = 1;
             }
-            proc_data->init->interrupt_list[0].irq = irq;
+            process->init->interrupt_list[0].irq = irq;
         }
     }
     return 0;
 }
 
+void launch_process(const char *bin_name, int id)
+{
+    /* create a frame that will act as the init data, we can then map
+     * into target processes */
+    rump_process_t *process = process_from_id(id);
+    process->init = (init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, INIT_DATA_NUM_FRAMES, PAGE_BITS_4K);
+    ZF_LOGF_IF(process->init == NULL, "Could not create init_data frame");
+
+
+    /* setup init priority.  Reduce by 2 so that we can have higher priority serial thread
+       for benchmarking */
+    process->init->priority = seL4_MaxPrio - 2;
+    process->init->rumprun_memory_size = RUMP_DEV_RAM_MEMORY;
+
+
+    /* badge the fault endpoint to use for messages such that we can distinguish them */
+    cspacepath_t badged_ep_path;
+    error = vka_cspace_alloc_path(&env.vka, &badged_ep_path);
+    ZF_LOGF_IF(error, "Failed to allocate path");
+        cspacepath_t ep_path;
+    vka_cspace_make_path(&env.vka, env.ep.cptr, &ep_path);
+    error = vka_cnode_mint(&badged_ep_path, &ep_path, seL4_AllRights, seL4_CapData_Badge_new(id));
+    ZF_LOGF_IF(error, "Failed to badge ep");
+
+    sel4utils_process_config_t config = process_config_default_simple(&env.simple, bin_name, process->init->priority);
+    config = process_config_mcp(config, process->init->priority);
+    config = process_config_fault_cptr(config, badged_ep_path.capPtr);
+
+    /* Set up rumprun process */
+    error = sel4utils_configure_process_custom(&process->process, &env.vka, &env.vspace, config);
+    ZF_LOGF_IF(error, "Failed to configure process");
+
+    /* set up init_data process info */
+    process->init->stack_pages = CONFIG_SEL4UTILS_STACK_SIZE / PAGE_SIZE_4K;
+    process->init->stack = process->process.thread.stack_top - CONFIG_SEL4UTILS_STACK_SIZE;
+
+#ifdef CONFIG_IOMMU
+    process->init->io_space = sel4utils_copy_cap_to_process(&process->process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapIOSpace));
+#endif /* CONFIG_IOMMU */
+#ifdef CONFIG_ARM_SMMU
+    process->init->io_space_caps = arch_copy_iospace_caps_to_process(&process->process, &env);
+#endif
+    cspacepath_t path;
+    vka_cspace_make_path(&env.vka, simple_get_irq_ctrl(&env.simple), &path);
+    process->init->irq_control = sel4utils_move_cap_to_process(&process->process, path, NULL);
+    process->init->sched_control = sel4utils_copy_cap_to_process(&process->process, &env.vka, simple_get_sched_ctrl(&env.simple, 0));
+
+    error = sel4utils_copy_timer_caps_to_process(&process->process.init->to, &env.timer_objects, &env.vka, &process);
+    arch_copy_IOPort_cap(process->init, &env, &process->process);
+
+    /* setup data about untypeds */
+    alloc_untypeds(process);
+    alloc_devices(process);
+    copy_untypeds_to_process(process);
+    process->init->tsc_freq = simple_get_arch_info(&env.simple);
+
+    /* copy the rpc endpoint - we wait on the endpoint for a message
+     * or a fault to see when the process finishes */
+    process->init->rpc_ep = sel4utils_copy_path_to_process(&process->process, badged_ep_path);
+    ZF_LOGF_IF(process->init->rpc_ep == 0, "Failed to copy rpc ep to process");
+
+    /* allocate an EP just for this process which we use to send the init data */
+    vka_object_t init_ep_obj;
+    vka_alloc_endpoint(&env.vka, &init_ep_obj);
+    seL4_CPtr init_ep = sel4utils_copy_cap_to_process(&process->process, &env.vka, init_ep_obj.cptr);
+
+    /* WARNING: DO NOT COPY MORE CAPS TO THE PROCESS BEYOND THIS POINT,
+     * AS THE SLOTS WILL BE CONSIDERED FREE AND OVERRIDDEN BY THE PROCESS. */
+    /* set up free slot range */
+    process->init->cspace_size_bits = CONFIG_SEL4UTILS_CSPACE_SIZE_BITS;
+    process->init->free_slots.start = init_ep + 1;
+    process->init->free_slots.end = BIT(CONFIG_SEL4UTILS_CSPACE_SIZE_BITS);
+    assert(process->init->free_slots.start < process->init->free_slots.end);
+    strncpy(process->init->cmdline, RUMPCONFIG, RUMP_CONFIG_MAX);
+    NAME_THREAD(process->process.thread.tcb.cptr, bin_name);
+
+    /* set up args for the process */
+    char endpoint_string[WORD_STRING_SIZE];
+    char *argv[] = {(char *)bin_name, endpoint_string};
+    snprintf(endpoint_string, WORD_STRING_SIZE, "%lu", (unsigned long) init_ep);
+    /* spawn the process */
+    error = sel4utils_spawn_process_v(&process->process, &env.vka, &env.vspace,
+                                      ARRAY_SIZE(argv), argv, 1);
+    assert(error == 0);
+    printf("process spawned\n");
+    /* send env.init_data to the new process */
+    send_init_data(&env, init_ep_obj.cptr, process);
+
+    /* free the init ep */
+    vka_free_object(&env.vka, &init_ep_obj);
+    }
+    return result;
+}
 
 /* Boot Rumprun process. */
 int
 run_rr(void)
 {
+    struct cpio_info info2;
+    cpio_info(_cpio_archive, &info2);
+    const char* bin_name;
+    for (int i = 0; i < info2.file_count; i++) {
+        unsigned long size;
+        cpio_get_entry(_cpio_archive, i, &bin_name, &size);
+        ZF_LOGV("name %d: %s\n", i, bin_name);
+    }
 
-
-    /* setup init priority.  Reduce by 2 so that we can have higher priority serial thread
-        for benchmarking */
-    env.rump_process.init->priority = seL4_MaxPrio - 2;
-    env.rump_process.init->rumprun_memory_size = RUMP_DEV_RAM_MEMORY;
-
-    UNUSED int error;
-    sel4utils_process_t process;
     char* a = RUMPCONFIG;
     printf("%zd %s\n", sizeof(RUMPCONFIG), a);
     /* Test intro banner. */
     printf("  starting app\n");
 
-    sel4utils_process_config_t config = process_config_default_simple(&env.simple, bin_name, env.rump_process.init->priority);
-    config = process_config_mcp(config, env.rump_process.init->priority);
-    /* Set up rumprun process */
-    error = sel4utils_configure_process_custom(&process, &env.vka, &env.vspace, config);
-    ZF_LOGF_IF(error, "Failed to configure process");
+    launch_process(bin_name, 1);
 
-    /* set up init_data process info */
-    env.rump_process.init->stack_pages = CONFIG_SEL4UTILS_STACK_SIZE / PAGE_SIZE_4K;
-    env.rump_process.init->stack = process.thread.stack_top - CONFIG_SEL4UTILS_STACK_SIZE;
+    /* wait on it to finish, rpc or fault, report result */
+    seL4_Word result = 0;
+    bool reply = false;
+    int error = 0;
+    seL4_MessageInfo_t info;
 
-#ifdef CONFIG_IOMMU
-    env.rump_process.init->io_space = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_init_cap(&env.simple, seL4_CapIOSpace));
-#endif /* CONFIG_IOMMU */
-#ifdef CONFIG_ARM_SMMU
-    env.rump_process.init->io_space_caps = arch_copy_iospace_caps_to_process(&process, &env);
-#endif
-    env.rump_process.init->irq_control = move_init_cap_to_process(&process, simple_get_init_cap(&env.simple, seL4_CapIRQControl ));
-    env.rump_process.init->sched_control = sel4utils_copy_cap_to_process(&process, &env.vka, simple_get_sched_ctrl(&env.simple, 0));
-    /* setup data about untypeds */
+    while (result == 0) {
+        seL4_Word badge = 0;
 
-    alloc_untypeds(&env.rump_process);
-    alloc_devices(&env.rump_process);
-    error = sel4utils_copy_timer_caps_to_process(&env.rump_process.init->to, &env.timer_objects, &env.vka, &process);
-    ZF_LOGF_IF(error, "sel4utils_copy_timer_caps_to_process failed");
+        if (reply) {
+            seL4_SetMR(0, error);
+            info = api_reply_recv(env.ep.cptr, info, &badge, env.reply_obj.cptr);
+            reply = false;
+        } else {
+            info = api_recv(env.ep.cptr, &badge, env.reply_obj.cptr);
+        }
 
-    arch_copy_IOPort_cap(env.rump_process.init, &env, &process);
-    copy_untypeds_to_process(&process, &env.rump_process);
-
-    env.rump_process.init->tsc_freq = simple_get_arch_info(&env.simple);
-    /* copy the fault endpoint - we wait on the endpoint for a message
-     * or a fault to see when the process finishes */
-    seL4_CPtr endpoint = sel4utils_copy_cap_to_process(&process, &env.vka, process.fault_endpoint.cptr);
-    /* WARNING: DO NOT COPY MORE CAPS TO THE PROCESS BEYOND THIS POINT,
-     * AS THE SLOTS WILL BE CONSIDERED FREE AND OVERRIDDEN BY THE PROCESS. */
-    /* set up free slot range */
-    env.rump_process.init->cspace_size_bits = CONFIG_SEL4UTILS_CSPACE_SIZE_BITS;
-    env.rump_process.init->free_slots.start = endpoint + 1;
-    env.rump_process.init->free_slots.end = BIT(CONFIG_SEL4UTILS_CSPACE_SIZE_BITS);
-    assert(env.rump_process.init->free_slots.start < env.rump_process.init->free_slots.end);
-    strncpy(env.rump_process.init->cmdline, RUMPCONFIG, RUMP_CONFIG_MAX);
-    NAME_THREAD(process.thread.tcb.cptr, bin_name);
-
-    /* set up args for the process */
-    char endpoint_string[WORD_STRING_SIZE];
-    char *argv[] = {(char *)bin_name, endpoint_string};
-    snprintf(endpoint_string, WORD_STRING_SIZE, "%lu", (unsigned long)endpoint);
-    /* spawn the process */
-    error = sel4utils_spawn_process_v(&process, &env.vka, &env.vspace,
-                                      ARRAY_SIZE(argv), argv, 1);
-    assert(error == 0);
-    printf("process spawned\n");
-    /* send env.init_data to the new process */
-    send_init_data(&env, process.fault_endpoint.cptr, &process);
-    vka_object_t reply_slot;
-    vka_alloc_reply(&env.vka, &reply_slot);
-    /* wait on it to finish or fault, report result */
-    seL4_MessageInfo_t info = api_recv(process.fault_endpoint.cptr, NULL, reply_slot.cptr);
-
-    int result = seL4_GetMR(0);
-    if (seL4_MessageInfo_get_label(info) != seL4_Fault_NullFault) {
-        sel4utils_print_fault_message(info, "rumprun");
-        sel4debug_dump_registers(process.thread.tcb.cptr);
-        result = -1;
+        seL4_Word label = seL4_MessageInfo_get_label(info);
+        if (label != seL4_Fault_NullFault) {
+            /* it's a fault */
+            sel4utils_print_fault_message(info, "rumprun");
+            sel4debug_dump_registers(rump_process->process.thread.tcb.cptr);
+            result = -1;
+        } else {
+            ZF_LOGE("unknown message\n");
+            result = -1;
+        }
     }
     return result;
 }
-
 
 static int
 create_thread_handler(sel4utils_thread_entry_fn handler, int priority, int UNUSED timeslice)
@@ -369,11 +434,14 @@ void *main_continued(void *arg UNUSED)
     ZF_LOGF_IFERR(res_buf, "Could not set log buffer");
 #endif //CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
 
-    /* create a frame that will act as the init data, we can then map
-     * into target processes */
-    env.rump_process.init = (init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, INIT_DATA_NUM_FRAMES, PAGE_BITS_4K);
-    ZF_LOGF_IF(env.rump_process.init == NULL, "Could not create init_data frame");
+    int error = vka_alloc_endpoint(&env.vka, &env.ep);
+    ZF_LOGF_IF(error, "Failed to allocate endpoint");
 
+    /* allocate reply object */
+    if (config_set(CONFIG_KERNEL_RT)) {
+        error = vka_alloc_reply(&env.vka, &env.reply_obj);
+        ZF_LOGF_IF(error, "Failed to allocate reply object");
+    }
 
 
 
