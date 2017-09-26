@@ -113,7 +113,7 @@ void serial_interrupt(void *_arg1, void *_arg2, void *_arg3)
     if (error != 0) {
         ZF_LOGF("seL4_IRQHandler_SetNotification failed\n");
     }
-    ps_io_ops_t io_ops;
+    ps_io_ops_t io_ops = {0};
     sel4platsupport_get_io_port_ops(&io_ops.io_port_ops, &env.simple);
 
 #if defined(CONFIG_LIB_SEL4_PLAT_SUPPORT_USE_SEL4_DEBUG_PUTCHAR) && defined(CONFIG_DEBUG_BUILD)
