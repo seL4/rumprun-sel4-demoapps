@@ -25,6 +25,7 @@
 #include <sel4utils/stack.h>
 #include <sel4utils/util.h>
 #include <sel4utils/time_server/client.h>
+#include <serial_server/parent.h>
 #include <vka/object.h>
 #include <platsupport/io.h>
 #include <vka/object_capops.h>
@@ -301,6 +302,10 @@ void launch_process(const char *bin_name, int id)
     process->init->rpc_ep = sel4utils_copy_path_to_process(&process->process, badged_ep_path);
     ZF_LOGF_IF(process->init->rpc_ep == 0, "Failed to copy rpc ep to process");
 
+    /* set up a serial server ep */
+    process->init->serial_ep = serial_server_parent_mint_endpoint_to_process(&process->process);
+    ZF_LOGF_IF(process->init->serial_ep == 0, "Failed to copy rpc serial ep to process");
+
     /* allocate an EP just for this process which we use to send the init data */
     vka_object_t init_ep_obj;
     vka_alloc_endpoint(&env.vka, &init_ep_obj);
@@ -487,6 +492,9 @@ void *main_continued(void *arg UNUSED)
     error = vka_alloc_notification(&env.vka, &env.timer_ntfn);
     ZF_LOGF_IF(error, "Failed to allocate timer notification");
 
+    /* start the serial server thread */
+    error = serial_server_parent_spawn_thread(&env.simple, &env.vka, &env.vspace, seL4_MaxPrio - 1);
+    ZF_LOGF_IF(error, "Failed to spawn serial server thread");
 
     /* get the caps we need to set up a timer and serial interrupts */
     sel4platsupport_init_default_serial_caps(&env.vka, &env.vspace, &env.simple, &env.serial_objects);
@@ -507,7 +515,7 @@ void *main_continued(void *arg UNUSED)
     error = tm_init(&env.time_manager, &env.timer.ltimer, &ops, N_RUMP_PROCESSES);
     ZF_LOGF_IF(error, "Failed to init time manager");
 
-    int err = seL4_TCB_SetPriority(simple_get_tcb(&env.simple), seL4_MaxPrio - 1);
+    int err = seL4_TCB_SetPriority(simple_get_tcb(&env.simple), seL4_MaxPrio);
     ZF_LOGF_IFERR(err, "seL4_TCB_SetPriority thread failed");
     /* Create serial thread */
     err = create_thread_handler(serial_interrupt, seL4_MaxPrio, 100);
