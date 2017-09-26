@@ -49,6 +49,8 @@
         <linkfile src="libsel4muslcsys" dest="libs/libsel4muslcsys"/>
         <linkfile src="libsel4platsupport" dest="libs/libsel4platsupport"/>
         <linkfile src="libsel4utils" dest="libs/libsel4utils"/>
+        <linkfile src="libsel4serialserver" dest="libs/libsel4serialserver"/>
+        <linkfile src="libsel4test" dest="libs/libsel4test"/>
         <linkfile src="libsel4sync" dest="libs/libsel4sync"/>
         <linkfile src="libsel4vspace" dest="libs/libsel4vspace"/>
         <linkfile src="libsel4vka" dest="libs/libsel4vka"/>

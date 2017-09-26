@@ -16,7 +16,8 @@ apps-$(CONFIG_APP_ROOTTASK)        += roottask
 roottask-y                          = common libsel4 libmuslc libsel4vka libcpio libelf \
                                       libsel4allocman  \
                                       libsel4platsupport libsel4platsupport libsel4muslcsys \
-                                      libsel4simple libsel4vspace libsel4utils libutils libsel4debug libsel4sync
+                                      libsel4simple libsel4vspace libsel4utils libutils libsel4debug \
+                                      libsel4sync libsel4serialserver
 
 # set up correct simple lib for our kernel
 roottask-y += libsel4simple-default
