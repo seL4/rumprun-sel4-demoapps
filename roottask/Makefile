@@ -52,6 +52,7 @@ include $(SEL4_COMMON)/common.mk
 ${COMPONENTS2}:
 	false
 
+.PHONY: archive.o
 archive.o: ${COMPONENTS2}
 	@echo " [archive.o] $(COMPONENTS2)"
 	$(Q)mkdir -p $(dir $@)
