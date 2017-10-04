@@ -502,11 +502,13 @@ void *main_continued(void *arg UNUSED)
 
     ps_io_ops_t ops = {0};
     error = sel4platsupport_new_io_ops(env.vspace, env.vka, &ops);
+    ZF_LOGF_IF(error, "Failed to init io ops");
 
-    ZF_LOGF_IF(error, "Failed to init malloc ops");
-    error = sel4platsupport_init_default_timer(&env.vka, &env.vspace, &env.simple, env.timer_ntfn.cptr,
-                                               &env.timer);
+    error = sel4platsupport_new_arch_ops(&ops, &env.simple);
+    ZF_LOGF_IF(error, "Failed to init arch ops");
 
+    error = sel4platsupport_init_default_timer_ops(&env.vka, &env.vspace, &env.simple, ops,
+                                                   env.timer_ntfn.cptr, &env.timer);
     ZF_LOGF_IF(error, "Failed init default timer");
 
     error = seL4_TCB_BindNotification(simple_get_tcb(&env.simple), env.timer_ntfn.cptr);
