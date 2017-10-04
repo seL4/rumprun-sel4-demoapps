@@ -307,9 +307,8 @@ void launch_process(const char *bin_name, int id)
     ZF_LOGF_IF(process->init->serial_ep == 0, "Failed to copy rpc serial ep to process");
 
     /* allocate an EP just for this process which we use to send the init data */
-    vka_object_t init_ep_obj;
-    vka_alloc_endpoint(&env.vka, &init_ep_obj);
-    seL4_CPtr init_ep = sel4utils_copy_cap_to_process(&process->process, &env.vka, init_ep_obj.cptr);
+    vka_alloc_endpoint(&env.vka, &process->init_ep_obj);
+    seL4_CPtr init_ep = sel4utils_copy_cap_to_process(&process->process, &env.vka, process->init_ep_obj.cptr);
 
     /* WARNING: DO NOT COPY MORE CAPS TO THE PROCESS BEYOND THIS POINT,
      * AS THE SLOTS WILL BE CONSIDERED FREE AND OVERRIDDEN BY THE PROCESS. */
@@ -331,10 +330,8 @@ void launch_process(const char *bin_name, int id)
     assert(error == 0);
     printf("process spawned\n");
     /* send env.init_data to the new process */
-    send_init_data(&env, init_ep_obj.cptr, process);
+    send_init_data(&env, process->init_ep_obj.cptr, process);
 
-    /* free the init ep */
-    vka_free_object(&env.vka, &init_ep_obj);
 }
 
 static int timer_callback(uintptr_t id)
