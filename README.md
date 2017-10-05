@@ -40,6 +40,10 @@ editing the .config file directly.
 * redis
 * rust
 * [erlang](userapps/erlang/README.md)
+* [susan](userapps/susan/README.md)
+* [cjpeg](userapps/cjpeg/README.md)
+* [djpeg](userapps/djpeg/README.md)
+* [mad](userapps/mad/README.md)
 
 ## Apps that are currently broken
 * [Python](userapps/python/README.md)
