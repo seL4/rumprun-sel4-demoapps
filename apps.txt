@@ -11,3 +11,6 @@ memcached
 leveldb
 erlang
 susan
+cjpeg
+djpeg
+mad
