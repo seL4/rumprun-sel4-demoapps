@@ -111,6 +111,12 @@ init_env(rump_env_t *env)
 
     bootstrap_configure_virtual_pool(allocman, vaddr,
                                      ALLOCATOR_VIRTUAL_POOL_SIZE, simple_get_pd(&env->simple));
+
+    error = sel4platsupport_new_io_ops(env->vspace, env->vka, &env->ops);
+    ZF_LOGF_IF(error, "Failed to init io ops");
+
+    error = sel4platsupport_new_arch_ops(&env->ops, &env->simple);
+    ZF_LOGF_IF(error, "Failed to init arch ops");
 }
 
 /* Allocate untypeds till either a certain number of bytes is allocated
@@ -497,21 +503,15 @@ void *main_continued(void *arg UNUSED)
     sel4platsupport_init_default_serial_caps(&env.vka, &env.vspace, &env.simple, &env.serial_objects);
 
 
-    ps_io_ops_t ops = {0};
-    error = sel4platsupport_new_io_ops(env.vspace, env.vka, &ops);
-    ZF_LOGF_IF(error, "Failed to init io ops");
 
-    error = sel4platsupport_new_arch_ops(&ops, &env.simple);
-    ZF_LOGF_IF(error, "Failed to init arch ops");
-
-    error = sel4platsupport_init_default_timer_ops(&env.vka, &env.vspace, &env.simple, ops,
-                                                   env.timer_ntfn.cptr, &env.timer);
+    error = sel4platsupport_init_default_timer_ops(&env.vka, &env.vspace, &env.simple,
+                                                   env.ops, env.timer_ntfn.cptr, &env.timer);
     ZF_LOGF_IF(error, "Failed init default timer");
 
     error = seL4_TCB_BindNotification(simple_get_tcb(&env.simple), env.timer_ntfn.cptr);
     ZF_LOGF_IF(error, "Failed to bind timer notification and endpoint\n");
 
-    error = tm_init(&env.time_manager, &env.timer.ltimer, &ops, N_RUMP_PROCESSES);
+    error = tm_init(&env.time_manager, &env.timer.ltimer, &env.ops, N_RUMP_PROCESSES);
     ZF_LOGF_IF(error, "Failed to init time manager");
 
     int err = seL4_TCB_SetPriority(simple_get_tcb(&env.simple), seL4_MaxPrio);
@@ -554,7 +554,7 @@ int main(void)
     init_env(&env);
 
     /* enable serial driver */
-    platsupport_serial_setup_simple(NULL, &env.simple, &env.vka);
+    platsupport_serial_setup_io_ops(&env.ops);
 
     /* switch to a bigger, safer stack with a guard page
      * before starting Rumprun, resume on main_continued() */

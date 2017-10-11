@@ -55,7 +55,8 @@ typedef struct rump_env {
     seL4_timer_t timer;
     /* timer manager - for timeouts */
     time_manager_t time_manager;
-
+    /* operations for hardware io */
+    ps_io_ops_t ops;
     serial_objects_t serial_objects;
     /* notification timer irqs come in on */
     vka_object_t timer_ntfn;
