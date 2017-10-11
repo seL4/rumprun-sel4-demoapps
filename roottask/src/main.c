@@ -29,10 +29,15 @@
 #include <vka/object.h>
 #include <platsupport/io.h>
 #include <vka/object_capops.h>
+#include <arch_stdio.h>
 
 #include <vspace/vspace.h>
 #include "common.h"
 #include <rumprun/init_data.h>
+
+/* the serial badge is the next bit after the bits taken by the next process badge */
+#define SERIAL_BADGE_BIT (seL4_WordBits - CLZL((seL4_Word) N_RUMP_PROCESSES) + 1llu)
+#define SERIAL_BADGE (BIT(SERIAL_BADGE_BIT))
 
 #define RUMP_UNTYPED_MEMORY (BIT(25))
 /* Number of untypeds to try and use to allocate the driver memory. */
@@ -431,6 +436,10 @@ run_rr(void)
             }
         } else {
            /* it's an irq */
+            if (badge & SERIAL_BADGE) {
+                seL4_IRQHandler_Ack(env.serial_objects.serial_irq_path.capPtr);
+                handle_char(&env, __arch_getchar());
+            }
             sel4platsupport_handle_timer_irq(&env.timer, badge);
             error = tm_update(&env.time_manager);
             ZF_LOGF_IF(error, "failed to update time manager");
@@ -516,9 +525,21 @@ void *main_continued(void *arg UNUSED)
 
     int err = seL4_TCB_SetPriority(simple_get_tcb(&env.simple), seL4_MaxPrio);
     ZF_LOGF_IFERR(err, "seL4_TCB_SetPriority thread failed");
-    /* Create serial thread */
-    err = create_thread_handler(serial_interrupt, seL4_MaxPrio, 100);
-    ZF_LOGF_IF(err, "Could not create serial thread");
+
+    /* badge the irq_ntfn for serial */
+    cspacepath_t src, dest;
+    error = vka_cspace_alloc_path(&env.vka, &dest);
+    ZF_LOGF_IF(error, "Failed to allocate cslot");
+
+    vka_cspace_make_path(&env.vka, env.irq_ntfn.cptr, &src);
+    error = vka_cnode_mint(&dest, &src, seL4_AllRights, seL4_CapData_Badge_new(SERIAL_BADGE));
+    ZF_LOGF_IFERR(error, "Failed to mint cap");
+
+    /* Bind serial input to badged ntfn */
+    error = seL4_IRQHandler_SetNotification(env.serial_objects.serial_irq_path.capPtr,
+                                            dest.capPtr);
+    ZF_LOGF_IFERR(error, "Failed to bind serial irq");
+
     /* Create idle thread */
     err = create_thread_handler(count_idle, 0, 100);
     ZF_LOGF_IF(err, "Could not create idle thread");

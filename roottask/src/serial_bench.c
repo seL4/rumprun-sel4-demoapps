@@ -13,6 +13,7 @@
 #include <rumprun/init_data.h>
 #include <platsupport/plat/pit.h>
 #include <platsupport/io.h>
+#include <platsupport/arch/tsc.h>
 #include <sel4platsupport/platsupport.h>
 #include <sel4platsupport/arch/io.h>
 #include <sel4utils/benchmark_track.h>
@@ -95,109 +96,67 @@ seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, ui
     printf("vmf: %"PRId32" c: %"PRIx64"\n", vmfault_entries, vmfault_time);
 }
 #endif // CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
-uint64_t cpucount;
-uint64_t cpucount2;
-int __plat_serial_init(ps_io_ops_t* io_ops);
 
-void serial_interrupt(void *_arg1, void *_arg2, void *_arg3)
+void handle_char(rump_env_t *env, int c)
 {
-    vka_object_t serial_notification;
-    int error = vka_alloc_notification(&env.vka, &serial_notification);
-    if (error != 0) {
-        ZF_LOGF("Failed to allocate notification object");
-    }
+    /* stateful vars for input char processing */
+    static int pos = 0;
+    static uint64_t cpucount = 0;
+    static uint64_t cpucount2 = 0;
+    static char reset_buffer[] = "reset";
 
-
-    error = seL4_IRQHandler_SetNotification(env.serial_objects.serial_irq_path.capPtr, serial_notification.cptr);
-    if (error != 0) {
-        ZF_LOGF("seL4_IRQHandler_SetNotification failed\n");
-    }
-    ps_io_ops_t io_ops = {0};
-    sel4platsupport_get_io_port_ops(&io_ops.io_port_ops, &env.simple);
-
-#if defined(CONFIG_LIB_SEL4_PLAT_SUPPORT_USE_SEL4_DEBUG_PUTCHAR) && defined(CONFIG_DEBUG_BUILD)
-    /* We need to initialise the platform serial if CONFIG_LIB_SEL4_PLAT_SUPPORT_USE_SEL4_DEBUG_PUTCHAR
-    is set as it won't have happened yet and is a prerequisite for using __arch_getchar() */
-    error = __plat_serial_init(&io_ops);
-    if (error != 0) {
-        ZF_LOGF("__plat_serial_init failed\n");
-    }
-#endif
-
-    char reset_buffer[] = "reset";
-    int pos = 0;
-    while (true) {
-        seL4_Word sender_badge;
-        int c;
-        seL4_Wait(serial_notification.cptr, &sender_badge);
-        seL4_IRQHandler_Ack(env.serial_objects.serial_irq_path.capPtr);
-        while (true) {
-            uint32_t hi1, lo1;
-            /* get next character */
-            c = __arch_getchar();
-            if (c == -1) {
-                break;
-            }
-
-            /* Reset machine if "reset" received over serial */
-            if (c == reset_buffer[pos]) {
-                pos++;
-                if (pos == 5) {
-                    ps_io_port_out(&io_ops.io_port_ops, 0x64, 1, 0xFE);
-                }
-            } else {
-                pos = 0;
-            }
-
-            /* If a character start benchmarking (reset everything) */
-            if (c == 'a') {
-
-#ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
-                /* Reset log buffer */
-                if (log_buffer == NULL) {
-                    ZF_LOGF("A user-level buffer has to be set before resetting benchmark.\
-                            Use seL4_BenchmarkSetLogBuffer\n");
-                }
-                int error = seL4_BenchmarkResetLog();
-                if (error) {
-                    ZF_LOGF("Could not reset log");
-                }
-#endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
-                /* Record tsc count */
-                __asm__ __volatile__ ( "rdtsc" : "=a" (lo1), "=d" (hi1));
-                cpucount = ((uint64_t) hi1) << 32llu | (uint64_t) lo1;
-                ccount = 0;
-            }
-
-            /* Stop benchmarking when 'b' character */
-            if (c == 'b') {
-                /* Record finish time */
-                __asm__ __volatile__ ( "rdtsc" : "=a" (lo1), "=d" (hi1));
-                cpucount2 = ((uint64_t) hi1) << 32llu | (uint64_t) lo1;
-
-#ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
-                /* Stop recording kernel entries */
-                logIndexFinalized = seL4_BenchmarkFinalizeLog();
-#endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
-                /* Print total cycles and idle cycles to serial */
-                printf("tot: %"PRIx64"\n idle: %"PRIx64"\n", cpucount2 - cpucount, ccount);
-            }
-            if (c == 'c') {
-#ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
-                benchmark_track_kernel_entry_t *ksLog = (benchmark_track_kernel_entry_t *) log_buffer;
-                printf("dumping log: %"PRId32", %zd %zd\n", logIndexFinalized, sizeof(benchmark_track_kernel_entry_t), sizeof(kernel_entry_t));
-                seL4_BenchmarkTrackDumpSummary_pri(ksLog, logIndexFinalized);//ksLogIndexFinalized);
-#endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
-            }
-
-            /* print char received */
-            if (c == '\r') {
-                __arch_putchar('\n');
-            } else {
-                __arch_putchar(c);
-            }
+    /* Reset machine if "reset" received over serial */
+    if (c == reset_buffer[pos]) {
+        pos++;
+        if (pos == strlen(reset_buffer)) {
+            ps_io_port_out(&env->ops.io_port_ops, 0x64, 1, 0xFE);
+            /* DOES NOT RETURN - resets machine */
         }
-
+    } else {
+        pos = 0;
     }
 
+    switch (c) {
+    case -1:
+        return;
+    case 'a':
+#ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
+        /* Reset log buffer */
+        ZF_LOGF_IF(log_buffer == NULL,
+                   "A user-level buffer has to be set before resetting benchmark.\
+                   Use seL4_BenchmarkSetLogBuffer\n");
+        int error = seL4_BenchmarkResetLog();
+        ZF_LOGF_IF(error, "Could not reset log");
+#endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
+        /* Record tsc count */
+        cpucount = rdtsc_pure();
+        break;
+    case 'b':
+        /* Stop benchmarking when 'b' character */
+        /* Record finish time */
+        cpucount2 = rdtsc_pure();
+#ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
+        /* Stop recording kernel entries */
+        logIndexFinalized = seL4_BenchmarkFinalizeLog();
+#endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
+        printf("tot: %"PRIx64"\n idle: %"PRIx64"\n", cpucount2 - cpucount, ccount);
+        break;
+    case 'c':
+#ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
+        benchmark_track_kernel_entry_t *ksLog = (benchmark_track_kernel_entry_t *) log_buffer;
+        printf("dumping log: %"PRId32", %zd %zd\n", logIndexFinalized,
+                sizeof(benchmark_track_kernel_entry_t), sizeof(kernel_entry_t));
+        seL4_BenchmarkTrackDumpSummary_pri(ksLog, logIndexFinalized);//ksLogIndexFinalized);
+#endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
+        break;
+    default:
+        break;
+    }
+
+    /* print char received */
+    if (c == '\r') {
+        __arch_putchar('\n');
+    } else {
+       __arch_putchar(c);
+    }
 }
