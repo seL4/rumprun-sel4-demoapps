@@ -492,7 +492,7 @@ void *main_continued(void *arg UNUSED)
     }
 
     /* create a notification for the timer */
-    error = vka_alloc_notification(&env.vka, &env.timer_ntfn);
+    error = vka_alloc_notification(&env.vka, &env.irq_ntfn);
     ZF_LOGF_IF(error, "Failed to allocate timer notification");
 
     /* start the serial server thread */
@@ -505,10 +505,10 @@ void *main_continued(void *arg UNUSED)
 
 
     error = sel4platsupport_init_default_timer_ops(&env.vka, &env.vspace, &env.simple,
-                                                   env.ops, env.timer_ntfn.cptr, &env.timer);
+                                                   env.ops, env.irq_ntfn.cptr, &env.timer);
     ZF_LOGF_IF(error, "Failed init default timer");
 
-    error = seL4_TCB_BindNotification(simple_get_tcb(&env.simple), env.timer_ntfn.cptr);
+    error = seL4_TCB_BindNotification(simple_get_tcb(&env.simple), env.irq_ntfn.cptr);
     ZF_LOGF_IF(error, "Failed to bind timer notification and endpoint\n");
 
     error = tm_init(&env.time_manager, &env.timer.ltimer, &env.ops, N_RUMP_PROCESSES);

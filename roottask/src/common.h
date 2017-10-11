@@ -58,8 +58,8 @@ typedef struct rump_env {
     /* operations for hardware io */
     ps_io_ops_t ops;
     serial_objects_t serial_objects;
-    /* notification timer irqs come in on */
-    vka_object_t timer_ntfn;
+    /* notification timer and serial input come in on */
+    vka_object_t irq_ntfn;
     /* reply object to use for recv on the RT kernel */
     vka_object_t reply_obj;
     /* endpoint for root task to handle faults and rpcs on */
