@@ -522,8 +522,8 @@ void *main_continued(void *arg UNUSED)
     error = tm_init(&env.time_manager, &env.timer.ltimer, &env.ops, N_RUMP_PROCESSES);
     ZF_LOGF_IF(error, "Failed to init time manager");
 
-    int err = seL4_TCB_SetPriority(simple_get_tcb(&env.simple), seL4_MaxPrio);
-    ZF_LOGF_IFERR(err, "seL4_TCB_SetPriority thread failed");
+    error = seL4_TCB_SetPriority(simple_get_tcb(&env.simple), seL4_MaxPrio);
+    ZF_LOGF_IFERR(error, "seL4_TCB_SetPriority thread failed");
 
     /* badge the irq_ntfn for serial */
     cspacepath_t src, dest;
@@ -540,13 +540,13 @@ void *main_continued(void *arg UNUSED)
     ZF_LOGF_IFERR(error, "Failed to bind serial irq");
 
     /* Create idle thread */
-    err = create_thread_handler(count_idle, 0, 100);
-    ZF_LOGF_IF(err, "Could not create idle thread");
+    error = create_thread_handler(count_idle, 0, 100);
+    ZF_LOGF_IF(error, "Could not create idle thread");
 
     if (config_set(CONFIG_USE_HOG_THREAD)) {
         /* Create hog thread */
-        err = create_thread_handler(hog_thread, seL4_MaxPrio - 1, CONFIG_HOG_BANDWIDTH);
-        ZF_LOGF_IF(err, "Could not create hog thread thread");
+        error = create_thread_handler(hog_thread, seL4_MaxPrio - 1, CONFIG_HOG_BANDWIDTH);
+        ZF_LOGF_IF(error, "Could not create hog thread thread");
     }
 
     /* now set up and run rumprun */
