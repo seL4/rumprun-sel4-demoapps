@@ -52,9 +52,9 @@ typedef struct device {
 #endif
 
 #define RUMP_ENV_VARS "\"env\": \""CONFIG_RUMPRUN_ENV_STRING"\""
-#define RUMP_CMDLINE "\"cmdline\": \""CONFIG_RUMPRUN_COMMAND_LINE"\""
+#define RUMP_CMDLINE_FMT "\"cmdline\": \"%s\""
 
-#define RUMPCONFIG "{"RUMP_ENV_VARS", "NETWORK", "CONFIG_RUMPRUN_EXTRA_CONFIG", "RUMP_CMDLINE",},"
+#define RUMPCONFIG "{"RUMP_ENV_VARS", "NETWORK", "CONFIG_RUMPRUN_EXTRA_CONFIG", "RUMP_CMDLINE_FMT",},"
 
 int get_num_devices(void);
 device_t *get_devices(void);

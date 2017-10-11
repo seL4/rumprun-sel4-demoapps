@@ -247,8 +247,14 @@ int alloc_devices(rump_process_t *process) {
     return 0;
 }
 
-void launch_process(const char *bin_name, int id)
+void launch_process(const char *bin_name, const char *cmdline, int id)
 {
+    /* check rump kernel config string length */
+    if (strlen(RUMPCONFIG) + strlen(cmdline) > RUMP_CONFIG_MAX) {
+        ZF_LOGE("cmdline too long!");
+        return;
+    }
+
     /* create a frame that will act as the init data, we can then map
      * into target processes */
     rump_process_t *process = process_from_id(id);
@@ -328,7 +334,7 @@ void launch_process(const char *bin_name, int id)
     process->init->free_slots.start = init_ep + 1;
     process->init->free_slots.end = BIT(CONFIG_SEL4UTILS_CSPACE_SIZE_BITS);
     assert(process->init->free_slots.start < process->init->free_slots.end);
-    strncpy(process->init->cmdline, RUMPCONFIG, RUMP_CONFIG_MAX);
+    snprintf(process->init->cmdline, RUMP_CONFIG_MAX, RUMPCONFIG, cmdline);
     NAME_THREAD(process->process.thread.tcb.cptr, bin_name);
 
     /* set up args for the process */
@@ -395,11 +401,10 @@ run_rr(void)
         ZF_LOGV("name %d: %s\n", i, bin_name);
     }
 
-    char* a = RUMPCONFIG;
-    ZF_LOGV("%zd %s\n", sizeof(RUMPCONFIG), a);
+    ZF_LOGV(RUMP_CMDLINE_FMT, bin_name);
     ZF_LOGV("  starting app\n");
 
-    launch_process(bin_name, 1);
+    launch_process(bin_name, CONFIG_RUMPRUN_COMMAND_LINE, 1);
 
     /* wait on it to finish, rpc or fault, report result */
     seL4_Word result = 0;
@@ -562,9 +567,6 @@ int main(void)
     info = platsupport_get_bootinfo();
 
     NAME_THREAD(seL4_CapInitThreadTCB, "roottask");
-
-    /* Check rump kernel config string length */
-    compile_time_assert(rump_config_is_too_long, sizeof(RUMPCONFIG) < RUMP_CONFIG_MAX);
 
     /* initialise libsel4simple, which abstracts away which kernel version
      * we are running on */
