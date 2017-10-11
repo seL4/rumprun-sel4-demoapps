@@ -18,10 +18,9 @@
 #include <sel4utils/benchmark_track.h>
 #include "common.h"
 #include <sel4/benchmark_track_types.h>
+#include <arch_stdio.h>
 /* This file is for dumping benchmark results over serial to an external receiver */
 
-void __arch_putchar(char);
-char __arch_getchar(void);
 /* Print out a summary of what has been tracked */
 #ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
 static inline void
