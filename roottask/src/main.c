@@ -339,7 +339,7 @@ void launch_process(const char *bin_name, int id)
     error = sel4utils_spawn_process_v(&process->process, &env.vka, &env.vspace,
                                       ARRAY_SIZE(argv), argv, 1);
     assert(error == 0);
-    printf("process spawned\n");
+    ZF_LOGV("process spawned\n");
     /* send env.init_data to the new process */
     send_init_data(&env, process->init_ep_obj.cptr, process);
 
@@ -396,9 +396,8 @@ run_rr(void)
     }
 
     char* a = RUMPCONFIG;
-    printf("%zd %s\n", sizeof(RUMPCONFIG), a);
-    /* Test intro banner. */
-    printf("  starting app\n");
+    ZF_LOGV("%zd %s\n", sizeof(RUMPCONFIG), a);
+    ZF_LOGV("  starting app\n");
 
     launch_process(bin_name, 1);
 
