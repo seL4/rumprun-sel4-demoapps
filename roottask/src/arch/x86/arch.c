@@ -19,7 +19,7 @@
 #define IO_PORT_MAX 0
 /* copy the caps required to set up the sel4platsupport default timer */
 void
-arch_copy_IOPort_cap(init_data_t *init, env_t env, sel4utils_process_t *test_process)
+arch_copy_IOPort_cap(init_data_t *init, rump_env_t *env, sel4utils_process_t *test_process)
 {
     seL4_CPtr io_port_cap = simple_get_IOPort_cap(&env->simple, IO_PORT_MIN, IO_PORT_MAX);
     if (io_port_cap == 0) {

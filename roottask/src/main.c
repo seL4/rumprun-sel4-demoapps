@@ -60,7 +60,7 @@ static sel4utils_alloc_data_t data;
 
 
 /* environment encapsulating allocation interfaces etc */
-struct env env;
+static rump_env_t env = {0};
 
 extern vspace_t *muslc_this_vspace;
 extern reservation_t muslc_brk_reservation;
@@ -75,7 +75,7 @@ static inline rump_process_t *process_from_id(int id)
 
 /* initialise our runtime environment */
 static void
-init_env(env_t env)
+init_env(rump_env_t *env)
 {
     allocman_t *allocman;
     reservation_t virtual_reservation;
@@ -171,7 +171,7 @@ copy_untypeds_to_process(rump_process_t *process)
 
 /* map the init data into the process, and send the address via ipc */
 static void *
-send_init_data(env_t env, seL4_CPtr endpoint, rump_process_t *process)
+send_init_data(rump_env_t *env, seL4_CPtr endpoint, rump_process_t *process)
 {
     /* map the cap into remote vspace */
     void *remote_vaddr = vspace_share_mem(&env->vspace, &process->process.vspace, process->init,
