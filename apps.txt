@@ -13,4 +13,4 @@ erlang
 susan
 cjpeg
 djpeg
-mad
+madplay
