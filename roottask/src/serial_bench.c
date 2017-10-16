@@ -139,7 +139,7 @@ void handle_char(rump_env_t *env, int c)
         /* Stop recording kernel entries */
         logIndexFinalized = seL4_BenchmarkFinalizeLog();
 #endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
-        printf("tot: %"PRIx64"\n idle: %"PRIx64"\n", cpucount2 - cpucount, ccount);
+        printf("tot: %"PRIu64"\n idle: %"PRIu64"\n", cpucount2 - cpucount, ccount);
         break;
     case 'c':
 #ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
