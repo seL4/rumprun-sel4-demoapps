@@ -103,6 +103,7 @@ void handle_char(rump_env_t *env, int c)
     static int pos = 0;
     static uint64_t cpucount = 0;
     static uint64_t cpucount2 = 0;
+    static uint64_t start_idle_count = 0;
     static char reset_buffer[] = "reset";
 
     /* Reset machine if "reset" received over serial */
@@ -130,6 +131,7 @@ void handle_char(rump_env_t *env, int c)
 #endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
         /* Record tsc count */
         cpucount = rdtsc_pure();
+        start_idle_count = ccount;
         break;
     case 'b':
         /* Stop benchmarking when 'b' character */
@@ -139,7 +141,7 @@ void handle_char(rump_env_t *env, int c)
         /* Stop recording kernel entries */
         logIndexFinalized = seL4_BenchmarkFinalizeLog();
 #endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
-        printf("tot: %"PRIu64"\n idle: %"PRIu64"\n", cpucount2 - cpucount, ccount);
+        printf("tot: %"PRIu64"\n idle: %"PRIu64"\n", cpucount2 - cpucount, ccount-start_idle_count);
         break;
     case 'c':
 #ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
