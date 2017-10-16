@@ -10,7 +10,7 @@
 # @TAG(DATA61_BSD)
 #
 ARCHIVE = redis
-BAKE_TARGET = $(PROJECT_BASE)/projects/rumprun-packages/redis/bin/redis-server
+BAKE_TARGET = $(BUILD_DIR)/bin/redis-server
 PATH2 := ${PATH}
 
 include $(PROJECT_BASE)/apps/rumpcommon.mk
@@ -18,4 +18,4 @@ include $(PROJECT_BASE)/apps/rumpcommon.mk
 .PHONY: $(BAKE_TARGET)_
 $(BAKE_TARGET)_:
 	cd $(PROJECT_BASE)/projects/rumprun-packages/redis && \
-	env -i PATH=${PATH2} RUMPRUN_TOOLCHAIN_TUPLE=$(RRTOOLCHAIN) make cache
+	env -i PATH=${PATH2} BUILD_DIR=$(BUILD_DIR) RUMPRUN_TOOLCHAIN_TUPLE=$(RRTOOLCHAIN) make redis-server
