@@ -19,7 +19,12 @@
     <remote name="seL4-projects"
         fetch="../seL4proj"
     />
-    
+
+
+    <remote name="rumprun-packages"
+        fetch="https://github.com/rumpkernel/"
+    />
+
     <remote name="iperf"
         fetch="https://github.com/esnet/"
     />
@@ -30,7 +35,7 @@
     />
 
     <!-- list of 'projects' (i.e repositories), path is relative to the path in remote above -->
-    <project name="seL4" path="kernel" revision="new-rt">
+    <project name="seL4" path="kernel">
         <linkfile src="libsel4" dest="libs/libsel4"/>
     </project>
 
@@ -66,7 +71,7 @@
 
     <project name="musllibc" revision="sel4" path="libs/libmuslc"/>
 
-    <project name="rumprun-sel4-demoapps" remote="seL4-projects" revision="kent-redisbench" path="projects/rumprun-sel4-demoapps">
+    <project name="rumprun-sel4-demoapps" remote="seL4-projects" path="projects/rumprun-sel4-demoapps">
         <!-- symlinks to make the project structure fit the build system -->
         <linkfile src="Kconfig" dest="Kconfig"/>
         <linkfile src="Kbuild" dest="Kbuild" />
@@ -77,9 +82,9 @@
         <linkfile src="README.md" dest="README.md"/>
     </project>
 
-    <project name="rumprun" remote="seL4-projects" path="rumprun" revision="kent-redis-bench" />
+    <project name="rumprun" remote="seL4-projects" path="rumprun"/>
 
-    <project name="rumprun-packages" remote="seL4-projects" path="projects/rumprun-packages"/>
+    <project name="rumprun-packages" remote="rumprun-packages" path="projects/rumprun-packages"/>
 
     <project name="leveldb" remote="seL4-projects" revision="sel4" path="projects/leveldb"/>
 
