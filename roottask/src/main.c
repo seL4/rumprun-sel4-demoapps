@@ -258,6 +258,7 @@ void launch_process(const char *bin_name, const char *cmdline, int id)
     /* create a frame that will act as the init data, we can then map
      * into target processes */
     rump_process_t *process = process_from_id(id);
+    process->bin_name = bin_name;
     process->init = (init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, INIT_DATA_NUM_FRAMES, PAGE_BITS_4K);
     ZF_LOGF_IF(process->init == NULL, "Could not create init_data frame");
 
@@ -431,7 +432,7 @@ run_rr(void)
                 info = handle_timer_rpc(rump_process, badge, info);
             } else if (label != seL4_Fault_NullFault) {
                 /* it's a fault */
-                sel4utils_print_fault_message(info, "rumprun");
+                sel4utils_print_fault_message(info, rump_process->bin_name);
                 sel4debug_dump_registers(rump_process->process.thread.tcb.cptr);
                 result = -1;
             } else {

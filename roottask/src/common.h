@@ -42,6 +42,7 @@ typedef struct rump_process {
     /* notification to signal client on when a timeout has expired */
     vka_object_t timer_signal;
     vka_object_t init_ep_obj;
+    const char *bin_name;
 } rump_process_t;
 
 typedef struct rump_env {
