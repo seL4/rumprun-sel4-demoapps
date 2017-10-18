@@ -20,11 +20,6 @@
         fetch="../seL4proj"
     />
 
-
-    <remote name="rumprun-packages"
-        fetch="https://github.com/rumpkernel/"
-    />
-
     <remote name="iperf"
         fetch="https://github.com/esnet/"
     />
@@ -84,7 +79,7 @@
 
     <project name="rumprun" remote="seL4-projects" path="rumprun"/>
 
-    <project name="rumprun-packages" remote="rumprun-packages" path="projects/rumprun-packages"/>
+    <project name="rumprun-packages" remote="seL4-projects" path="projects/rumprun-packages"/>
 
     <project name="leveldb" remote="seL4-projects" revision="sel4" path="projects/leveldb"/>
 
