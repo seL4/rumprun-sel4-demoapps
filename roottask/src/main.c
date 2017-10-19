@@ -443,7 +443,11 @@ run_rr(void)
            /* it's an irq */
             if (badge & SERIAL_BADGE) {
                 seL4_IRQHandler_Ack(env.serial_objects.serial_irq_path.capPtr);
-                handle_char(&env, __arch_getchar());
+                char c = -1;
+                do {
+                    c = __arch_getchar();
+                    handle_char(&env, c);
+                } while (c != -1);
             }
             sel4platsupport_handle_timer_irq(&env.timer, badge);
             error = tm_update(&env.time_manager);
