@@ -66,7 +66,7 @@
 
     <project name="musllibc" revision="sel4" path="libs/libmuslc"/>
 
-    <project name="rumprun-sel4-demoapps" remote="seL4-projects" path="projects/rumprun-sel4-demoapps">
+    <project name="rumprun-sel4-demoapps" remote="seL4-projects" revision="refs/tags/eurosys18" path="projects/rumprun-sel4-demoapps">
         <!-- symlinks to make the project structure fit the build system -->
         <linkfile src="Kconfig" dest="Kconfig"/>
         <linkfile src="Kbuild" dest="Kbuild" />
