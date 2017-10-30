@@ -27,6 +27,8 @@ arch_copy_IOPort_cap(init_data_t *init, rump_env_t *env, sel4utils_process_t *te
     }
     /* io port cap (since the default timer on ia32 is the PIT) */
     init->io_port = sel4utils_copy_cap_to_process(test_process, &env->vka, io_port_cap);
+    ZF_LOGF_IF(init->io_port == 0, "copy cap failed");
+
 }
 
 uint64_t ccount = 0;

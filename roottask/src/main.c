@@ -155,6 +155,7 @@ copy_untypeds_to_process(rump_process_t *process)
     int total_caps = process->num_untypeds_devram + process->num_untypeds + process->num_untypeds_dev;
     for (int i = 0; i < total_caps; i++) {
         seL4_CPtr slot = sel4utils_copy_cap_to_process(&process->process, &env.vka, process->untypeds[i].cptr);
+        ZF_LOGF_IF(slot == 0, "copy cap failed");
         /* ALLOCMAN_UT_KERNEL, ALLOCMAN_UT_DEV, ALLOCMAN_UT_DEV_MEM */
         uint8_t untyped_is_device;
         if (i < process->num_untypeds_devram) {
@@ -303,9 +304,15 @@ void launch_process(const char *bin_name, const char *cmdline, int id)
     cspacepath_t path;
     vka_cspace_make_path(&env.vka, simple_get_irq_ctrl(&env.simple), &path);
     process->init->irq_control = sel4utils_move_cap_to_process(&process->process, path, NULL);
-    process->init->sched_control = sel4utils_copy_cap_to_process(&process->process, &env.vka, simple_get_sched_ctrl(&env.simple, 0));
+    if (simple_get_sched_ctrl(&env.simple, 0) != seL4_CapNull) {
+        /* This doesn't exist on master kernel */
+        process->init->sched_control = sel4utils_copy_cap_to_process(&process->process, &env.vka, simple_get_sched_ctrl(&env.simple, 0));
+        ZF_LOGF_IF(process->init->sched_control == 0, "copy cap failed");
+    }
+
     process->init->timer_signal = sel4utils_copy_cap_to_process(&process->process, &env.vka,
                                                                         process->timer_signal.cptr);
+    ZF_LOGF_IF(process->init->timer_signal == 0, "copy cap failed");
 
     arch_copy_IOPort_cap(process->init, &env, &process->process);
 
