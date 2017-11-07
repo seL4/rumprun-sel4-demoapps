@@ -280,7 +280,7 @@ void launch_process(const char *bin_name, const char *cmdline, int id)
     ZF_LOGF_IF(error, "Failed to allocate path");
         cspacepath_t ep_path;
     vka_cspace_make_path(&env.vka, env.ep.cptr, &ep_path);
-    error = vka_cnode_mint(&badged_ep_path, &ep_path, seL4_AllRights, seL4_CapData_Badge_new(id));
+    error = vka_cnode_mint(&badged_ep_path, &ep_path, seL4_AllRights, id);
     ZF_LOGF_IF(error, "Failed to badge ep");
 
     sel4utils_process_config_t config = process_config_default_simple(&env.simple, bin_name, process->init->priority);
@@ -548,7 +548,7 @@ void *main_continued(void *arg UNUSED)
     ZF_LOGF_IF(error, "Failed to allocate cslot");
 
     vka_cspace_make_path(&env.vka, env.irq_ntfn.cptr, &src);
-    error = vka_cnode_mint(&dest, &src, seL4_AllRights, seL4_CapData_Badge_new(SERIAL_BADGE));
+    error = vka_cnode_mint(&dest, &src, seL4_AllRights, SERIAL_BADGE);
     ZF_LOGF_IFERR(error, "Failed to mint cap");
 
     /* Bind serial input to badged ntfn */
