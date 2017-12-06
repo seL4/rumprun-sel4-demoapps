@@ -34,6 +34,8 @@ typedef struct env *env_t;
 
 typedef struct rump_process {
     init_data_t *init;
+    void *stdio[RR_NUMIO];
+    vka_object_t stdio_notifications[RR_NUMIO];
     vka_object_t untypeds[CONFIG_MAX_NUM_BOOTINFO_UNTYPED_CAPS];
     int num_untypeds_devram;
     int num_untypeds;

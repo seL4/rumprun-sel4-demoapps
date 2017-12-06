@@ -30,6 +30,7 @@
 #include <platsupport/io.h>
 #include <vka/object_capops.h>
 #include <arch_stdio.h>
+#include <utils/circular_buffer.h>
 
 #include <vspace/vspace.h>
 #include "common.h"
@@ -38,6 +39,7 @@
 /* the serial badge is the next bit after the bits taken by the next process badge */
 #define SERIAL_BADGE_BIT (seL4_WordBits - CLZL((seL4_Word) N_RUMP_PROCESSES) + 1llu)
 #define SERIAL_BADGE (BIT(SERIAL_BADGE_BIT))
+#define STDIO_BADGE (BIT(SERIAL_BADGE_BIT+1))
 
 #define RUMP_UNTYPED_MEMORY (BIT(25))
 /* Number of untypeds to try and use to allocate the driver memory. */
@@ -263,6 +265,13 @@ void launch_process(const char *bin_name, const char *cmdline, int id)
     process->init = (init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, INIT_DATA_NUM_FRAMES, PAGE_BITS_4K);
     ZF_LOGF_IF(process->init == NULL, "Could not create init_data frame");
 
+    /* Create shared memory frames for stdio streams */
+    for(int i = 0; i < RR_NUMIO; i++) {
+        process->stdio[i] = (init_data_t *) vspace_new_pages(&env.vspace, seL4_AllRights, 1, RR_STDIO_PAGE_BITS);
+        ZF_LOGF_IF(process->stdio[i] == NULL, "Could not create stdio frame");
+    }
+
+
     int error = tm_alloc_id_at(&env.time_manager, id);
     ZF_LOGF_IF(error, "Failed to allocate timeout id");
 
@@ -331,6 +340,32 @@ void launch_process(const char *bin_name, const char *cmdline, int id)
     process->init->serial_ep = serial_server_parent_mint_endpoint_to_process(&process->process);
     ZF_LOGF_IF(process->init->serial_ep == 0, "Failed to copy rpc serial ep to process");
 
+    /* Set up 3 stdio shared frames and notification objects */
+    for(int i = 0; i < RR_NUMIO; i++) {
+        /* Map memory into address space */
+        process->init->stdio[i] = vspace_share_mem(&env.vspace, &process->process.vspace, process->stdio[i],
+                                          1, RR_STDIO_PAGE_BITS, seL4_AllRights, true);
+        ZF_LOGF_IF(process->init->stdio[i] == NULL, "Failed to share memory with launched process");
+        if (i != RR_STDIN) {
+
+            cspacepath_t src, dest;
+            error = vka_cspace_alloc_path(&env.vka, &dest);
+            ZF_LOGF_IF(error, "Failed to allocate cslot");
+
+            vka_cspace_make_path(&env.vka, env.irq_ntfn.cptr, &src);
+            error = vka_cnode_mint(&dest, &src, seL4_AllRights, STDIO_BADGE);
+            ZF_LOGF_IFERR(error, "Failed to mint cap");
+            process->init->stdio_eps[i] = sel4utils_copy_path_to_process(&process->process, dest);
+            ZF_LOGF_IF(process->init->stdio_eps[i] == 0, "Failed to copy stdio ep to process");
+
+        } else {
+            vka_alloc_endpoint(&env.vka, &process->stdio_notifications[i]);
+            process->init->stdio_eps[i] = sel4utils_copy_cap_to_process(&process->process, &env.vka, process->stdio_notifications[i].cptr);
+            ZF_LOGF_IF(process->init->stdio_eps[i] == 0, "Failed to copy stdio ep to process");
+
+        }
+    }
+
     /* allocate an EP just for this process which we use to send the init data */
     vka_alloc_endpoint(&env.vka, &process->init_ep_obj);
     seL4_CPtr init_ep = sel4utils_copy_cap_to_process(&process->process, &env.vka, process->init_ep_obj.cptr);
@@ -396,6 +431,44 @@ static seL4_MessageInfo_t handle_timer_rpc(rump_process_t *process, int id, seL4
     return info;
 }
 
+static int buffer_dequeue(rump_process_t *process, int fd, uint8_t *c) {
+    circ_buf_t *cb = process->stdio[fd];
+    if (circ_buf_is_empty(cb)) {
+        return 0;
+    } else {
+        *c = circ_buf_get(cb);
+        return 1;
+    }
+}
+
+static int buffer_enqueue(rump_process_t *process, int fd, uint8_t c) {
+    circ_buf_t *cb = process->stdio[fd];
+    if (circ_buf_is_full(cb)) {
+        /* full */
+        ZF_LOGD("Receiev buffer full\n");
+        return 0;
+    } else {
+        circ_buf_put(cb, c);
+    }
+    /* This is currently not aiming to be too performant as it is a
+       proof of concept.  Signal on every character received */
+    seL4_Signal(process->stdio_notifications[0].cptr);
+    return 1;
+}
+
+/* This currently assumes process 1 */
+static int flush_stdio_buffers(void) {
+    char c;
+    rump_process_t *process = process_from_id(1);
+    while (buffer_dequeue(process, RR_STDOUT, &c)) {
+        __arch_putchar(c);
+    }
+    while (buffer_dequeue(process, RR_STDIN, &c)) {
+        __arch_putchar(c);
+    }
+    return 0;
+}
+
 /* Boot Rumprun process. */
 int
 run_rr(void)
@@ -453,8 +526,15 @@ run_rr(void)
                 char c = -1;
                 do {
                     c = __arch_getchar();
-                    handle_char(&env, c);
+                    if (c != -1) {
+                        buffer_enqueue(process_from_id(1), RR_STDIN, c);
+                        handle_char(&env, c);
+                    }
                 } while (c != -1);
+            }
+
+            if (badge & STDIO_BADGE) {
+                flush_stdio_buffers();
             }
             sel4platsupport_handle_timer_irq(&env.timer, badge);
             error = tm_update(&env.time_manager);

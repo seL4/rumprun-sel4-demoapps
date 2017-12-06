@@ -154,11 +154,4 @@ void handle_char(rump_env_t *env, int c)
     default:
         break;
     }
-
-    /* print char received */
-    if (c == '\r') {
-        __arch_putchar('\n');
-    } else {
-       __arch_putchar(c);
-    }
 }
