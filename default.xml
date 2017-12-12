@@ -78,7 +78,9 @@
         <linkfile src="README.md" dest="README.md"/>
     </project>
 
-    <project name="rumprun" remote="seL4-projects" path="rumprun"/>
+    <project name="rumprun" remote="seL4-projects" path="projects/rumprun">
+        <linkfile src="." dest="libs/rumprun"/>
+    </project>
 
     <project name="rumprun-packages" remote="seL4-projects" path="projects/rumprun-packages"/>
 

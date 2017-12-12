@@ -21,7 +21,7 @@ else
 OBJECTBASE = hw-obj
 RRTOOLCHAIN= i486-rumprun-netbsdelf
 endif
-include ${PWD}/rumprun/platform/sel4/rumprunlibs.mk
+include ${PWD}/libs/rumprun/platform/sel4/rumprunlibs.mk
 
 -include .config
 
