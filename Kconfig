@@ -40,7 +40,7 @@ menu "Libraries"
     source "libs/libsel4allocman/Kconfig"
     source "libs/libsel4test/Kconfig"
     source "libs/libsel4serialserver/Kconfig"
-    source "rumprun/Kconfig"
+    source "libs/rumprun/Kconfig"
 endmenu
 
 menu "Applications"
