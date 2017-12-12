@@ -9,8 +9,10 @@
 #
 # @TAG(DATA61_BSD)
 #
-libc=libmuslc
--include rumprun/Kbuild
 
--include $(wildcard apps/*/Kbuild)
--include $(wildcard libs/*/Kbuild)
+components-$(CONFIG_APP_MULTICORE_PTHREAD) += multicore_pthread
+roottask-components-$(CONFIG_APP_MULTICORE_PTHREAD) += multicore_pthread
+multicore_pthread-y = rumprun
+
+multicore_pthread: $(multicore_pthread-y)
+

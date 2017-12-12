@@ -9,8 +9,10 @@
 #
 # @TAG(DATA61_BSD)
 #
-libc=libmuslc
--include rumprun/Kbuild
 
--include $(wildcard apps/*/Kbuild)
--include $(wildcard libs/*/Kbuild)
+components-$(CONFIG_APP_LEVELDB) += leveldb
+roottask-components-$(CONFIG_APP_LEVELDB) += leveldb
+leveldb-y = rumprun
+
+leveldb: $(leveldb-y)
+

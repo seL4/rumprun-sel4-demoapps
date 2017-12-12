@@ -45,7 +45,22 @@ endmenu
 
 menu "Applications"
     source "apps/roottask/Kconfig"
-    source "apps/Kconfig"
+    source "apps/nginx/Kconfig"
+    source "apps/hello/Kconfig"
+    source "apps/netserver/Kconfig"
+    source "apps/redis/Kconfig"
+    source "apps/python/Kconfig"
+    source "apps/lmbench/Kconfig"
+    source "apps/iperf3/Kconfig"
+    source "apps/rust/Kconfig"
+    source "apps/multicore_pthread/Kconfig"
+    source "apps/memcached/Kconfig"
+    source "apps/leveldb/Kconfig"
+    source "apps/erlang/Kconfig"
+    source "apps/susan/Kconfig"
+    source "apps/cjpeg/Kconfig"
+    source "apps/djpeg/Kconfig"
+    source "apps/madplay/Kconfig"
 endmenu
 
 source "$COMMON_PATH/Kconfig"

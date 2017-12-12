@@ -59,7 +59,6 @@ editing the .config file directly.
 ```
 repo init -u $(GIT URL TO MANIFEST)
 repo sync
-source scripts/init-all.sh
 make hello-x86_64-x86_64_qemu_defconfig
 make
 ```

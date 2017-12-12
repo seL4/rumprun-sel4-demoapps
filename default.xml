@@ -73,7 +73,6 @@
         <linkfile src="Makefile" dest="Makefile" />
         <linkfile src="configs" dest="configs"/>
         <linkfile src="roottask" dest="apps/roottask"/>
-        <linkfile src="scripts" dest="scripts"/>
         <linkfile src="README.md" dest="README.md"/>
     </project>
 

@@ -9,8 +9,10 @@
 #
 # @TAG(DATA61_BSD)
 #
-libc=libmuslc
--include rumprun/Kbuild
 
--include $(wildcard apps/*/Kbuild)
--include $(wildcard libs/*/Kbuild)
+components-$(CONFIG_APP_MADPLAY) += madplay
+roottask-components-$(CONFIG_APP_MADPLAY) += madplay
+madplay-y = rumprun
+
+madplay: $(madplay-y)
+

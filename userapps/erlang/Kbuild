@@ -9,8 +9,10 @@
 #
 # @TAG(DATA61_BSD)
 #
-libc=libmuslc
--include rumprun/Kbuild
 
--include $(wildcard apps/*/Kbuild)
--include $(wildcard libs/*/Kbuild)
+components-$(CONFIG_APP_ERLANG) += erlang
+roottask-components-$(CONFIG_APP_ERLANG) += erlang
+erlang-y = rumprun
+
+erlang: $(erlang-y)
+

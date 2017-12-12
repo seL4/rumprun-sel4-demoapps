@@ -9,8 +9,9 @@
 #
 # @TAG(DATA61_BSD)
 #
-libc=libmuslc
--include rumprun/Kbuild
 
--include $(wildcard apps/*/Kbuild)
--include $(wildcard libs/*/Kbuild)
+menuconfig APP_SUSAN
+  bool "susan app"
+  default n
+  help
+      Rumprun Application: susan

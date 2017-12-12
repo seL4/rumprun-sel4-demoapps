@@ -9,8 +9,10 @@
 #
 # @TAG(DATA61_BSD)
 #
-libc=libmuslc
--include rumprun/Kbuild
 
--include $(wildcard apps/*/Kbuild)
--include $(wildcard libs/*/Kbuild)
+components-$(CONFIG_APP_NGINX) += nginx
+roottask-components-$(CONFIG_APP_NGINX) += nginx
+nginx-y = rumprun
+
+nginx: $(nginx-y)
+
