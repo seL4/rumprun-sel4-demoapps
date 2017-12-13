@@ -47,7 +47,6 @@ editing the .config file directly.
 
 ## Apps that are currently broken
 * [Python](userapps/python/README.md)
-* lmbench
 * netserver
 
 # Dependencies
