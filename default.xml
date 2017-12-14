@@ -76,6 +76,21 @@
         <linkfile src="configs" dest="configs"/>
         <linkfile src="roottask" dest="apps/roottask"/>
         <linkfile src="README.md" dest="README.md"/>
+        <linkfile src="userapps/cjpeg" dest="apps/cjpeg"/>
+        <linkfile src="userapps/djpeg" dest="apps/djpeg"/>
+        <linkfile src="userapps/erlang" dest="apps/erlang"/>
+        <linkfile src="userapps/hello" dest="apps/hello"/>
+        <linkfile src="userapps/iperf3" dest="apps/iperf3"/>
+        <linkfile src="userapps/leveldb" dest="apps/leveldb"/>
+        <linkfile src="userapps/madplay" dest="apps/madplay"/>
+        <linkfile src="userapps/memcached" dest="apps/memcached"/>
+        <linkfile src="userapps/multicore_pthread" dest="apps/multicore_pthread"/>
+        <linkfile src="userapps/netserver" dest="apps/netserver"/>
+        <linkfile src="userapps/nginx" dest="apps/nginx"/>
+        <linkfile src="userapps/python" dest="apps/python"/>
+        <linkfile src="userapps/redis" dest="apps/redis"/>
+        <linkfile src="userapps/rust" dest="apps/rust"/>
+        <linkfile src="userapps/susan" dest="apps/susan"/>
     </project>
 
     <project name="rumprun" remote="seL4-projects" path="projects/rumprun">
