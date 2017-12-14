@@ -9,13 +9,10 @@
 #
 # @TAG(DATA61_BSD)
 #
+
+include ${PWD}/libs/rumprun/platform/sel4/rumprunlibs.mk
+
 CFILES   := $(wildcard $(SOURCE_DIR)/src/*.c)
-
-
-ARCHIVE = multicore_pthread
-BAKE_TARGET = $(BUILD_DIR)/multicore_pthread
-include $(PROJECT_BASE)/apps/rumpcommon.mk
-
-.PHONY: $(BAKE_TARGET)_
-$(BAKE_TARGET)_:
-	$(RRTOOLCHAIN)-gcc  $(CFILES) -o multicore_pthread -lm
+.PHONY:multicore_pthread
+multicore_pthread: $(CFILES)
+	$(RUMPRUN_CC) $(CFILES) -o $@ -lm

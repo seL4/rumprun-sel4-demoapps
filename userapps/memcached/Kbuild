@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_MEMCACHED) += memcached
-roottask-components-$(CONFIG_APP_MEMCACHED) += memcached
-memcached-y = rumprun
-
-memcached: $(memcached-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,memcached,CONFIG_APP_MEMCACHED,\
+	 $(PWD)/projects/rumprun-packages/memcached/build/memcached))

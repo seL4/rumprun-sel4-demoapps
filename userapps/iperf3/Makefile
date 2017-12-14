@@ -9,23 +9,15 @@
 #
 # @TAG(DATA61_BSD)
 #
-CFILES   := $(wildcard $(SOURCE_DIR)/src/*.c)
 
-PATH2 := ${PATH}
-
-ARCHIVE = iperf3
-BAKE_TARGET = $(BUILD_DIR)/$(RTARGET)/src/iperf3
-
-include $(PROJECT_BASE)/apps/rumpcommon.mk
+include ${PWD}/libs/rumprun/platform/sel4/rumprunlibs.mk
 
 .PHONY: $(BAKE_TARGET)_
-$(BAKE_TARGET)_: $(RTARGET)/src/iperf_config.h
-	mkdir -p $(BUILD_DIR)/$(RTARGET)/
-	cd $(BUILD_DIR)/$(RTARGET) && CC=$(RRTOOLCHAIN)-gcc make || true
+$(BAKE_TARGET)_: src/iperf_config.h
+	CC=$(RUMPRUN_CC) make || true
 
 
-$(RTARGET)/src/iperf_config.h:
-	mkdir -p $(BUILD_DIR)/$(RTARGET)/
-	cd $(PROJECT_BASE)/projects/iperf && git checkout refs/tags/3.1.3 && git am $(SOURCE_DIR)/patches/*
-	cd $(BUILD_DIR)/$(RTARGET) && env -i PATH=${PATH2} CC=$(RRTOOLCHAIN)-gcc ac_cv_header_netinet_sctp_h=no \
-	$(PROJECT_BASE)/projects/iperf/configure --host=$(RRTOOLCHAIN) --enable-shared=no
+src/iperf_config.h:
+	cd $(PWD)/projects/iperf && git checkout refs/tags/3.1.3 && git am $(SOURCE_DIR)/patches/*
+	cd $(BUILD_DIR) && env -i PATH=${PATH} CC=$(RUMPRUN_CC) ac_cv_header_netinet_sctp_h=no \
+	$(PROJECT_BASE)/projects/iperf/configure --host=$(RUMPRUN_TOOLTUPLE) --enable-shared=no

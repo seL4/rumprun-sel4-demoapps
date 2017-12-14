@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_CJPEG) += cjpeg
-roottask-components-$(CONFIG_APP_CJPEG) += cjpeg
-cjpeg-y = rumprun
-
-cjpeg: $(cjpeg-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,cjpeg,CONFIG_APP_CJPEG,\
+	${PWD}/projects/rumprun-packages/jpeg/build/jpeg-6a/cjpeg))

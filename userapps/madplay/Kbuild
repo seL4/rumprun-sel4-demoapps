@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_MADPLAY) += madplay
-roottask-components-$(CONFIG_APP_MADPLAY) += madplay
-madplay-y = rumprun
-
-madplay: $(madplay-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,madplay,CONFIG_APP_MADPLAY,\
+	 $(PWD)/projects/rumprun-packages/mad/build/mad-0.14.2b/madplay))

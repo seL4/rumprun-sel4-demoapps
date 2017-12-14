@@ -10,9 +10,6 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_DJPEG) += djpeg
-roottask-components-$(CONFIG_APP_DJPEG) += djpeg
-djpeg-y = rumprun
-
-djpeg: $(djpeg-y)
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,djpeg,CONFIG_APP_DJPEG,\
+	$(PWD)/projects/rumprun-packages/jpeg/build/jpeg-6a/djpeg))
 

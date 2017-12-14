@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_IPERF3) += iperf3
-roottask-components-$(CONFIG_APP_IPERF3) += iperf3
-iperf3-y = rumprun
-
-iperf3: $(iperf3-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,iperf3,CONFIG_APP_IPERF3,\
+	$(BUILD_BASE)/iperf3/src/iperf3))

@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_NETSERVER) += netserver
-roottask-components-$(CONFIG_APP_NETSERVER) += netserver
-netserver-y = rumprun
-
-netserver: $(netserver-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,netserver,CONFIG_APP_NETSERVER,\
+	 $(BUILD_BASE)/netserver/src/netserver))

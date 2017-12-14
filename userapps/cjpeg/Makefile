@@ -9,14 +9,10 @@
 #
 # @TAG(DATA61_BSD)
 #
-ARCHIVE = cjpeg
-BAKE_TARGET = $(PROJECT_BASE)/projects/rumprun-packages/jpeg/build/jpeg-6a/cjpeg
-# Save the path
-PATH2 := ${PATH}
 
-include $(PROJECT_BASE)/apps/rumpcommon.mk
+include ${PWD}/libs/rumprun/platform/sel4/rumprunlibs.mk
 
-.PHONY: $(BAKE_TARGET)_
-$(BAKE_TARGET)_:
+.PHONY: cjpeg
+cjpeg:
 	cd $(PROJECT_BASE)/projects/rumprun-packages/jpeg && \
-	env -i PATH=${PATH2} RUMPRUN_TOOLCHAIN_TUPLE=$(RRTOOLCHAIN) make
+	env -i PATH=${PATH} RUMPRUN_TOOLCHAIN_TUPLE=$(RUMPRUN_TOOLTUPLE) make

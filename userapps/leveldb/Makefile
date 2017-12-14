@@ -9,13 +9,10 @@
 #
 # @TAG(DATA61_BSD)
 #
-ARCHIVE = leveldb
-BAKE_TARGET = $(PROJECT_BASE)/projects/leveldb/out-static/db_bench
-PATH2 := ${PATH}
 
-include $(PROJECT_BASE)/apps/rumpcommon.mk
+include ${PWD}/libs/rumprun/platform/sel4/rumprunlibs.mk
 
-.PHONY: $(BAKE_TARGET)_
-$(BAKE_TARGET)_:
+.PHONY: leveldb
+leveldb:
 	cd $(PROJECT_BASE)/projects/leveldb && \
-	env -i PATH=${PATH2} TARGET_OS=NetBSD CXX=$(RRTOOLCHAIN)-g++ CC=$(RRTOOLCHAIN)-gcc make 
+	env -i PATH=$(RUMPRUN_BIN_DIR):${PATH} TARGET_OS=NetBSD CXX=$(RUMPRUN_TOOLTUPLE)-g++ CC=$(RUMPRUN_TOOLTUPLE)-gcc make

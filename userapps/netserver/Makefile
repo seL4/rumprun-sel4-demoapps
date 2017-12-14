@@ -10,17 +10,13 @@
 # @TAG(DATA61_BSD)
 #
 
-ARCHIVE = netserver
-BAKE_TARGET = $(BUILD_DIR)/$(RTARGET)/src/netserver
-include $(PROJECT_BASE)/apps/rumpcommon.mk
+include ${PWD}/libs/rumprun/platform/sel4/rumprunlibs.mk
 
-.PHONY: $(BAKE_TARGET)_
-$(BAKE_TARGET)_: $(RTARGET)/config.h
-	mkdir -p $(BUILD_DIR)/$(RTARGET)/
-	cd $(BUILD_DIR)/$(RTARGET) && CC=$(RRTOOLCHAIN)-gcc make
+.PHONY: netserver
+netserver: config.h
+	CC=$(RUMPRUN_CC) make
 
 
-$(RTARGET)/config.h:
-	mkdir -p $(BUILD_DIR)/$(RTARGET)/
-	cd $(BUILD_DIR)/$(RTARGET) && CC=$(RRTOOLCHAIN)-gcc ac_cv_func_setpgrp_void=yes \
-	$(PROJECT_BASE)/projects/benchmarks/netperf-2.7.0/configure --host=$(RRTOOLCHAIN) --enable-intervals \
+config.h:
+	CC=$(RUMPRUN_CC) ac_cv_func_setpgrp_void=yes \
+	$(PWD)/projects/benchmarks/netperf-2.7.0/configure --host=$(RUMPRUN_TOOLTUPLE) --enable-intervals \

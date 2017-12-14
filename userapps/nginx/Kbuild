@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_NGINX) += nginx
-roottask-components-$(CONFIG_APP_NGINX) += nginx
-nginx-y = rumprun
-
-nginx: $(nginx-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,nginx,CONFIG_APP_NGINX,\
+	 $(PWD)/projects/rumprun-packages/nginx/bin/nginx))

@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_PYTHON) += python
-roottask-components-$(CONFIG_APP_PYTHON) += python
-python-y = rumprun
-
-python: $(python-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,python,CONFIG_APP_PYTHON,\
+	 $(PWD)/projects/rumprun-packages/python3/build/python,sel4_generic))

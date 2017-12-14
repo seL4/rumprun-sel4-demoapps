@@ -9,14 +9,10 @@
 #
 # @TAG(DATA61_BSD)
 #
-ARCHIVE = susan
-BAKE_TARGET = $(PROJECT_BASE)/projects/rumprun-packages/susan/build/susan.o
-# Save the path
-PATH2 := ${PATH}
 
-include $(PROJECT_BASE)/apps/rumpcommon.mk
+include ${PWD}/libs/rumprun/platform/sel4/rumprunlibs.mk
 
-.PHONY: $(BAKE_TARGET)_
-$(BAKE_TARGET)_:
+.PHONY: susan
+susan:
 	cd $(PROJECT_BASE)/projects/rumprun-packages/susan && \
-	env -i PATH=${PATH2} RUMPRUN_TOOLCHAIN_TUPLE=$(RRTOOLCHAIN) make
+	env -i PATH=${PATH} RUMPRUN_TOOLCHAIN_TUPLE=$(RUMPRUN_TOOLTUPLE) make

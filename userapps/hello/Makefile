@@ -9,13 +9,10 @@
 #
 # @TAG(DATA61_BSD)
 #
+
+include ${PWD}/libs/rumprun/platform/sel4/rumprunlibs.mk
+
 CFILES   := $(wildcard $(SOURCE_DIR)/src/*.c)
 
-
-ARCHIVE = hello
-BAKE_TARGET = $(BUILD_DIR)/hello
-include $(PROJECT_BASE)/apps/rumpcommon.mk
-
-.PHONY: $(BAKE_TARGET)_
-$(BAKE_TARGET)_:
-	$(RRTOOLCHAIN)-gcc -I$(STAGE_DIR)/include -lsel4 -L$(STAGE_DIR)/lib $(CFILES) -o hello
+hello: $(CFILES)
+	$(RUMPRUN_CC) $(CFILES) -o $@

@@ -9,16 +9,10 @@
 #
 # @TAG(DATA61_BSD)
 #
-ARCHIVE = erlang
-BAKE_TARGET = $(PROJECT_BASE)/projects/rumprun-packages/erlang/bin/beam
-# Save the path
-PATH2 := ${PATH}
 
-RR_CONFIG := sel4_virtio
+include ${PWD}/libs/rumprun/platform/sel4/rumprunlibs.mk
 
-include $(PROJECT_BASE)/apps/rumpcommon.mk
-
-.PHONY: $(BAKE_TARGET)_
-$(BAKE_TARGET)_:
+.PHONY: erlang
+erlang:
 	cd $(PROJECT_BASE)/projects/rumprun-packages/erlang && \
-	env -i PATH=${PATH2} HOME=${HOME} RUMPRUN_TOOLCHAIN_TUPLE=$(RRTOOLCHAIN) make
+	env -i PATH=${PATH} HOME=${HOME} RUMPRUN_TOOLCHAIN_TUPLE=$(RUMPRUN_TOOLTUPLE) make

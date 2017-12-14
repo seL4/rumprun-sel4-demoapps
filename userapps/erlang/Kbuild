@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_ERLANG) += erlang
-roottask-components-$(CONFIG_APP_ERLANG) += erlang
-erlang-y = rumprun
-
-erlang: $(erlang-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,erlang,CONFIG_APP_ERLANG,\
+	$(PWD)/projects/rumprun-packages/erlang/bin/beam, sel4_virtio))

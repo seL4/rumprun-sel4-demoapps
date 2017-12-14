@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_HELLO) += hello
-roottask-components-$(CONFIG_APP_HELLO) += hello
-hello-y = rumprun
-
-hello: $(hello-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,hello,CONFIG_APP_HELLO,\
+	$(BUILD_BASE)/hello/hello))

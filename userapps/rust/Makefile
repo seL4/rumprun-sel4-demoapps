@@ -9,11 +9,9 @@
 #
 # @TAG(DATA61_BSD)
 #
-ARCHIVE = rust
-BAKE_TARGET = $(SOURCE_DIR)/target/x86_64-rumprun-netbsd/debug/rust
 
-include $(PROJECT_BASE)/apps/rumpcommon.mk
+include ${PWD}/libs/rumprun/platform/sel4/rumprunlibs.mk
 
-.PHONY: $(BAKE_TARGET)_
-$(BAKE_TARGET)_:
-	cd $(SOURCE_DIR) && cargo build --target=x86_64-rumprun-netbsd
+.PHONY: rust
+rust:
+	cargo build --target=$(RUMPRUN_TOOLTUPLE)

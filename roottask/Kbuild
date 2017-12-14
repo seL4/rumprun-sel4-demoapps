@@ -21,9 +21,10 @@ roottask-y                          = common libsel4 libmuslc libsel4vka libcpio
 
 # set up correct simple lib for our kernel
 roottask-y += libsel4simple-default
-roottask-components=$(addprefix $(STAGE_BASE)/bin/sel4/, $(roottask-components-y))
+roottask-components=$(addprefix $(STAGE_BASE)/bin/rump/, $(roottask-components-y))
+RUMPRUN_USERLEVEL_APPS += $(roottask-components-y)
 
 roottask: export COMPONENTS=${roottask-components}
 
+roottask: kernel_elf $(roottask-y) $(roottask-components)
 
-roottask: kernel_elf $(roottask-y) $(roottask-components-y)

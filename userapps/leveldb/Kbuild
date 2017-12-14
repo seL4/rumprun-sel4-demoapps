@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_LEVELDB) += leveldb
-roottask-components-$(CONFIG_APP_LEVELDB) += leveldb
-leveldb-y = rumprun
-
-leveldb: $(leveldb-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,leveldb,CONFIG_APP_LEVELDB,\
+	$(PWD)/projects/leveldb/out-static/db_bench))

@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_REDIS) += redis
-roottask-components-$(CONFIG_APP_REDIS) += redis
-redis-y = rumprun
-
-redis: $(redis-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,redis,CONFIG_APP_REDIS,\
+	 $(BUILD_BASE)/redis/bin/redis-server))

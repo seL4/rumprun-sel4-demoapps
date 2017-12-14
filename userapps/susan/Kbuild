@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_SUSAN) += susan
-roottask-components-$(CONFIG_APP_SUSAN) += susan
-susan-y = rumprun
-
-susan: $(susan-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,susan,CONFIG_APP_SUSAN,\
+	 $(PWD)/projects/rumprun-packages/susan/build/susan.o))

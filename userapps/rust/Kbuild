@@ -10,9 +10,5 @@
 # @TAG(DATA61_BSD)
 #
 
-components-$(CONFIG_APP_RUST) += rust
-roottask-components-$(CONFIG_APP_RUST) += rust
-rust-y = rumprun
-
-rust: $(rust-y)
-
+$(eval $(call RUMPRUN_BAKE_DEPENDENCY,rust,CONFIG_APP_RUST,\
+	 $(SEL4_APPS_PATH)/rust/target/x86_64-rumprun-netbsd/debug/rust))
