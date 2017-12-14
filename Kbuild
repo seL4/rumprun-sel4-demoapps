@@ -10,7 +10,8 @@
 # @TAG(DATA61_BSD)
 #
 libc=libmuslc
--include rumprun/Kbuild
 
--include $(wildcard apps/*/Kbuild)
+
+-include $(patsubst apps/roottask/Kbuild,,$(wildcard apps/*/Kbuild))
+-include apps/roottask/Kbuild
 -include $(wildcard libs/*/Kbuild)
