@@ -11,6 +11,36 @@
 #
 libc=libmuslc
 
+# arg1 : component name
+# arg2 : CONFIG_Variable to test
+# arg3 : PATH to binary produced by recursive make
+# arg4 : (optional) Rumprun config
+#
+# Example:
+# RUMPRUN_BAKE_DEPENDENCY(cjpeg,CONFIG_APP_CJPEG,
+#	${PWD}/projects/rumprun-packages/jpeg/build/jpeg-6a/cjpeg,
+#	sel4_generic)
+
+define RUMPRUN_BAKE_DEPENDENCY
+
+components-$$($2) += $1
+roottask-components-$$($2) += $1
+$1-y = rumprun-toplevel-support
+$1_bin_name := $3
+ifeq ($4,)
+ifdef CONFIG_RUMPRUN_USE_PCI_ETHERNET
+$1_rr_config := sel4_ethernet
+else
+$1_rr_config := sel4_generic
+endif
+else
+$1_rr_config := $4
+endif
+
+$1: $$($1-y)
+
+endef
+
 
 -include $(patsubst apps/roottask/Kbuild,,$(wildcard apps/*/Kbuild))
 -include apps/roottask/Kbuild
