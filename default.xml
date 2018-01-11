@@ -26,7 +26,7 @@
     <linkfile dest="libs/rumprun" src="."/>
   </project>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="SEL4PROJ" revision="f51213438bd04cb4bcce72acf1fcd4fcca66a101" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="SEL4PROJ" revision="93e421f4eee338548b25001505f58f775f07ed29" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="SEL4PROJ" revision="80816754d6b90adb0fc1b81f0f2cb80eecf06ebe" upstream="master">
     <linkfile dest="Kconfig" src="Kconfig"/>
     <linkfile dest="Kbuild" src="Kbuild"/>
     <linkfile dest="Makefile" src="Makefile"/>
@@ -49,10 +49,10 @@
     <linkfile dest="apps/rust" src="userapps/rust"/>
     <linkfile dest="apps/susan" src="userapps/susan"/>
   </project>
-  <project name="seL4" path="kernel" revision="0064f92aed858814a43f15ba55a58eeea95dd7ed" upstream="master">
+  <project name="seL4" path="kernel" revision="e0d76080d34605cedea4f6156b8a3215d630754b" upstream="master">
     <linkfile dest="libs/libsel4" src="libsel4"/>
   </project>
-  <project name="seL4_libs" path="projects/seL4_libs" revision="bf05faa0e21c35792fd36a98558938ce532c92b1" upstream="master">
+  <project name="seL4_libs" path="projects/seL4_libs" revision="ee63bf60153f960c09ceb633e16ea328d42284e8" upstream="master">
     <linkfile dest="libs/libsel4muslcsys" src="libsel4muslcsys"/>
     <linkfile dest="libs/libsel4platsupport" src="libsel4platsupport"/>
     <linkfile dest="libs/libsel4utils" src="libsel4utils"/>
