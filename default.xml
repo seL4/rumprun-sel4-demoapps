@@ -26,7 +26,7 @@
     <linkfile dest="libs/rumprun" src="."/>
   </project>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="SEL4PROJ" revision="f51213438bd04cb4bcce72acf1fcd4fcca66a101" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="SEL4PROJ" revision="3575b166b0e7394bd86f593ed58ebd7a24136264" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="SEL4PROJ" revision="82cec5c26b658a780cf93d5eac671e50a64198dd" upstream="master">
     <linkfile dest="Kconfig" src="Kconfig"/>
     <linkfile dest="Kbuild" src="Kbuild"/>
     <linkfile dest="Makefile" src="Makefile"/>
@@ -49,10 +49,10 @@
     <linkfile dest="apps/rust" src="userapps/rust"/>
     <linkfile dest="apps/susan" src="userapps/susan"/>
   </project>
-  <project name="seL4" path="kernel" revision="396315f3bfb2592e2fe61eaaeee916b626f26e68" upstream="master">
+  <project name="seL4" path="kernel" revision="d928d566669a0aa1769b1279ccffc5d634024db7" upstream="master">
     <linkfile dest="libs/libsel4" src="libsel4"/>
   </project>
-  <project name="seL4_libs" path="projects/seL4_libs" revision="8338a1bf71a7a87c2a2cdfdffa7bf4c3d6440c03" upstream="master">
+  <project name="seL4_libs" path="projects/seL4_libs" revision="724576ac6c5b690735b67544e1cc4e5acf2adb8a" upstream="master">
     <linkfile dest="libs/libsel4muslcsys" src="libsel4muslcsys"/>
     <linkfile dest="libs/libsel4platsupport" src="libsel4platsupport"/>
     <linkfile dest="libs/libsel4utils" src="libsel4utils"/>
@@ -67,7 +67,7 @@
     <linkfile dest="libs/libsel4bench" src="libsel4bench"/>
     <linkfile dest="libs/libsel4allocman" src="libsel4allocman"/>
   </project>
-  <project name="seL4_tools" path="projects/seL4_tools" revision="afe398cd09bc35c5a4d573006ed19284a164ad80" upstream="master">
+  <project name="seL4_tools" path="projects/seL4_tools" revision="26b594c6c288108d84484ebde500ab898de71021" upstream="master">
     <linkfile dest="tools/common" src="common-tool"/>
     <linkfile dest="tools/elfloader" src="elfloader-tool"/>
     <linkfile dest="tools/kbuild" src="kbuild-tool"/>
