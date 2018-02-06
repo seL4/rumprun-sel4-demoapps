@@ -26,7 +26,7 @@
     <linkfile dest="libs/rumprun" src="."/>
   </project>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="f51213438bd04cb4bcce72acf1fcd4fcca66a101" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="1a7e11a7dec3c86c8e646df2b9ff7ca2ee799fbd" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="c19747ef67fe4015edef9e3490eacd16649bc595" upstream="master">
     <linkfile dest="Kconfig" src="Kconfig"/>
     <linkfile dest="Kbuild" src="Kbuild"/>
     <linkfile dest="Makefile" src="Makefile"/>
@@ -49,7 +49,7 @@
     <linkfile dest="apps/rust" src="userapps/rust"/>
     <linkfile dest="apps/susan" src="userapps/susan"/>
   </project>
-  <project name="seL4" path="kernel" revision="5e73f25c5f826ac0a5d972bd054934bc48c415b3" upstream="master">
+  <project name="seL4" path="kernel" revision="a82b066c365c203a77d23b2ddaf490f5ee0e59af" upstream="master">
     <linkfile dest="libs/libsel4" src="libsel4"/>
   </project>
   <project name="seL4_libs" path="projects/seL4_libs" revision="724576ac6c5b690735b67544e1cc4e5acf2adb8a" upstream="master">
@@ -67,12 +67,12 @@
     <linkfile dest="libs/libsel4bench" src="libsel4bench"/>
     <linkfile dest="libs/libsel4allocman" src="libsel4allocman"/>
   </project>
-  <project name="seL4_tools" path="projects/seL4_tools" revision="de799d079d923633e0e6ba791595bfc13b0bdc8b" upstream="master">
+  <project name="seL4_tools" path="projects/seL4_tools" revision="3cc123cd22c55a7d25f92ba2670d1e24330f83c4" upstream="master">
     <linkfile dest="tools/common" src="common-tool"/>
     <linkfile dest="tools/elfloader" src="elfloader-tool"/>
     <linkfile dest="tools/kbuild" src="kbuild-tool"/>
   </project>
-  <project name="util_libs" path="projects/util_libs" revision="48a144dd901459fdf263836569e017cf4da8d700" upstream="master">
+  <project name="util_libs" path="projects/util_libs" revision="7397328206807da096970a18c450a81ec44e28a6" upstream="master">
     <linkfile dest="libs/libplatsupport" src="libplatsupport"/>
     <linkfile dest="libs/libcpio" src="libcpio"/>
     <linkfile dest="libs/libelf" src="libelf"/>
