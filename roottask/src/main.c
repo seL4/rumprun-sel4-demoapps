@@ -25,6 +25,7 @@
 #include <sel4utils/stack.h>
 #include <sel4utils/util.h>
 #include <sel4utils/time_server/client.h>
+#include <sel4utils/arch/tsc.h>
 #include <serial_server/parent.h>
 #include <vka/object.h>
 #include <platsupport/io.h>
@@ -329,7 +330,7 @@ void launch_process(const char *bin_name, const char *cmdline, int id)
     alloc_untypeds(process);
     alloc_devices(process);
     copy_untypeds_to_process(process);
-    process->init->tsc_freq = simple_get_arch_info(&env.simple);
+    process->init->tsc_freq = x86_get_tsc_freq_from_simple(&env.simple);
 
     /* copy the rpc endpoint - we wait on the endpoint for a message
      * or a fault to see when the process finishes */
