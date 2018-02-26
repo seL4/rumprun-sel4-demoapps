@@ -620,7 +620,8 @@ void *main_continued(void *arg UNUSED)
     error = tm_init(&env.time_manager, &env.timer.ltimer, &env.ops, N_RUMP_PROCESSES);
     ZF_LOGF_IF(error, "Failed to init time manager");
 
-    error = seL4_TCB_SetPriority(simple_get_tcb(&env.simple), seL4_MaxPrio);
+    seL4_CPtr auth = simple_get_tcb(&env.simple);
+    error = seL4_TCB_SetPriority(simple_get_tcb(&env.simple), auth, seL4_MaxPrio);
     ZF_LOGF_IFERR(error, "seL4_TCB_SetPriority thread failed");
 
     /* badge the irq_ntfn for serial */
