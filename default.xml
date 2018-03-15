@@ -26,7 +26,7 @@
     <linkfile dest="libs/rumprun" src="."/>
   </project>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="f51213438bd04cb4bcce72acf1fcd4fcca66a101" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="8144ed0ba62addb323b03de9f333f403fc9b5a64" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="fcd57e385c089428209dca0c18e5a6e83ffe479e" upstream="master">
     <linkfile dest="Kconfig" src="Kconfig"/>
     <linkfile dest="Kbuild" src="Kbuild"/>
     <linkfile dest="Makefile" src="Makefile"/>
@@ -67,7 +67,7 @@
     <linkfile dest="libs/libsel4bench" src="libsel4bench"/>
     <linkfile dest="libs/libsel4allocman" src="libsel4allocman"/>
   </project>
-  <project name="seL4_tools" path="projects/seL4_tools" revision="8bcd0f1e434adc89a5da7ac07f553230bf96eeb8" upstream="master">
+  <project name="seL4_tools" path="projects/seL4_tools" revision="413656df3d75a6ffd493ae4693b386fb6d67a6bc" upstream="master">
     <linkfile dest="tools/common" src="common-tool"/>
     <linkfile dest="tools/elfloader" src="elfloader-tool"/>
     <linkfile dest="tools/kbuild" src="kbuild-tool"/>
