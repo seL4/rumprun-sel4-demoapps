@@ -26,7 +26,7 @@
     <linkfile dest="libs/rumprun" src="."/>
   </project>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="f51213438bd04cb4bcce72acf1fcd4fcca66a101" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="075d90230aa22e87e16d24e9ed3d3d0e330ac5ca" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="20b9e4ebeeac0150baf28a8593dd9b659b2a26ee" upstream="master">
     <linkfile dest="Kconfig" src="Kconfig"/>
     <linkfile dest="Kbuild" src="Kbuild"/>
     <linkfile dest="Makefile" src="Makefile"/>
@@ -49,7 +49,7 @@
     <linkfile dest="apps/rust" src="userapps/rust"/>
     <linkfile dest="apps/susan" src="userapps/susan"/>
   </project>
-  <project name="seL4" path="kernel" revision="b942a5044119ed75ad8f607618ca069a0d3f0aa9" upstream="master">
+  <project name="seL4" path="kernel" revision="a7a6d9e229524725dd3d01c9e46b4fe35d851c38" upstream="master">
     <linkfile dest="libs/libsel4" src="libsel4"/>
   </project>
   <project name="seL4_libs" path="projects/seL4_libs" revision="6ee8ecb02b7071ee0eb505277e77bf30d1b5dc1d" upstream="master">
