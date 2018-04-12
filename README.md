@@ -64,7 +64,7 @@ make
 
 
 # Running the image
-https://wiki.sel4.systems/Hardware/IA32
+https://docs.sel4.systems/Hardware/IA32
 
 QEMU:
 You can run by running `make simulate` or more specifically: 
