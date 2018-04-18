@@ -49,7 +49,7 @@
     <linkfile dest="apps/rust" src="userapps/rust"/>
     <linkfile dest="apps/susan" src="userapps/susan"/>
   </project>
-  <project name="seL4" path="kernel" revision="0dd40b6c43a290173ea7782b97afbbbddfa23b36" upstream="master">
+  <project name="seL4" path="kernel" revision="8484c24659aaea6104996eb5cc0133bf2addfe8e" upstream="master">
     <linkfile dest="libs/libsel4" src="libsel4"/>
   </project>
   <project name="seL4_libs" path="projects/seL4_libs" revision="494cd46c8497f50036b5e517720e1604affe6b10" upstream="master">
