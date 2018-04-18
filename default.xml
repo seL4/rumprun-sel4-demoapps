@@ -19,14 +19,14 @@
   
   <project name="iperf" path="projects/iperf" remote="iperf" revision="274eaed5b17f664e4ac6c79f1ba854b55f15a3a3" upstream="refs/tags/3.1.3"/>
   <project name="leveldb" path="projects/leveldb" remote="seL4-projects" revision="90894f76537ca8a74c7761f2dd3a34341ba90007" upstream="sel4"/>
-  <project name="musllibc" path="projects/musllibc" revision="d5d5d04e4f99f9900269350e5bb0f9f9b0a27ca9" upstream="sel4">
+  <project name="musllibc" path="projects/musllibc" revision="f58dacf44a679a2d7c10fbb8d8bc8f58e2123791" upstream="sel4">
     <linkfile dest="libs/libmuslc" src="."/>
   </project>
   <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="fc53174d76b03fb627b7b96240c85bb776105c90" upstream="master">
     <linkfile dest="libs/rumprun" src="."/>
   </project>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="f51213438bd04cb4bcce72acf1fcd4fcca66a101" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="ae8b9e397d32d9da51e47d62425b3a0336e11e9d" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="de0cf4e0a39fd94881d1f2752f038c53bffa7749" upstream="master">
     <linkfile dest="Kconfig" src="Kconfig"/>
     <linkfile dest="Kbuild" src="Kbuild"/>
     <linkfile dest="Makefile" src="Makefile"/>
@@ -49,10 +49,10 @@
     <linkfile dest="apps/rust" src="userapps/rust"/>
     <linkfile dest="apps/susan" src="userapps/susan"/>
   </project>
-  <project name="seL4" path="kernel" revision="511be7d91dba84fea3d227d01a0475503b415cbe" upstream="master">
+  <project name="seL4" path="kernel" revision="0dd40b6c43a290173ea7782b97afbbbddfa23b36" upstream="master">
     <linkfile dest="libs/libsel4" src="libsel4"/>
   </project>
-  <project name="seL4_libs" path="projects/seL4_libs" revision="a34751b760261a8bb519d33a5dd440a24c724f8d" upstream="master">
+  <project name="seL4_libs" path="projects/seL4_libs" revision="494cd46c8497f50036b5e517720e1604affe6b10" upstream="master">
     <linkfile dest="libs/libsel4muslcsys" src="libsel4muslcsys"/>
     <linkfile dest="libs/libsel4platsupport" src="libsel4platsupport"/>
     <linkfile dest="libs/libsel4utils" src="libsel4utils"/>
@@ -67,12 +67,12 @@
     <linkfile dest="libs/libsel4bench" src="libsel4bench"/>
     <linkfile dest="libs/libsel4allocman" src="libsel4allocman"/>
   </project>
-  <project name="seL4_tools" path="projects/seL4_tools" revision="a242cb7c4fdbdce6d9fd01f5b375c7137ed55f05" upstream="master">
+  <project name="seL4_tools" path="projects/seL4_tools" revision="87642544dbb767806d9c1f0fb673eb5ac86c242b" upstream="master">
     <linkfile dest="tools/common" src="common-tool"/>
     <linkfile dest="tools/elfloader" src="elfloader-tool"/>
     <linkfile dest="tools/kbuild" src="kbuild-tool"/>
   </project>
-  <project name="util_libs" path="projects/util_libs" revision="b89a19a3a566f2e2289b1114c55b12fff12865be" upstream="master">
+  <project name="util_libs" path="projects/util_libs" revision="f667cfa2f8aae95db65a991ba7dfedf75cb6e46e" upstream="master">
     <linkfile dest="libs/libplatsupport" src="libplatsupport"/>
     <linkfile dest="libs/libcpio" src="libcpio"/>
     <linkfile dest="libs/libelf" src="libelf"/>
