@@ -10,10 +10,17 @@
 # @TAG(DATA61_BSD)
 
 cmake_minimum_required(VERSION 3.7.2)
-project(Hello C)
 
+set_property(GLOBAL APPEND PROPERTY AvailableRumprunApps "hello")
 
-add_executable(hello src/hello.c)
+if ("${APP}" STREQUAL "hello")
+	set(RumprunCommandLine "Hello world" CACHE STRING "")
+	set(LibSel4UtilsCSpaceSizeBits 16 CACHE STRING "" FORCE)
+	set(KernelRootCNodeSizeBits 16 CACHE STRING "" FORCE)
 
-
-install(TARGETS hello RUNTIME DESTINATION bin)
+	BakeExternalRumpkernelCMakeProject(hello
+		SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src
+		OUTPUT_BIN bin/hello
+		)
+	set_property(GLOBAL APPEND PROPERTY rumprunapps_property hello)
+endif()
