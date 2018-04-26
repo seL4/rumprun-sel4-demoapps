@@ -22,11 +22,11 @@
   <project name="musllibc" path="projects/musllibc" revision="f58dacf44a679a2d7c10fbb8d8bc8f58e2123791" upstream="sel4">
     <linkfile dest="libs/libmuslc" src="."/>
   </project>
-  <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="fc53174d76b03fb627b7b96240c85bb776105c90" upstream="master">
+  <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="8311b27ca996071a9eecdd5cb69b8dadc099f4a1" upstream="master">
     <linkfile dest="libs/rumprun" src="."/>
   </project>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="f51213438bd04cb4bcce72acf1fcd4fcca66a101" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="b6790c7976ebe3a87f8b0da60a096e4def1a837a" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="1a3f80ea5255fb477468dfcf9842015b43ffd7fc" upstream="master">
     <linkfile dest="Kconfig" src="Kconfig"/>
     <linkfile dest="Kbuild" src="Kbuild"/>
     <linkfile dest="Makefile" src="Makefile"/>
@@ -49,10 +49,10 @@
     <linkfile dest="apps/rust" src="userapps/rust"/>
     <linkfile dest="apps/susan" src="userapps/susan"/>
   </project>
-  <project name="seL4" path="kernel" revision="a0ce040af88a3547021e96bccd5e8ca30e387a6e" upstream="master">
+  <project name="seL4" path="kernel" revision="d4fdc3cd5ea64aa201952de14b7c18df359948d0" upstream="master">
     <linkfile dest="libs/libsel4" src="libsel4"/>
   </project>
-  <project name="seL4_libs" path="projects/seL4_libs" revision="784574bad4bce22aff4ebd7d6cc3672f320d2b7d" upstream="master">
+  <project name="seL4_libs" path="projects/seL4_libs" revision="1697cb16ecbc7820cbda78d7c7c1896e884195a1" upstream="master">
     <linkfile dest="libs/libsel4muslcsys" src="libsel4muslcsys"/>
     <linkfile dest="libs/libsel4platsupport" src="libsel4platsupport"/>
     <linkfile dest="libs/libsel4utils" src="libsel4utils"/>
