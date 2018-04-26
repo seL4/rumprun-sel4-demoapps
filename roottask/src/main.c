@@ -123,7 +123,7 @@ init_env(rump_env_t *env)
     error = sel4platsupport_new_io_ops(env->vspace, env->vka, &env->ops);
     ZF_LOGF_IF(error, "Failed to init io ops");
 
-    error = sel4platsupport_new_arch_ops(&env->ops, &env->simple);
+    error = sel4platsupport_new_arch_ops(&env->ops, &env->simple, &env->vka);
     ZF_LOGF_IF(error, "Failed to init arch ops");
 }
 
