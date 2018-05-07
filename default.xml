@@ -22,11 +22,11 @@
   <project name="musllibc" path="projects/musllibc" revision="f58dacf44a679a2d7c10fbb8d8bc8f58e2123791" upstream="sel4">
     <linkfile dest="libs/libmuslc" src="."/>
   </project>
-  <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="4203e63c3f330249cbfa4bf588628d5b2bcd56c8" upstream="master">
+  <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="5ffcb07f42a4139a6dc5038fc620b27d7a07d713" upstream="master">
     <linkfile dest="libs/rumprun" src="."/>
   </project>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="fc49ce7cb0434b66e0121f40e4c48d8d72d8a5ac" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="6d4df7d93841862a96e0533966b1439871fb8c41" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="1f13ab6758567b9d5128807c5955dc69815106fb" upstream="master">
     <linkfile dest="Kconfig" src="Kconfig"/>
     <linkfile dest="Kbuild" src="Kbuild"/>
     <linkfile dest="Makefile" src="Makefile"/>
