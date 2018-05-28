@@ -26,7 +26,7 @@
     <linkfile dest="libs/rumprun" src="."/>
   </project>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="fc49ce7cb0434b66e0121f40e4c48d8d72d8a5ac" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="277272cf26a072302c88c68cd8e3e54ae88d4d87" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="191007b83d20b10b9ffdf62b990cba1776182846" upstream="master">
     <linkfile dest="Kconfig" src="Kconfig"/>
     <linkfile dest="Kbuild" src="Kbuild"/>
     <linkfile dest="Makefile" src="Makefile"/>
