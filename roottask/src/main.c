@@ -85,6 +85,10 @@ static inline rump_process_t *process_from_id(int id)
 static void
 init_env(rump_env_t *env)
 {
+    /* Make this variable static so that it's contents isn't overwritten
+       We don't make it a global as it currently shouldn't be accessed anywhere else */
+    static sel4utils_res_t muslc_brk_reservation_memory;
+
     allocman_t *allocman;
     reservation_t virtual_reservation;
     int error;
@@ -104,7 +108,6 @@ init_env(rump_env_t *env)
                                                            &env->vka, platsupport_get_bootinfo());
     ZF_LOGF_IF(error, "Failed to bootstrap vspace");
 
-    sel4utils_res_t muslc_brk_reservation_memory;
     error = sel4utils_reserve_range_no_alloc(&env->vspace, &muslc_brk_reservation_memory, 1048576, seL4_AllRights, 1, &muslc_brk_reservation_start);
     ZF_LOGF_IF(error, "Failed to reserve_range");
 
