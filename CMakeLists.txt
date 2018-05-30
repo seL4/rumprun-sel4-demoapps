@@ -40,7 +40,7 @@ set(SIMULATION OFF CACHE BOOL "Include only simulation compatible tests")
 set(RELEASE OFF CACHE BOOL "Performance optimized build")
 set(PLATFORM "x86_64" CACHE STRING "Platform to test")
 set_property(CACHE PLATFORM PROPERTY STRINGS ${KernelX86Sel4Arch_all_strings})
-set(APP "Hello" CACHE STRING "Application to build")
+set(APP "hello" CACHE STRING "Application to build")
 
 # Determine the platform/architecture
 if (${PLATFORM} IN_LIST KernelX86Sel4Arch_all_strings)
