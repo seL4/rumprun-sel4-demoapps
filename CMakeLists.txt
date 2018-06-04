@@ -59,6 +59,7 @@ ApplyCommonReleaseVerificationSettings(${RELEASE} OFF)
 include(ExternalProject)
 
 # Import apps with CMake support
+add_subdirectory(userapps/jpeg)
 add_subdirectory(userapps/hello)
 add_subdirectory(userapps/redis)
 add_subdirectory(userapps/iperf3)
