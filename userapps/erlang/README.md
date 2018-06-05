@@ -11,6 +11,8 @@
 -->
 # erlang on BEAM on Rumprun on seL4 (on QEMU)
 
+> Support for this in the master branch is currently not provided
+
 This app is a wrapper around the demo erlang application located in rumprun-packages.  It builds BEAM and
 an erlang echo server to run on Rumprun.
 

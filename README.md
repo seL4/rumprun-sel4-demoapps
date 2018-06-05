@@ -39,15 +39,14 @@ editing the .config file directly.
 * nginx
 * redis
 * rust
-* [erlang](userapps/erlang/README.md)
 * [susan](userapps/susan/README.md)
 * [cjpeg](userapps/cjpeg/README.md)
 * [djpeg](userapps/djpeg/README.md)
-* [mad](userapps/mad/README.md)
 
 ## Apps that are currently broken
-* [Python](userapps/python/README.md)
-* netserver
+* [erlang](userapps/erlang/README.md): Currently isn't supported due to a restriction in how hardware resources
+  can be given to an instance of a rump kernel. There isn't currently any timeframe for a fix.
+* [mad](userapps/mad/README.md): Doesn't currently build due to autoconf issues
 
 # Dependencies
 * https://github.com/SEL4PROJ/sel4-tutorials/blob/master/Prerequisites.md
