@@ -31,74 +31,23 @@
 
     <!-- list of 'projects' (i.e repositories), path is relative to the path in remote above -->
     <project name="seL4" path="kernel">
-        <linkfile src="libsel4" dest="libs/libsel4"/>
-    </project>
 
-    <project name="seL4_tools" path="projects/seL4_tools">
-        <linkfile src="common-tool" dest="tools/common"/>
-        <linkfile src="cmake-tool" dest="tools/cmake-tool"/>
+    <project name="seL4_tools" path="tools/seL4">
         <linkfile src="cmake-tool/init-build.sh" dest="init-build.sh"/>
         <linkfile src="cmake-tool/default-CMakeLists.txt" dest="CMakeLists.txt"/>
-        <linkfile src="elfloader-tool" dest="tools/elfloader"/>
-        <linkfile src="kbuild-tool" dest="tools/kbuild"/>
     </project>
 
-    <project name="seL4_libs" path="projects/seL4_libs">
-        <linkfile src="libsel4muslcsys" dest="libs/libsel4muslcsys"/>
-        <linkfile src="libsel4platsupport" dest="libs/libsel4platsupport"/>
-        <linkfile src="libsel4utils" dest="libs/libsel4utils"/>
-        <linkfile src="libsel4serialserver" dest="libs/libsel4serialserver"/>
-        <linkfile src="libsel4test" dest="libs/libsel4test"/>
-        <linkfile src="libsel4sync" dest="libs/libsel4sync"/>
-        <linkfile src="libsel4vspace" dest="libs/libsel4vspace"/>
-        <linkfile src="libsel4vka" dest="libs/libsel4vka"/>
-        <linkfile src="libsel4debug" dest="libs/libsel4debug"/>
-        <linkfile src="libsel4simple" dest="libs/libsel4simple"/>
-        <linkfile src="libsel4simple-default" dest="libs/libsel4simple-default"/>
-        <linkfile src="libsel4bench" dest="libs/libsel4bench"/>
-        <linkfile src="libsel4allocman" dest="libs/libsel4allocman"/>
-    </project>
+    <project name="seL4_libs" path="projects/seL4_libs"/>
 
-    <project name="util_libs" path="projects/util_libs">
-        <linkfile src="libplatsupport" dest="libs/libplatsupport"/>
-        <linkfile src="libcpio" dest="libs/libcpio"/>
-        <linkfile src="libelf" dest="libs/libelf"/>
-        <linkfile src="libutils" dest="libs/libutils"/>
-	    <linkfile src="libethdrivers" dest="libs/libethdrivers"/>
-    </project>
+    <project name="util_libs" path="projects/util_libs"/>
 
-    <project name="musllibc" path="projects/musllibc" revision="sel4">
-        <linkfile src="." dest="libs/libmuslc"/>
-    </project>
+    <project name="musllibc" path="projects/musllibc" revision="sel4"/>
 
     <project name="rumprun-sel4-demoapps" remote="seL4-projects" path="projects/rumprun-sel4-demoapps">
-        <!-- symlinks to make the project structure fit the build system -->
-        <linkfile src="Kconfig" dest="Kconfig"/>
-        <linkfile src="Kbuild" dest="Kbuild" />
-        <linkfile src="Makefile" dest="Makefile" />
-        <linkfile src="configs" dest="configs"/>
-        <linkfile src="roottask" dest="apps/roottask"/>
         <linkfile src="README.md" dest="README.md"/>
-        <linkfile src="userapps/cjpeg" dest="apps/cjpeg"/>
-        <linkfile src="userapps/djpeg" dest="apps/djpeg"/>
-        <linkfile src="userapps/erlang" dest="apps/erlang"/>
-        <linkfile src="userapps/hello" dest="apps/hello"/>
-        <linkfile src="userapps/iperf3" dest="apps/iperf3"/>
-        <linkfile src="userapps/leveldb" dest="apps/leveldb"/>
-        <linkfile src="userapps/madplay" dest="apps/madplay"/>
-        <linkfile src="userapps/memcached" dest="apps/memcached"/>
-        <linkfile src="userapps/multicore_pthread" dest="apps/multicore_pthread"/>
-        <linkfile src="userapps/netserver" dest="apps/netserver"/>
-        <linkfile src="userapps/nginx" dest="apps/nginx"/>
-        <linkfile src="userapps/python" dest="apps/python"/>
-        <linkfile src="userapps/redis" dest="apps/redis"/>
-        <linkfile src="userapps/rust" dest="apps/rust"/>
-        <linkfile src="userapps/susan" dest="apps/susan"/>
     </project>
 
-    <project name="rumprun" remote="seL4-projects" path="projects/rumprun">
-        <linkfile src="." dest="libs/rumprun"/>
-    </project>
+    <project name="rumprun" remote="seL4-projects" path="projects/rumprun"/>
 
     <project name="rumprun-packages" remote="seL4-projects" path="projects/rumprun-packages"/>
 
