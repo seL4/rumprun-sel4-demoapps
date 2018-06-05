@@ -67,6 +67,7 @@ add_subdirectory(userapps/leveldb)
 add_subdirectory(userapps/redis)
 add_subdirectory(userapps/nginx)
 add_subdirectory(userapps/iperf3)
+add_subdirectory(userapps/rust)
 
 add_subdirectory(roottask)
 
