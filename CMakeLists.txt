@@ -65,6 +65,7 @@ add_subdirectory(userapps/multicore_pthread)
 add_subdirectory(userapps/hello)
 add_subdirectory(userapps/leveldb)
 add_subdirectory(userapps/redis)
+add_subdirectory(userapps/nginx)
 add_subdirectory(userapps/iperf3)
 
 add_subdirectory(roottask)
