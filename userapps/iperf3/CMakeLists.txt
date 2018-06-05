@@ -25,7 +25,6 @@ if ("${APP}" STREQUAL "iperf3")
     set(RumprunDHCPMethod "Static IP" CACHE STRING "")
     set(RumprunUsePCIEthernet ON CACHE STRING "" FORCE)
     set(RumprunMemoryMiB  128 CACHE STRING "")
-    set(RumprunDHCPMethod "Static IP" CACHE STRING "")
     set(LibSel4UtilsCSpaceSizeBits 18 CACHE STRING "" FORCE)
     set(KernelRootCNodeSizeBits 18 CACHE STRING "" FORCE)
 
