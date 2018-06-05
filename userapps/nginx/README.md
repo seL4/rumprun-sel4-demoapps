@@ -17,6 +17,7 @@ Extra configuration is requried for seL4.
 
 ## Compilation steps
 ```
-make nginx-ia32-x86_64_qemu_defconfig
-make
+mkdir build-ninja && cd build-ninja
+../init-build.sh -DPLATFORM=x86_64 -DAPP=nginx
+ninja
 ```

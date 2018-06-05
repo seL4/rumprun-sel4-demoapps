@@ -57,21 +57,23 @@ editing the .config file directly.
 ```
 repo init -u $(GIT URL TO MANIFEST)
 repo sync
-make hello-x86_64-x86_64_qemu_defconfig
-make
+(cd projects/rumprun && ./init-sources.sh)
+mkdir build-hello && cd build-hello
+../init-build.sh -DPLATFORM=x86_64 -DSIMULATION=TRUE -DAPP=hello
+ninja
 ```
 
 
 # Running the image
-https://docs.sel4.systems/Hardware/IA32
 
-QEMU:
-You can run by running `make simulate` or more specifically: 
+## QEMU
+
+You can run by running a generated simulate script: 
 ```
-qemu-system-x86_64 \
-		-m 512 -nographic  -kernel images/kernel-$(SEL4_ARCH)-$(PLAT) \
-		-initrd images/roottask-image-$(SEL4_ARCH)-$(PLAT) -cpu Haswell
+./simulate
 # quit with Ctrl-A X
 ```
 To add QEMU networking you will also need: `-net nic,model=e1000 -net tap,script=no,ifname=tap0` which requires
 a tap network interface configured.
+
+See https://docs.sel4.systems/Hardware/IA32 for running on actual hardware
