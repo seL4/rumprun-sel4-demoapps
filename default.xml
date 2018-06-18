@@ -26,7 +26,7 @@
     <linkfile dest="libs/rumprun" src="."/>
   </project>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="fc49ce7cb0434b66e0121f40e4c48d8d72d8a5ac" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="214c450f4b837ca9675d8f7df04fb6a9555685a3" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="ba357005f4bb33cfb5e59659c180507bbc3f7934" upstream="master">
     <linkfile dest="Kconfig" src="Kconfig"/>
     <linkfile dest="Kbuild" src="Kbuild"/>
     <linkfile dest="Makefile" src="Makefile"/>
@@ -67,7 +67,7 @@
     <linkfile dest="libs/libsel4bench" src="libsel4bench"/>
     <linkfile dest="libs/libsel4allocman" src="libsel4allocman"/>
   </project>
-  <project name="seL4_tools" path="projects/seL4_tools" revision="9fd7042edd1cd6f5574ebb5f49e15474f6ad1b71" upstream="master">
+  <project name="seL4_tools" path="projects/seL4_tools" revision="eebdd5763290bd1407aaa8ea784b9a75400a1c3e" upstream="master">
     <linkfile dest="tools/common" src="common-tool"/>
     <linkfile dest="tools/cmake-tool" src="cmake-tool"/>
     <linkfile dest="init-build.sh" src="cmake-tool/init-build.sh"/>
