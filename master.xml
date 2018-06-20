@@ -30,7 +30,7 @@
     />
 
     <!-- list of 'projects' (i.e repositories), path is relative to the path in remote above -->
-    <project name="seL4" path="kernel">
+    <project name="seL4" path="kernel"/>
 
     <project name="seL4_tools" path="tools/seL4">
         <linkfile src="cmake-tool/init-build.sh" dest="init-build.sh"/>
