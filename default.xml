@@ -19,67 +19,17 @@
   
   <project name="iperf" path="projects/iperf" remote="iperf" revision="274eaed5b17f664e4ac6c79f1ba854b55f15a3a3" upstream="refs/tags/3.1.3"/>
   <project name="leveldb" path="projects/leveldb" remote="seL4-projects" revision="90894f76537ca8a74c7761f2dd3a34341ba90007" upstream="sel4"/>
-  <project name="musllibc" path="projects/musllibc" revision="fad6e9e25c82bb763f0680c73f0eeaab36097ab2" upstream="sel4">
-    <linkfile dest="libs/libmuslc" src="."/>
-  </project>
-  <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="1bde4f311bce1a59dfbc2a6f6b2b4cae3f113729" upstream="master">
-    <linkfile dest="libs/rumprun" src="."/>
-  </project>
-  <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="fc49ce7cb0434b66e0121f40e4c48d8d72d8a5ac" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="f92b7c9d5def890f7f571f7609d032eabfe59790" upstream="master">
-    <linkfile dest="Kconfig" src="Kconfig"/>
-    <linkfile dest="Kbuild" src="Kbuild"/>
-    <linkfile dest="Makefile" src="Makefile"/>
-    <linkfile dest="configs" src="configs"/>
-    <linkfile dest="apps/roottask" src="roottask"/>
+  <project name="musllibc" path="projects/musllibc" revision="fad6e9e25c82bb763f0680c73f0eeaab36097ab2" upstream="sel4"/>
+  <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="1bde4f311bce1a59dfbc2a6f6b2b4cae3f113729" upstream="master"/>
+  <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master"/>
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="7674abe34788852c4068a68ce96c43a90bbc8903" upstream="master">
     <linkfile dest="README.md" src="README.md"/>
-    <linkfile dest="apps/cjpeg" src="userapps/cjpeg"/>
-    <linkfile dest="apps/djpeg" src="userapps/djpeg"/>
-    <linkfile dest="apps/erlang" src="userapps/erlang"/>
-    <linkfile dest="apps/hello" src="userapps/hello"/>
-    <linkfile dest="apps/iperf3" src="userapps/iperf3"/>
-    <linkfile dest="apps/leveldb" src="userapps/leveldb"/>
-    <linkfile dest="apps/madplay" src="userapps/madplay"/>
-    <linkfile dest="apps/memcached" src="userapps/memcached"/>
-    <linkfile dest="apps/multicore_pthread" src="userapps/multicore_pthread"/>
-    <linkfile dest="apps/netserver" src="userapps/netserver"/>
-    <linkfile dest="apps/nginx" src="userapps/nginx"/>
-    <linkfile dest="apps/python" src="userapps/python"/>
-    <linkfile dest="apps/redis" src="userapps/redis"/>
-    <linkfile dest="apps/rust" src="userapps/rust"/>
-    <linkfile dest="apps/susan" src="userapps/susan"/>
   </project>
-  <project name="seL4" path="kernel" revision="cda18f80791931d91dc5df8a9fc720bc42d1ddba" upstream="master">
-    <linkfile dest="libs/libsel4" src="libsel4"/>
-  </project>
-  <project name="seL4_libs" path="projects/seL4_libs" revision="2752d2b945741829c856511d9a6f1040a667c33f" upstream="master">
-    <linkfile dest="libs/libsel4muslcsys" src="libsel4muslcsys"/>
-    <linkfile dest="libs/libsel4platsupport" src="libsel4platsupport"/>
-    <linkfile dest="libs/libsel4utils" src="libsel4utils"/>
-    <linkfile dest="libs/libsel4serialserver" src="libsel4serialserver"/>
-    <linkfile dest="libs/libsel4test" src="libsel4test"/>
-    <linkfile dest="libs/libsel4sync" src="libsel4sync"/>
-    <linkfile dest="libs/libsel4vspace" src="libsel4vspace"/>
-    <linkfile dest="libs/libsel4vka" src="libsel4vka"/>
-    <linkfile dest="libs/libsel4debug" src="libsel4debug"/>
-    <linkfile dest="libs/libsel4simple" src="libsel4simple"/>
-    <linkfile dest="libs/libsel4simple-default" src="libsel4simple-default"/>
-    <linkfile dest="libs/libsel4bench" src="libsel4bench"/>
-    <linkfile dest="libs/libsel4allocman" src="libsel4allocman"/>
-  </project>
-  <project name="seL4_tools" path="projects/seL4_tools" revision="eebdd5763290bd1407aaa8ea784b9a75400a1c3e" upstream="master">
-    <linkfile dest="tools/common" src="common-tool"/>
-    <linkfile dest="tools/cmake-tool" src="cmake-tool"/>
+  <project name="seL4" path="kernel" revision="cda18f80791931d91dc5df8a9fc720bc42d1ddba" upstream="master"/>
+  <project name="seL4_libs" path="projects/seL4_libs" revision="2752d2b945741829c856511d9a6f1040a667c33f" upstream="master"/>
+  <project name="seL4_tools" path="tools/seL4" revision="eebdd5763290bd1407aaa8ea784b9a75400a1c3e" upstream="master">
     <linkfile dest="init-build.sh" src="cmake-tool/init-build.sh"/>
     <linkfile dest="CMakeLists.txt" src="cmake-tool/default-CMakeLists.txt"/>
-    <linkfile dest="tools/elfloader" src="elfloader-tool"/>
-    <linkfile dest="tools/kbuild" src="kbuild-tool"/>
   </project>
-  <project name="util_libs" path="projects/util_libs" revision="4f4cd205262a4c266c3f03b5d6d5fcd8991f1d80" upstream="master">
-    <linkfile dest="libs/libplatsupport" src="libplatsupport"/>
-    <linkfile dest="libs/libcpio" src="libcpio"/>
-    <linkfile dest="libs/libelf" src="libelf"/>
-    <linkfile dest="libs/libutils" src="libutils"/>
-    <linkfile dest="libs/libethdrivers" src="libethdrivers"/>
-  </project>
+  <project name="util_libs" path="projects/util_libs" revision="84e1fe35e410deff2f3f879ac8ce468ba8f9e67a" upstream="master"/>
 </manifest>
