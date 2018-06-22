@@ -19,15 +19,15 @@
   
   <project name="iperf" path="projects/iperf" remote="iperf" revision="274eaed5b17f664e4ac6c79f1ba854b55f15a3a3" upstream="refs/tags/3.1.3"/>
   <project name="leveldb" path="projects/leveldb" remote="seL4-projects" revision="90894f76537ca8a74c7761f2dd3a34341ba90007" upstream="sel4"/>
-  <project name="musllibc" path="projects/musllibc" revision="fad6e9e25c82bb763f0680c73f0eeaab36097ab2" upstream="sel4"/>
+  <project name="musllibc" path="projects/musllibc" revision="8c30737c8f719c3f634e251f0825f7aab6449abd" upstream="sel4"/>
   <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="1bde4f311bce1a59dfbc2a6f6b2b4cae3f113729" upstream="master"/>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="305994eb69c9246d745ed9890e77f335c351bed4" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="d49adea95650aedb3543162faa768da35dbe1484" upstream="master">
     <linkfile dest="README.md" src="README.md"/>
   </project>
   <project name="seL4" path="kernel" revision="1dd8015da20735c50c2bab025eefeaecb26d010a" upstream="master"/>
-  <project name="seL4_libs" path="projects/seL4_libs" revision="2752d2b945741829c856511d9a6f1040a667c33f" upstream="master"/>
-  <project name="seL4_tools" path="tools/seL4" revision="eebdd5763290bd1407aaa8ea784b9a75400a1c3e" upstream="master">
+  <project name="seL4_libs" path="projects/seL4_libs" revision="d6e8a67e89e1a762d6c2d8a18ef40a9c1403df2a" upstream="master"/>
+  <project name="seL4_tools" path="tools/seL4" revision="00f5e802dfd49527cff663e8bc47c2fa71a4ee5a" upstream="master">
     <linkfile dest="init-build.sh" src="cmake-tool/init-build.sh"/>
     <linkfile dest="CMakeLists.txt" src="cmake-tool/default-CMakeLists.txt"/>
   </project>
