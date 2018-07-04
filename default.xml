@@ -22,10 +22,10 @@
   <project name="musllibc" path="projects/musllibc" revision="b41b6f8ff99a4328a681023b64234938459854fc" upstream="sel4"/>
   <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="7af5e34eb3935fbbcc46c44feddc9bd77a43b437" upstream="master"/>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="c683f587bd41735d39e0cef56addfa5baf9c3174" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="2bc611c98808b15a7007be1507dd14b473cb210c" upstream="master">
     <linkfile dest="README.md" src="README.md"/>
   </project>
-  <project name="seL4" path="kernel" revision="7e507434d3e414b7c73bb08e51466bb39434f4c8" upstream="master"/>
+  <project name="seL4" path="kernel" revision="9328208142b4da12ca742b935b429ca696941782" upstream="master"/>
   <project name="seL4_libs" path="projects/seL4_libs" revision="fb4799226217548f6959e8348c49222e2a01dc26" upstream="master"/>
   <project name="seL4_tools" path="tools/seL4" revision="9f2926b5b1ebcb595d1c7fed6f59e00eb0f16913" upstream="master">
     <linkfile dest="init-build.sh" src="cmake-tool/init-build.sh"/>
