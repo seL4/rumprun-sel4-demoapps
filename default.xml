@@ -20,16 +20,16 @@
   <project name="iperf" path="projects/iperf" remote="iperf" revision="274eaed5b17f664e4ac6c79f1ba854b55f15a3a3" upstream="refs/tags/3.1.3"/>
   <project name="leveldb" path="projects/leveldb" remote="seL4-projects" revision="90894f76537ca8a74c7761f2dd3a34341ba90007" upstream="sel4"/>
   <project name="musllibc" path="projects/musllibc" revision="e6cd7b1622fdec33dcb341ccbb3a78596559c6d5" upstream="sel4"/>
-  <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="ef10573e21700ccc1ce55c977e1de9482137369b" upstream="master"/>
+  <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="14bcfe6d7106e149139c757c1f5d1616c0a8cc31" upstream="master"/>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="700d8c5350056647fd670474d17b2f4e184db012" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="d7ceafebc0d3ddf6f72b6af9bf03a3ef6cccd63b" upstream="master">
     <linkfile dest="README.md" src="README.md"/>
   </project>
-  <project name="seL4" path="kernel" revision="9d218f8ca2bda2011c423fbce7243a0d0259756d" upstream="master"/>
-  <project name="seL4_libs" path="projects/seL4_libs" revision="7528b23f85dffafcb26a966ad7fa99e0efc13427" upstream="master"/>
-  <project name="seL4_tools" path="tools/seL4" revision="e5306979679fab74faca9f4e2ee02e478f7c9bff" upstream="master">
+  <project name="seL4" path="kernel" revision="72e675f1daac9e377ab48f1dd69dcbad125bc2bb" upstream="master"/>
+  <project name="seL4_libs" path="projects/seL4_libs" revision="6289da1a763b45128bcb5296982c608da6432201" upstream="master"/>
+  <project name="seL4_tools" path="tools/seL4" revision="3148e37fd334bc6115d32f7c3c3acaff3ca571ea" upstream="master">
     <linkfile dest="init-build.sh" src="cmake-tool/init-build.sh"/>
     <linkfile dest="CMakeLists.txt" src="cmake-tool/default-CMakeLists.txt"/>
   </project>
-  <project name="util_libs" path="projects/util_libs" revision="da4dac1b667da09e0d1c22586d6b9f2ec8dd2065" upstream="master"/>
+  <project name="util_libs" path="projects/util_libs" revision="5ba7c9daf4a14f9cb39f8827190af50f64c2b85e" upstream="master"/>
 </manifest>
