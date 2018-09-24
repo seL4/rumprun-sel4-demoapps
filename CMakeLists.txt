@@ -51,7 +51,7 @@ else()
 endif()
 
 if(SIMULATION)
-    ApplyCommonSimulationSettings()
+    ApplyCommonSimulationSettings(${KernelArch})
 endif()
 
 ApplyCommonReleaseVerificationSettings(${RELEASE} OFF)
