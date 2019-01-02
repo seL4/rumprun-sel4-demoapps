@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-     Copyright 2018, Data61
+     Copyright 2019, Data61
      Commonwealth Scientific and Industrial Research Organisation (CSIRO)
      ABN 41 687 119 230.
 
@@ -20,9 +20,9 @@
   <project name="iperf" path="projects/iperf" remote="iperf" revision="274eaed5b17f664e4ac6c79f1ba854b55f15a3a3" upstream="refs/tags/3.1.3"/>
   <project name="leveldb" path="projects/leveldb" remote="seL4-projects" revision="90894f76537ca8a74c7761f2dd3a34341ba90007" upstream="sel4"/>
   <project name="musllibc" path="projects/musllibc" revision="9e288a83f17de80e54af87852674d70f59d6beee" upstream="sel4"/>
-  <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="b94904defc1cfe80b377a939fd027a8793f0ec04" upstream="master"/>
+  <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="27f908e4845a9422f65a8f43acfb534c1c7d91ed" upstream="master"/>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="3ea840cbc053bdc01550e38037aff0c00f71b3ac" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="7951b6c76330f70e0e5cf4c02e69a86382aeb363" upstream="master">
     <linkfile dest="README.md" src="README.md"/>
   </project>
   <project name="seL4" path="kernel" revision="d56175ec3ec1c104d8d17d437c312ef1567fca35" upstream="master"/>
