@@ -74,6 +74,7 @@ extern vspace_t *muslc_this_vspace;
 extern reservation_t muslc_brk_reservation;
 extern void *muslc_brk_reservation_start;
 extern char _cpio_archive[];
+extern char _cpio_archive_end[];
 
 
 static inline rump_process_t *process_from_id(int id)
@@ -478,11 +479,12 @@ int
 run_rr(void)
 {
     struct cpio_info info2;
-    cpio_info(_cpio_archive, &info2);
+    unsigned long cpio_len = _cpio_archive_end - _cpio_archive;
+    cpio_info(_cpio_archive, cpio_len, &info2);
     const char* bin_name;
     for (int i = 0; i < info2.file_count; i++) {
         unsigned long size;
-        cpio_get_entry(_cpio_archive, i, &bin_name, &size);
+        cpio_get_entry(_cpio_archive, cpio_len, i, &bin_name, &size);
         ZF_LOGV("name %d: %s\n", i, bin_name);
     }
 
