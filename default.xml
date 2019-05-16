@@ -19,10 +19,10 @@
   
   <project name="iperf" path="projects/iperf" remote="iperf" revision="274eaed5b17f664e4ac6c79f1ba854b55f15a3a3" upstream="refs/tags/3.1.3"/>
   <project name="leveldb" path="projects/leveldb" remote="seL4-projects" revision="90894f76537ca8a74c7761f2dd3a34341ba90007" upstream="sel4"/>
-  <project name="musllibc" path="projects/musllibc" revision="def9ee4b77825db615a7332ceea00284866f1124" upstream="sel4"/>
+  <project name="musllibc" path="projects/musllibc" revision="f58bc71f4ae291cf58cc058aa816dd65be9dca7f" upstream="sel4"/>
   <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="742007f09a1021ff1c834a39fa21944a27bdb488" upstream="master"/>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="77bdba952316eb1f2a4558b80a44fc7dfc0bc986" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="129ccf6d0a720a9d49d147285e0da72be787b816" upstream="master">
     <linkfile dest="README.md" src="README.md"/>
   </project>
   <project name="seL4" path="kernel" revision="d0d97779cbf0bbf54bab26b2274ae435908d5ab6" upstream="master"/>
