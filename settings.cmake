@@ -37,3 +37,9 @@ if(SIMULATION)
 endif()
 
 ApplyCommonReleaseVerificationSettings(${RELEASE} OFF)
+
+file(GLOB result ${CMAKE_CURRENT_LIST_DIR}/userapps/*/settings.cmake)
+
+foreach(file ${result})
+    include("${file}")
+endforeach()

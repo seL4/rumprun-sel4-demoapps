@@ -14,11 +14,9 @@ cmake_minimum_required(VERSION 3.7.2)
 set_property(GLOBAL APPEND PROPERTY AvailableRumprunApps "multicore_pthread")
 
 if("${APP}" STREQUAL "multicore_pthread")
-    BakeExternalRumpkernelCMakeProject(
-        multicore_pthread
-        SOURCE_DIR
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-        OUTPUT_BIN
-        bin/multicore_pthread
-    )
+    set(RumprunCommandLine "pthread 16 2" CACHE STRING "")
+    set(LibSel4UtilsCSpaceSizeBits 16 CACHE STRING "" FORCE)
+    set(KernelRootCNodeSizeBits 16 CACHE STRING "" FORCE)
+
+    set_property(GLOBAL APPEND PROPERTY rumprunapps_property multicore_pthread)
 endif()

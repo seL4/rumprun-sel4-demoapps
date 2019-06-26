@@ -1,5 +1,5 @@
 #
-# Copyright 2018, Data61
+# Copyright 2019, Data61
 # Commonwealth Scientific and Industrial Research Organisation (CSIRO)
 # ABN 41 687 119 230.
 #
@@ -11,16 +11,12 @@
 
 cmake_minimum_required(VERSION 3.7.2)
 
-set_property(GLOBAL APPEND PROPERTY AvailableRumprunApps "hello")
-
-if ("${APP}" STREQUAL "hello")
-	set(RumprunCommandLine "Hello world" CACHE STRING "")
-	set(LibSel4UtilsCSpaceSizeBits 16 CACHE STRING "" FORCE)
-	set(KernelRootCNodeSizeBits 16 CACHE STRING "" FORCE)
-
-	BakeExternalRumpkernelCMakeProject(hello
-		SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src
-		OUTPUT_BIN bin/hello
-		)
-	set_property(GLOBAL APPEND PROPERTY rumprunapps_property hello)
+if("${APP}" STREQUAL "hello")
+    BakeExternalRumpkernelCMakeProject(
+        hello
+        SOURCE_DIR
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        OUTPUT_BIN
+        bin/hello
+    )
 endif()

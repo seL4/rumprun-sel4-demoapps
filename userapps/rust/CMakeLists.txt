@@ -1,5 +1,5 @@
 #
-# Copyright 2018, Data61
+# Copyright 2019, Data61
 # Commonwealth Scientific and Industrial Research Organisation (CSIRO)
 # ABN 41 687 119 230.
 #
@@ -11,38 +11,26 @@
 
 cmake_minimum_required(VERSION 3.7.2)
 
-set_property(GLOBAL APPEND PROPERTY AvailableRumprunApps rust)
+if("${APP}" STREQUAL "rust")
 
-if ("${APP}" STREQUAL "rust")
-
-    set(RumprunCommandLine "./rust" CACHE STRING "")
-    set(RumprunDHCPMethod "Static IP" CACHE STRING "")
-    set(RumprunUsePCIEthernet ON CACHE STRING "" FORCE)
-    set(RumprunMemoryMiB  128 CACHE STRING "")
-    set(LibSel4UtilsCSpaceSizeBits 18 CACHE STRING "" FORCE)
-    set(KernelRootCNodeSizeBits 18 CACHE STRING "" FORCE)
-
-    SetSimulationScriptProperty(MEM_SIZE "1024M")
     set(tuple $<TARGET_PROPERTY:rumprun_toplevel_support,RUMPRUN_TOOLCHAIN_TUPLE>)
     set(tool_location $<TARGET_PROPERTY:rumprun_toplevel_support,RUMPRUN_TOOLCHAIN_PATH>)
     set(bin_file ${CMAKE_CURRENT_BINARY_DIR}/output/rust)
     add_custom_command(
         OUTPUT ${bin_file}
-        COMMAND  cd ${CMAKE_CURRENT_LIST_DIR} && 
-           ${CMAKE_COMMAND} -E env
-            PATH=$ENV{PATH}:${tool_location}
-            cargo build --target ${tuple} --target-dir ${CMAKE_CURRENT_BINARY_DIR} -Z unstable-options --out-dir ${CMAKE_CURRENT_BINARY_DIR}/output
+        COMMAND
+            cd ${CMAKE_CURRENT_LIST_DIR} && ${CMAKE_COMMAND} -E env PATH=$ENV{PATH}:${tool_location}
+            cargo build
+            --target ${tuple}
+            --target-dir ${CMAKE_CURRENT_BINARY_DIR} -Z unstable-options
+            --out-dir ${CMAKE_CURRENT_BINARY_DIR}/output
         DEPENDS rumprun_toplevel_support
-        COMMENT "[Invoking cargo]")
-    
+        COMMENT "[Invoking cargo]"
+    )
+
     add_custom_target(rust_external DEPENDS ${bin_file})
     set_target_properties(rust_external PROPERTIES RUMP_BINARIES ${bin_file})
 
-
-    CreateRumprunBakeCommand(rust
-            CONFIG sel4_ethernet
-            RUMP_TARGETS rust_external)
-
-    set_property(GLOBAL APPEND PROPERTY rumprunapps_property rust)
+    CreateRumprunBakeCommand(rust CONFIG sel4_ethernet RUMP_TARGETS rust_external)
 
 endif()
