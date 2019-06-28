@@ -47,6 +47,7 @@
 
     <project name="rumprun-sel4-demoapps" remote="seL4-projects" path="projects/rumprun-sel4-demoapps">
         <linkfile src="README.md" dest="README.md"/>
+        <linkfile src="settings.cmake" dest="settings.cmake"/>
     </project>
 
     <project name="rumprun" remote="seL4-projects" path="projects/rumprun"/>

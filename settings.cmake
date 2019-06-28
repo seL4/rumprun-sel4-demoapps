@@ -12,6 +12,15 @@
 
 cmake_minimum_required(VERSION 3.7.2)
 
+set(project_dir "${CMAKE_CURRENT_LIST_DIR}")
+get_filename_component(resolved_path ${CMAKE_CURRENT_LIST_FILE} REALPATH)
+# repo_dir is distinct from project_dir as this file is symlinked.
+# project_dir corresponds to the top level project directory, and
+# repo_dir is the absolute path after following the symlink.
+get_filename_component(repo_dir ${resolved_path} DIRECTORY)
+
+include(${project_dir}/tools/seL4/cmake-tool/helpers/application_settings.cmake)
+
 # Define our top level settings. Whilst they have doc strings for readability here
 # Users should initialize a build directory by doing something like
 # mkdir build
@@ -27,10 +36,13 @@ set(APP "hello" CACHE STRING "Application to build")
 # Determine the platform/architecture
 if(${PLATFORM} IN_LIST supported_platforms)
     set(KernelArch x86 CACHE STRING "" FORCE)
-    set(KernelX86Sel4Arch ${PLATFORM} CACHE STRING "" FORCE)
+    set(KernelSel4Arch ${PLATFORM} CACHE STRING "" FORCE)
+    set(KernelPlatform pc99 CACHE STRING "" FORCE)
 else()
     message(FATAL_ERROR "Unknown PLATFORM. Initial configuration may not work")
 endif()
+
+include(${project_dir}/kernel/configs/seL4Config.cmake)
 
 if(SIMULATION)
     ApplyCommonSimulationSettings(${KernelArch})
@@ -38,7 +50,7 @@ endif()
 
 ApplyCommonReleaseVerificationSettings(${RELEASE} OFF)
 
-file(GLOB result ${CMAKE_CURRENT_LIST_DIR}/userapps/*/settings.cmake)
+file(GLOB result ${repo_dir}/userapps/*/settings.cmake)
 
 foreach(file ${result})
     include("${file}")
