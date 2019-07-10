@@ -88,7 +88,7 @@ MakeCPIO(archive.o "${cpiostring}" DEPENDS ${rumprunapps})
 
 add_executable(roottask EXCLUDE_FROM_ALL ${static} archive.o)
 target_include_directories(roottask PRIVATE "include")
-target_link_libraries(roottask Configuration muslc sel4 sel4allocman sel4vka sel4utils sel4test sel4platsupport sel4muslcsys rumprun sel4serialserver)
+target_link_libraries(roottask Configuration muslc sel4 sel4allocman sel4vka sel4utils sel4platsupport sel4muslcsys rumprun sel4serialserver)
 add_dependencies(roottask ${rumprunapps})
 
 # Set this image as the rootserver
