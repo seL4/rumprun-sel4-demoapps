@@ -60,8 +60,8 @@ typedef struct rump_env {
     time_manager_t time_manager;
     /* operations for hardware io */
     ps_io_ops_t ops;
-    /* objects for the serial device */
-    serial_objects_t serial_objects;
+    /* irq for the serial device */
+    cspacepath_t serial_irq;
     /* notification timer and serial input come in on */
     vka_object_t irq_ntfn;
     /* reply object to use for recv on the RT kernel */

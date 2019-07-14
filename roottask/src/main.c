@@ -528,7 +528,7 @@ run_rr(void)
         } else {
            /* it's an irq */
             if (badge & SERIAL_BADGE) {
-                seL4_IRQHandler_Ack(env.serial_objects.serial_irq_path.capPtr);
+                seL4_IRQHandler_Ack(env.serial_irq.capPtr);
                 char c = -1;
                 do {
                     c = __arch_getchar();
@@ -611,8 +611,13 @@ void *main_continued(void *arg UNUSED)
     ZF_LOGF_IF(error, "Failed to spawn serial server thread");
 
     /* get the caps we need to set up a timer and serial interrupts */
-    sel4platsupport_init_default_serial_caps(&env.vka, &env.vspace, &env.simple, &env.serial_objects);
+    error = vka_cspace_alloc_path(&env.vka, &env.serial_irq);
+    ZF_LOGF_IF(error, "Failed to allocate serial IRQ slot.");
 
+    error = simple_get_IRQ_handler(&env.simple, DEFAULT_SERIAL_INTERRUPT,
+                                   env.serial_irq);
+    ZF_LOGF_IF(error, "Failed to get IRQ cap for default COM device. IRQ is %d.",
+                DEFAULT_SERIAL_INTERRUPT);
 
 
     error = sel4platsupport_init_default_timer_ops(&env.vka, &env.vspace, &env.simple,
@@ -639,7 +644,7 @@ void *main_continued(void *arg UNUSED)
     ZF_LOGF_IFERR(error, "Failed to mint cap");
 
     /* Bind serial input to badged ntfn */
-    error = seL4_IRQHandler_SetNotification(env.serial_objects.serial_irq_path.capPtr,
+    error = seL4_IRQHandler_SetNotification(env.serial_irq.capPtr,
                                             dest.capPtr);
     ZF_LOGF_IFERR(error, "Failed to bind serial irq");
 
