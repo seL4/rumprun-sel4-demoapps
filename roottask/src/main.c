@@ -15,7 +15,6 @@
 #include <simple/simple.h>
 #include <simple-default/simple-default.h>
 #include <sel4platsupport/platsupport.h>
-#include <sel4platsupport/serial.h>
 #include <platsupport/local_time_manager.h>
 #include <sel4platsupport/arch/io.h>
 #include <sel4platsupport/io.h>

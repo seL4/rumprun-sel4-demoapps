@@ -21,7 +21,6 @@
 #include <simple/simple.h>
 #include <vspace/vspace.h>
 #include <rumprun/init_data.h>
-#include <sel4platsupport/serial.h>
 #include <sel4platsupport/timer.h>
 #include <platsupport/time_manager.h>
 #include <roottask_platform_config/config.h>
