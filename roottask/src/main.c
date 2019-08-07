@@ -40,6 +40,7 @@
 #define SERIAL_BADGE_BIT (seL4_WordBits - CLZL((seL4_Word) N_RUMP_PROCESSES) + 1llu)
 #define SERIAL_BADGE (BIT(SERIAL_BADGE_BIT))
 #define STDIO_BADGE (BIT(SERIAL_BADGE_BIT+1))
+#define IRQ_IFACE_USABLE_MASK (MASK(MAX_TIMER_IRQS) << (SERIAL_BADGE_BIT + 2))
 
 #define RUMP_UNTYPED_MEMORY (BIT(25))
 /* Number of untypeds to try and use to allocate the driver memory. */
@@ -123,11 +124,26 @@ init_env(rump_env_t *env)
     bootstrap_configure_virtual_pool(allocman, vaddr,
                                      ALLOCATOR_VIRTUAL_POOL_SIZE, simple_get_pd(&env->simple));
 
-    error = sel4platsupport_new_io_ops(env->vspace, env->vka, &env->ops);
-    ZF_LOGF_IF(error, "Failed to init io ops");
+    /* create a notification for the timer and serial */
+    error = vka_alloc_notification(&env->vka, &env->irq_ntfn);
+    ZF_LOGF_IF(error, "Failed to allocate timer notification");
+
+    /* initialise the IO ops individually, we want to use the mini IRQ Interface instead of the standard one */
+    error = sel4platsupport_new_malloc_ops(&env->ops.malloc_ops);
+    ZF_LOGF_IF(error, "Failed to initialise malloc ops");
+
+    error = sel4platsupport_new_io_mapper(&env->vspace, &env->vka, &env->ops.io_mapper);
+    ZF_LOGF_IF(error, "Failed to initialise IO mapper");
+
+    error = sel4platsupport_new_fdt_ops(&env->ops.io_fdt, &env->simple, &env->ops.malloc_ops);
+    ZF_LOGF_IF(error, "Failed to initialise FDT ops");
 
     error = sel4platsupport_new_arch_ops(&env->ops, &env->simple, &env->vka);
     ZF_LOGF_IF(error, "Failed to init arch ops");
+
+    error = sel4platsupport_new_mini_irq_ops(&env->ops.irq_ops, &env->vka, &env->simple, &env->ops.malloc_ops,
+                                             env->irq_ntfn.cptr, IRQ_IFACE_USABLE_MASK);
+    ZF_LOGF_IF(error, "Failed to initialise the mini IRQ ops");
 }
 
 /* Allocate untypeds till either a certain number of bytes is allocated
@@ -541,7 +557,10 @@ run_rr(void)
             if (badge & STDIO_BADGE) {
                 flush_stdio_buffers();
             }
-            sel4platsupport_handle_timer_irq(&env.timer, badge);
+
+            /* it's a timer interrupt, see if we need to handle any of them */
+            error = sel4platsupport_irq_handle(&env.ops.irq_ops, MINI_IRQ_INTERFACE_NTFN_ID, badge);
+            ZF_LOGF_IF(error, "Failed to handle IRQ");
             error = tm_update(&env.time_manager);
             ZF_LOGF_IF(error, "failed to update time manager");
         }
@@ -569,6 +588,8 @@ create_thread_handler(sel4utils_thread_entry_fn handler, int priority, int UNUSE
                                    1);
     return error;
 }
+
+
 
 #ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
 void *log_buffer;
@@ -601,10 +622,6 @@ void *main_continued(void *arg UNUSED)
         ZF_LOGF_IF(error, "Failed to allocate reply object");
     }
 
-    /* create a notification for the timer */
-    error = vka_alloc_notification(&env.vka, &env.irq_ntfn);
-    ZF_LOGF_IF(error, "Failed to allocate timer notification");
-
     /* start the serial server thread */
     error = serial_server_parent_spawn_thread(&env.simple, &env.vka, &env.vspace, seL4_MaxPrio - 1);
     ZF_LOGF_IF(error, "Failed to spawn serial server thread");
@@ -618,15 +635,13 @@ void *main_continued(void *arg UNUSED)
     ZF_LOGF_IF(error, "Failed to get IRQ cap for default COM device. IRQ is %d.",
                 DEFAULT_SERIAL_INTERRUPT);
 
-
-    error = sel4platsupport_init_default_timer_ops(&env.vka, &env.vspace, &env.simple,
-                                                   env.ops, env.irq_ntfn.cptr, &env.timer);
-    ZF_LOGF_IF(error, "Failed init default timer");
+    error = ltimer_default_init(&env.ltimer, env.ops, NULL, NULL);
+    ZF_LOGF_IF(error, "Failed to init ltimer");
 
     error = seL4_TCB_BindNotification(simple_get_tcb(&env.simple), env.irq_ntfn.cptr);
     ZF_LOGF_IF(error, "Failed to bind timer notification and endpoint\n");
 
-    error = tm_init(&env.time_manager, &env.timer.ltimer, &env.ops, N_RUMP_PROCESSES);
+    error = tm_init(&env.time_manager, &env.ltimer, &env.ops, N_RUMP_PROCESSES);
     ZF_LOGF_IF(error, "Failed to init time manager");
 
     seL4_CPtr auth = simple_get_tcb(&env.simple);

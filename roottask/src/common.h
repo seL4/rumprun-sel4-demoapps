@@ -21,7 +21,8 @@
 #include <simple/simple.h>
 #include <vspace/vspace.h>
 #include <rumprun/init_data.h>
-#include <sel4platsupport/timer.h>
+#include <platsupport/irq.h>
+#include <platsupport/ltimer.h>
 #include <platsupport/time_manager.h>
 #include <roottask_platform_config/config.h>
 #include <utils/page.h>
@@ -30,6 +31,7 @@ typedef struct env *env_t;
 
 #define INIT_DATA_NUM_FRAMES BYTES_TO_4K_PAGES(sizeof(init_data_t))
 #define N_RUMP_PROCESSES 10
+#define MAX_TIMER_IRQS 4
 
 typedef struct rump_process {
     init_data_t *init;
@@ -53,8 +55,8 @@ typedef struct rump_env {
     vspace_t vspace;
     /* abtracts over kernel version and boot environment */
     simple_t simple;
-    /* hardware timer */
-    seL4_timer_t timer;
+    /* logical timer interface */
+    ltimer_t ltimer;
     /* timer manager - for timeouts */
     time_manager_t time_manager;
     /* operations for hardware io */
