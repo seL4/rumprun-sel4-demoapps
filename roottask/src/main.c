@@ -578,7 +578,7 @@ static int create_thread_handler(sel4utils_thread_entry_fn handler, int priority
 {
     sel4utils_thread_config_t thread_config = thread_config_default(&env.simple,
                                                                     seL4_CapInitThreadCNode, seL4_NilData, seL4_CapNull, priority);
-    if (config_set(CONFIG_KERNEL_RT)) {
+    if (config_set(CONFIG_KERNEL_MCS)) {
         thread_config.sched_params = sched_params_periodic(thread_config.sched_params, &env.simple,
                                                            0, CONFIG_BOOT_THREAD_TIME_SLICE * US_IN_MS,
                                                            timeslice * CONFIG_BOOT_THREAD_TIME_SLICE * (US_IN_MS / 100),
@@ -622,7 +622,7 @@ void *main_continued(void *arg UNUSED)
     ZF_LOGF_IF(error, "Failed to allocate endpoint");
 
     /* allocate reply object */
-    if (config_set(CONFIG_KERNEL_RT)) {
+    if (config_set(CONFIG_KERNEL_MCS)) {
         error = vka_alloc_reply(&env.vka, &env.reply_obj);
         ZF_LOGF_IF(error, "Failed to allocate reply object");
     }
