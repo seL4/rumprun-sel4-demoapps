@@ -10,6 +10,7 @@
  * @TAG(DATA61_BSD)
  */
 #include <autoconf.h>
+#include <roottask/gen_config.h>
 #include <allocman/bootstrap.h>
 #include <allocman/vka.h>
 #include <simple/simple.h>
