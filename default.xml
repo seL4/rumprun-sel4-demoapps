@@ -19,19 +19,19 @@
   
   <project name="iperf" path="projects/iperf" remote="iperf" revision="274eaed5b17f664e4ac6c79f1ba854b55f15a3a3" upstream="refs/tags/3.1.3"/>
   <project name="leveldb" path="projects/leveldb" remote="seL4-projects" revision="90894f76537ca8a74c7761f2dd3a34341ba90007" upstream="sel4"/>
-  <project name="musllibc" path="projects/musllibc" revision="1aaf321083bd4b9c14413a1a82dbd496f5108a1b" upstream="sel4"/>
+  <project name="musllibc" path="projects/musllibc" revision="53a22343832f1b5310c93db51a3b04199c78bb49" upstream="sel4"/>
   <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="e307da61f7d2204e14da8fbe19c630373265d123" upstream="master"/>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="fc78a86d72fbdd3666b6e0c1ad9500ad9863d3e1" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="d083bbecc01596d7989b40192d99d4b7d110a626" upstream="master">
     <linkfile dest="README.md" src="README.md"/>
     <linkfile dest="settings.cmake" src="settings.cmake"/>
   </project>
-  <project name="seL4" path="kernel" revision="7798b4767dcb7bcd3699f191f685435cfa645518" upstream="master"/>
-  <project name="seL4_libs" path="projects/seL4_libs" revision="d2af53182cfd9c62ce409dfbac75b00a25cc4e68" upstream="master"/>
-  <project name="seL4_tools" path="tools/seL4" revision="e8822c6b583de4132f5ed88232f23215332753ff" upstream="master">
+  <project name="seL4" path="kernel" revision="58b6f3503ea7e48d5891b43fcae13911928bb50b" upstream="master"/>
+  <project name="seL4_libs" path="projects/seL4_libs" revision="0d668a1695d7c287c3c7bb1a789fd8b6114b3bd3" upstream="master"/>
+  <project name="seL4_tools" path="tools/seL4" revision="f3281cfb1fa78833a73d04c18c9642483a0f48cf" upstream="master">
     <linkfile dest="init-build.sh" src="cmake-tool/init-build.sh"/>
     <linkfile dest="CMakeLists.txt" src="cmake-tool/default-CMakeLists.txt"/>
   </project>
-  <project name="sel4runtime.git" path="projects/sel4runtime" remote="seL4-projects" revision="2bd3ae65aa8a5a951bfd56d699837930a6c05c4d" upstream="master"/>
-  <project name="util_libs" path="projects/util_libs" revision="ffbc57f187a3dafeb840c899e87b0236ba5574ec" upstream="master"/>
+  <project name="sel4runtime.git" path="projects/sel4runtime" remote="seL4-projects" revision="4a086d3b2650b4804bf4ebed1e4df6e046181706" upstream="master"/>
+  <project name="util_libs" path="projects/util_libs" revision="941954dca3bad32a53369b47bb706cebbc5bc8c1" upstream="master"/>
 </manifest>
