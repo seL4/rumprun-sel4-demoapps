@@ -20,7 +20,6 @@ get_filename_component(resolved_path ${CMAKE_CURRENT_LIST_FILE} REALPATH)
 get_filename_component(repo_dir ${resolved_path} DIRECTORY)
 
 include(${project_dir}/tools/seL4/cmake-tool/helpers/application_settings.cmake)
-include(${project_dir}/tools/seL4/cmake-tool/helpers/simulation.cmake)
 
 # Define our top level settings. Whilst they have doc strings for readability here
 # Users should initialize a build directory by doing something like
