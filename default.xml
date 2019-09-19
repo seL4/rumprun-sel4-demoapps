@@ -22,16 +22,16 @@
   <project name="musllibc" path="projects/musllibc" revision="22f3812381a1a15d8c6ae381ed9e36db2fcd7a66" upstream="sel4"/>
   <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="e307da61f7d2204e14da8fbe19c630373265d123" upstream="master"/>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="9e33f47570dac7b8deec8dccfc69b8ea886ae984" upstream="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="bba92d80c14e4ec2ac776dd014b669962cdf25c7" upstream="master">
     <linkfile dest="README.md" src="README.md"/>
     <linkfile dest="settings.cmake" src="settings.cmake"/>
   </project>
-  <project name="seL4" path="kernel" revision="8234026c1fb827abee75731b2575ddb741687eff" upstream="master"/>
-  <project name="seL4_libs" path="projects/seL4_libs" revision="a9034f03d36b5f698443862211c2f499aea30a61" upstream="master"/>
+  <project name="seL4" path="kernel" revision="8748d8ea5eb59a0695c806e441c8488b237757c5" upstream="master"/>
+  <project name="seL4_libs" path="projects/seL4_libs" revision="60f05c39496bd57bf301bab18983f2abc46aac7b" upstream="master"/>
   <project name="seL4_tools" path="tools/seL4" revision="69fbffd7b5bec2e6f12ad9566051b747a964b655" upstream="master">
     <linkfile dest="init-build.sh" src="cmake-tool/init-build.sh"/>
     <linkfile dest="CMakeLists.txt" src="cmake-tool/default-CMakeLists.txt"/>
   </project>
   <project name="sel4runtime.git" path="projects/sel4runtime" remote="seL4-projects" revision="4a086d3b2650b4804bf4ebed1e4df6e046181706" upstream="master"/>
-  <project name="util_libs" path="projects/util_libs" revision="6e9c6e0d92f163078aef1d28eaa53f5811b801e1" upstream="master"/>
+  <project name="util_libs" path="projects/util_libs" revision="1c3ae456e30b8c45763a014db215a6395208cd3a" upstream="master"/>
 </manifest>
