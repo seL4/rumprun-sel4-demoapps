@@ -22,7 +22,7 @@
   <project dest-branch="sel4" name="musllibc" path="projects/musllibc" revision="2af3006b0ccf36ba9ac5123f539d577fd97c5350" upstream="sel4"/>
   <project dest-branch="master" name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="e307da61f7d2204e14da8fbe19c630373265d123" upstream="master"/>
   <project dest-branch="master" name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master"/>
-  <project dest-branch="master" name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="10d8fe161367785d2dbcc9ea4ed901a5d8ad4d9a" upstream="master">
+  <project dest-branch="master" name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="1fd95d4fcc526e0b33749fb823928229e52a69d8" upstream="master">
     <linkfile dest="README.md" src="README.md"/>
     <linkfile dest="settings.cmake" src="settings.cmake"/>
   </project>
@@ -33,5 +33,5 @@
     <linkfile dest="CMakeLists.txt" src="cmake-tool/default-CMakeLists.txt"/>
   </project>
   <project dest-branch="master" name="sel4runtime.git" path="projects/sel4runtime" remote="seL4-projects" revision="8fddd5e8c1d76ee51b6c0d502e666ee431be32c6" upstream="master"/>
-  <project dest-branch="master" name="util_libs" path="projects/util_libs" revision="0ca571ab1e2d2cae45d87475b1ec5c3b60dd3808" upstream="master"/>
+  <project dest-branch="master" name="util_libs" path="projects/util_libs" revision="0723c601f52bf7c86c56c56d71d8c05c6010710f" upstream="master"/>
 </manifest>
