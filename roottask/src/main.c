@@ -32,6 +32,8 @@
 #include <vka/object_capops.h>
 #include <arch_stdio.h>
 #include <utils/circular_buffer.h>
+#include <utils/attribute.h>
+#include <muslcsys/vsyscall.h>
 
 #include <vspace/vspace.h>
 #include "common.h"
@@ -684,8 +686,7 @@ void *main_continued(void *arg UNUSED)
     return NULL;
 }
 
-/* entry point of root task */
-int main(void)
+static void CONSTRUCTOR(MUSLCSYS_WITH_VSYSCALL_PRIORITY) init(void)
 {
     seL4_BootInfo *info;
     info = platsupport_get_bootinfo();
@@ -698,7 +699,11 @@ int main(void)
 
     /* initialise the environment - allocator, cspace manager, vspace manager, timer */
     init_env(&env);
+}
 
+/* entry point of root task */
+int main(void)
+{
     /* enable serial driver */
     platsupport_serial_setup_io_ops(&env.ops);
 
