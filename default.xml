@@ -11,27 +11,27 @@
      @TAG(DATA61_BSD)
 -->
 <manifest>
-  <remote fetch="https://github.com/esnet/" name="iperf"/>
-  <remote fetch="../seL4" name="seL4"/>
-  <remote fetch="../seL4proj" name="seL4-projects"/>
+  <remote name="iperf" fetch="https://github.com/esnet/"/>
+  <remote name="seL4" fetch="../seL4"/>
+  <remote name="seL4-projects" fetch="../seL4proj"/>
   
   <default remote="seL4" revision="master"/>
   
-  <project dest-branch="refs/tags/3.1.3" name="iperf" path="projects/iperf" remote="iperf" revision="274eaed5b17f664e4ac6c79f1ba854b55f15a3a3" upstream="refs/tags/3.1.3"/>
-  <project dest-branch="sel4" name="leveldb" path="projects/leveldb" remote="seL4-projects" revision="90894f76537ca8a74c7761f2dd3a34341ba90007" upstream="sel4"/>
-  <project dest-branch="sel4" name="musllibc" path="projects/musllibc" revision="4a8335b2248d934e2e40386af4f1b0495b3c173d" upstream="sel4"/>
-  <project dest-branch="master" name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="405fb8ed94b9db554749a9cda29a235ca6c856ed" upstream="master"/>
-  <project dest-branch="master" name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master"/>
-  <project dest-branch="master" name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="c73a5fcbda83681d000aea36dfab460d4a8e1417" upstream="master">
-    <linkfile dest="README.md" src="README.md"/>
-    <linkfile dest="settings.cmake" src="settings.cmake"/>
+  <project name="iperf" path="projects/iperf" remote="iperf" revision="274eaed5b17f664e4ac6c79f1ba854b55f15a3a3" upstream="refs/tags/3.1.3" dest-branch="refs/tags/3.1.3"/>
+  <project name="leveldb" path="projects/leveldb" remote="seL4-projects" revision="90894f76537ca8a74c7761f2dd3a34341ba90007" upstream="sel4" dest-branch="sel4"/>
+  <project name="musllibc" path="projects/musllibc" revision="4a8335b2248d934e2e40386af4f1b0495b3c173d" upstream="sel4" dest-branch="sel4"/>
+  <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="405fb8ed94b9db554749a9cda29a235ca6c856ed" upstream="master" dest-branch="master"/>
+  <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master" dest-branch="master"/>
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="f60edee14a518a2af903746220ce238a9e6620de" upstream="master" dest-branch="master">
+    <linkfile src="README.md" dest="README.md"/>
+    <linkfile src="settings.cmake" dest="settings.cmake"/>
   </project>
-  <project dest-branch="master" name="seL4" path="kernel" revision="d4f59d37b142421f574a213e89592e319b73b0df" upstream="master"/>
-  <project dest-branch="master" name="seL4_libs" path="projects/seL4_libs" revision="3c18332edd44adefd848c895053a538c68106677" upstream="master"/>
-  <project dest-branch="master" name="seL4_tools" path="tools/seL4" revision="021452dd83cd85a943b56be83f71f5dc2e74d2fb" upstream="master">
-    <linkfile dest="init-build.sh" src="cmake-tool/init-build.sh"/>
-    <linkfile dest="CMakeLists.txt" src="cmake-tool/default-CMakeLists.txt"/>
+  <project name="seL4" path="kernel" revision="ef8b1776dba7c6c977ee72e998a4e17987e5448d" upstream="master" dest-branch="master"/>
+  <project name="seL4_libs" path="projects/seL4_libs" revision="3c18332edd44adefd848c895053a538c68106677" upstream="master" dest-branch="master"/>
+  <project name="seL4_tools" path="tools/seL4" revision="021452dd83cd85a943b56be83f71f5dc2e74d2fb" upstream="master" dest-branch="master">
+    <linkfile src="cmake-tool/init-build.sh" dest="init-build.sh"/>
+    <linkfile src="cmake-tool/default-CMakeLists.txt" dest="CMakeLists.txt"/>
   </project>
-  <project dest-branch="master" name="sel4runtime.git" path="projects/sel4runtime" remote="seL4-projects" revision="2755b9d840a4600a09cb9e880b6c14c7d2177d09" upstream="master"/>
-  <project dest-branch="master" name="util_libs" path="projects/util_libs" revision="602a47a4c853eddcc277c03fcba1fd23afdb927a" upstream="master"/>
+  <project name="sel4runtime.git" path="projects/sel4runtime" remote="seL4-projects" revision="2755b9d840a4600a09cb9e880b6c14c7d2177d09" upstream="master" dest-branch="master"/>
+  <project name="util_libs" path="projects/util_libs" revision="835e96ac320469ddc72bab66c2f64199c993233f" upstream="master" dest-branch="master"/>
 </manifest>
