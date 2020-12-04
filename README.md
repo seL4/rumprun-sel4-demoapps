@@ -1,14 +1,9 @@
 <!--
-     Copyright 2017, Data61
-     Commonwealth Scientific and Industrial Research Organisation (CSIRO)
-     ABN 41 687 119 230.
+     Copyright 2017, Data61, CSIRO (ABN 41 687 119 230)
 
-     This software may be distributed and modified according to the terms of
-     the BSD 2-Clause license. Note that NO WARRANTY is provided.
-     See "LICENSE_BSD2.txt" for details.
-
-     @TAG(DATA61_BSD)
+     SPDX-License-Identifier: CC-BY-SA-4.0
 -->
+
 # Rumprun apps
 
 This repository contains several apps for running with the rumprun unikernel with seL4 as the target platform.  It also conatins a seL4 root-task that creates and initialises a rumprun instance as a separate process.
@@ -68,7 +63,7 @@ ninja
 
 ## QEMU
 
-You can run by running a generated simulate script: 
+You can run by running a generated simulate script:
 ```
 ./simulate
 # quit with Ctrl-A X
