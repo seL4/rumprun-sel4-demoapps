@@ -18,8 +18,7 @@
 
 /* Print out a summary of what has been tracked */
 #ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
-static inline void
-seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, uint32_t logSize)
+static inline void seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, uint32_t logSize)
 {
     uint32_t index = 0;
     uint32_t syscall_entries[8];
@@ -50,7 +49,7 @@ seL4_BenchmarkTrackDumpSummary_pri(benchmark_track_kernel_entry_t *logBuffer, ui
         }
         if (logBuffer[index].entry.path == Entry_Syscall) {
             int syscall_no = logBuffer[index].entry.syscall_no;
-            if (syscall_no == 7 ) {
+            if (syscall_no == 7) {
                 cap_entries[logBuffer[index].entry.cap_type]++;
                 cap_time[logBuffer[index].entry.cap_type] += logBuffer[index].duration;
                 if (logBuffer[index].entry.cap_type == 2) {
@@ -135,13 +134,13 @@ void handle_char(rump_env_t *env, int c)
         /* Stop recording kernel entries */
         logIndexFinalized = seL4_BenchmarkFinalizeLog();
 #endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
-        printf("tot: %"PRIu64"\n idle: %"PRIu64"\n", cpucount2 - cpucount, ccount-start_idle_count);
+        printf("tot: %"PRIu64"\n idle: %"PRIu64"\n", cpucount2 - cpucount, ccount - start_idle_count);
         break;
     case 'c':
 #ifdef CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER
         benchmark_track_kernel_entry_t *ksLog = (benchmark_track_kernel_entry_t *) log_buffer;
         printf("dumping log: %"PRId32", %zd %zd\n", logIndexFinalized,
-                sizeof(benchmark_track_kernel_entry_t), sizeof(kernel_entry_t));
+               sizeof(benchmark_track_kernel_entry_t), sizeof(kernel_entry_t));
         seL4_BenchmarkTrackDumpSummary_pri(ksLog, logIndexFinalized);//ksLogIndexFinalized);
 #endif /* CONFIG_BENCHMARK_USE_KERNEL_LOG_BUFFER */
         break;

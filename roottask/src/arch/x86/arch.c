@@ -12,8 +12,7 @@
 #define IO_PORT_MIN 0xcf8
 #define IO_PORT_MAX 0xcff
 /* copy the caps required to set up the sel4platsupport default timer */
-void
-arch_copy_IOPort_cap(init_data_t *init, rump_env_t *env, sel4utils_process_t *test_process)
+void arch_copy_IOPort_cap(init_data_t *init, rump_env_t *env, sel4utils_process_t *test_process)
 {
     cspacepath_t path;
     seL4_Error error = vka_cspace_alloc_path(&env->vka, &path);
@@ -53,6 +52,6 @@ void __attribute__((optimize("O0"))) hog_thread(void *_arg1, void *_arg2, void *
 {
     while (true) {
         COMPILER_MEMORY_FENCE();
-        asm volatile ("nop");
+        asm volatile("nop");
     }
 }

@@ -41,7 +41,7 @@ typedef struct device {
 #define SUB_NETWORK "\"dhcp\","
 #endif
 #define NETWORK "\"net\" : {,\"if\":\""CONFIG_RUMPRUN_NETWORK_IFNAME"\", \"type\":\"inet\",\"method\": "SUB_NETWORK"}"
-#else 
+#else
 #define NETWORK ""
 #endif
 
