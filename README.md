@@ -35,16 +35,16 @@ editing the .config file directly.
 * redis
 * rust
 * [susan](userapps/susan/README.md)
-* [cjpeg](userapps/cjpeg/README.md)
-* [djpeg](userapps/djpeg/README.md)
+* [jpeg](userapps/jpeg/README.md)
 
 ## Apps that are currently broken
 * [erlang](userapps/erlang/README.md): Currently isn't supported due to a restriction in how hardware resources
   can be given to an instance of a rump kernel. There isn't currently any timeframe for a fix.
-* [mad](userapps/mad/README.md): Doesn't currently build due to autoconf issues
+* [madplay](userapps/madplay/README.md): Doesn't currently build due to autoconf issues
 
 # Dependencies
-* https://github.com/SEL4PROJ/sel4-tutorials/blob/master/Prerequisites.md
+
+* https://docs.sel4.systems/projects/buildsystem/host-dependencies.html
 * google repo tool
 
 
