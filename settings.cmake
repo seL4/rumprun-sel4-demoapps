@@ -39,7 +39,7 @@ endif()
 include(${project_dir}/kernel/configs/seL4Config.cmake)
 
 if(SIMULATION)
-    ApplyCommonSimulationSettings(${KernelArch})
+    ApplyCommonSimulationSettings(${KernelSel4Arch})
 endif()
 
 ApplyCommonReleaseVerificationSettings(${RELEASE} OFF)
