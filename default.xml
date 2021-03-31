@@ -13,14 +13,14 @@
   
   <project name="iperf" path="projects/iperf" remote="iperf" revision="274eaed5b17f664e4ac6c79f1ba854b55f15a3a3" upstream="refs/tags/3.1.3" dest-branch="refs/tags/3.1.3"/>
   <project name="leveldb" path="projects/leveldb" remote="seL4-projects" revision="90894f76537ca8a74c7761f2dd3a34341ba90007" upstream="sel4" dest-branch="sel4"/>
-  <project name="musllibc" path="projects/musllibc" revision="690b6d75eac7172a4147395ecd155f7c9b910c12" upstream="sel4" dest-branch="sel4"/>
+  <project name="musllibc" path="projects/musllibc" revision="c7aa943a2ad4fccaccf52a1f957bf8860f57f5b0" upstream="sel4" dest-branch="sel4"/>
   <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="405fb8ed94b9db554749a9cda29a235ca6c856ed" upstream="master" dest-branch="master"/>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master" dest-branch="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="10025f8edaa6c1c47845daa2722f511f6052009a" upstream="master" dest-branch="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="4add4e3ff3ecdc3e74e0c6eac8606280694904d6" upstream="master" dest-branch="master">
     <linkfile src="README.md" dest="README.md"/>
     <linkfile src="settings.cmake" dest="settings.cmake"/>
   </project>
-  <project name="seL4" path="kernel" revision="14f2ed76508f46553599a1b09976858286c22d2c" upstream="master" dest-branch="master"/>
+  <project name="seL4" path="kernel" revision="d486bc0b5a9bc5e05f195220959497acc0fedba1" upstream="master" dest-branch="master"/>
   <project name="seL4_libs" path="projects/seL4_libs" revision="32fdb53768a18d00e39895af6c131b9d7528aedc" upstream="master" dest-branch="master"/>
   <project name="seL4_tools" path="tools/seL4" revision="382e68285c84ced27e81cc6a8f175743ba755880" upstream="master" dest-branch="master">
     <linkfile src="cmake-tool/init-build.sh" dest="init-build.sh"/>
