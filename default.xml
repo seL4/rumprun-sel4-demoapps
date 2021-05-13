@@ -16,16 +16,16 @@
   <project name="musllibc" path="projects/musllibc" revision="c7aa943a2ad4fccaccf52a1f957bf8860f57f5b0" upstream="sel4" dest-branch="sel4"/>
   <project name="rumprun" path="projects/rumprun" remote="seL4-projects" revision="405fb8ed94b9db554749a9cda29a235ca6c856ed" upstream="master" dest-branch="master"/>
   <project name="rumprun-packages" path="projects/rumprun-packages" remote="seL4-projects" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master" dest-branch="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="523a2ca0af8f2d72b1fd6584bb11a5d13eab39d3" upstream="master" dest-branch="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" remote="seL4-projects" revision="53cdcbfe7c4e5498a6ecef6afe3a1c22050a57c5" upstream="master" dest-branch="master">
     <linkfile src="README.md" dest="README.md"/>
     <linkfile src="settings.cmake" dest="settings.cmake"/>
   </project>
   <project name="seL4" path="kernel" revision="41497c6e60eda3eb7dbc38baf3d9677a1132c624" upstream="master" dest-branch="master"/>
   <project name="seL4_libs" path="projects/seL4_libs" revision="c0724b90939ecf21babb9dd20f72130df07b2a8a" upstream="master" dest-branch="master"/>
-  <project name="seL4_tools" path="tools/seL4" revision="aca09f87c03bbde7c3a48972d20001487b28818b" upstream="master" dest-branch="master">
+  <project name="seL4_tools" path="tools/seL4" revision="b64893955c68f5add9d14d1e788abbfbfae18252" upstream="master" dest-branch="master">
     <linkfile src="cmake-tool/init-build.sh" dest="init-build.sh"/>
     <linkfile src="cmake-tool/default-CMakeLists.txt" dest="CMakeLists.txt"/>
   </project>
-  <project name="sel4runtime.git" path="projects/sel4runtime" remote="seL4-projects" revision="27ccd033f64c07b5b76d6f363296b58d71c36a2f" upstream="master" dest-branch="master"/>
+  <project name="sel4runtime.git" path="projects/sel4runtime" remote="seL4-projects" revision="e1c51c9b506708398bb1ffbf9098ae82855d3c14" upstream="master" dest-branch="master"/>
   <project name="util_libs" path="projects/util_libs" revision="8f0fa145d5a595cd570a3b8fdb67abb396f98175" upstream="master" dest-branch="master"/>
 </manifest>
