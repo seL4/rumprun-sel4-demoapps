@@ -37,16 +37,16 @@
 
     <project name="musllibc" path="projects/musllibc" revision="sel4"/>
 
-    <project name="sel4runtime.git" path="projects/sel4runtime" remote="seL4-projects"/>
+    <project name="sel4runtime.git" path="projects/sel4runtime"/>
 
-    <project name="rumprun-sel4-demoapps" remote="seL4-projects" path="projects/rumprun-sel4-demoapps">
+    <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps">
         <linkfile src="README.md" dest="README.md"/>
         <linkfile src="settings.cmake" dest="settings.cmake"/>
     </project>
 
-    <project name="rumprun" remote="seL4-projects" path="projects/rumprun"/>
+    <project name="rumprun" path="projects/rumprun"/>
 
-    <project name="rumprun-packages" remote="seL4-projects" path="projects/rumprun-packages"/>
+    <project name="rumprun-packages" path="projects/rumprun-packages"/>
 
     <project name="leveldb" remote="seL4-projects" revision="sel4" path="projects/leveldb"/>
 
