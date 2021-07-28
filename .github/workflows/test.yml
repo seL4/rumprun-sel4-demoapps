@@ -1,0 +1,33 @@
+# Copyright 2021, Proofcraft Pty Ltd
+#
+# SPDX-License-Identifier: BSD-2-Clause
+
+# Actions to run on pull requests
+
+name: RumpRun
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  hello:
+    name: Hello World
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        req: [sim, haswell3]
+    steps:
+    - name: Build
+      uses: seL4/ci-actions/rump-hello@master
+      with:
+        req: ${{ matrix.req }}
+    - name: Upload images
+      if: ${{ matrix.req != 'sim' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: images-${{ matrix.req }}
+        path: '*-images.tar.gz'
