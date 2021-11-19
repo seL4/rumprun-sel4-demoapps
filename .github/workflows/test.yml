@@ -4,12 +4,9 @@
 
 # Actions to run on pull requests
 
-name: RumpRun
+name: RumpRun PR
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
 
 jobs:
