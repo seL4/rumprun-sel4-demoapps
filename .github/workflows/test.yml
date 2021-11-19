@@ -4,14 +4,14 @@
 
 # Actions to run on pull requests
 
-name: RumpRun PR
+name: Hello World (PR)
 
 on:
   pull_request:
 
 jobs:
   hello:
-    name: Hello World
+    name: Test
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

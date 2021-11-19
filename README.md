@@ -6,6 +6,9 @@
 
 # Rumprun apps
 
+[![CI](https://github.com/seL4/rumprun-sel4-demoapps/actions/workflows/push.yml/badge.svg)](https://github.com/seL4/rumprun-sel4-demoapps/actions/workflows/push.yml)
+[![Hello World](https://github.com/seL4/rumprun-sel4-demoapps/actions/workflows/rump-deploy.yml/badge.svg)](https://github.com/seL4/rumprun-sel4-demoapps/actions/workflows/rump-deploy.yml)
+
 This repository contains several apps for running with the rumprun unikernel with seL4 as the target platform.  It also conatins a seL4 root-task that creates and initialises a rumprun instance as a separate process.
 Rumprun images are generally constructed by building the rumprun sources, compiling an app with the rumprun
 toolchains, baking the app using `rumprun-bake` which links in the rumprun and rumpkernel libraries, and finally
