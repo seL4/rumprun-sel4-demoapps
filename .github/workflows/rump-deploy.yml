@@ -4,7 +4,7 @@
 
 # Deploy default.xml to rumprun-sel4-demoapps after successful runs.
 
-name: RumpRun
+name: Hello World
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
         manifest: master.xml
 
   build:
-    name: Hello World Build
+    name: Build
     runs-on: ubuntu-latest
     needs: code
     strategy:
@@ -54,7 +54,7 @@ jobs:
         path: '*-images.tar.gz'
 
   hw-run:
-    name: Hello World Hardware Run
+    name: Hardware Run
     if: ${{ github.repository_owner == 'seL4' }}
     runs-on: ubuntu-latest
     needs: build
