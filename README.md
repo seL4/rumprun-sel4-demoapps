@@ -53,7 +53,7 @@ editing the .config file directly.
 
 # Installation steps
 ```
-repo init -u $(GIT URL TO MANIFEST)
+repo init -u https://github.com/seL4/rumprun-sel4-demoapps
 repo sync
 (cd projects/rumprun && ./init-sources.sh)
 mkdir build-hello && cd build-hello
