@@ -19,12 +19,12 @@
     <linkfile src="README.md" dest="README.md"/>
     <linkfile src="settings.cmake" dest="settings.cmake"/>
   </project>
-  <project name="seL4" path="kernel" revision="e9bdecab6dffe72ac9b1dd87be25bb9b90eb2f1e" upstream="master" dest-branch="master"/>
+  <project name="seL4" path="kernel" revision="9bc18febd7162fd8dfc92b51318c9c737c51e8b5" upstream="master" dest-branch="master"/>
   <project name="seL4_libs" path="projects/seL4_libs" revision="f3a3cf4d4e947628f75b56483a02cc506d199915" upstream="master" dest-branch="master"/>
   <project name="seL4_tools" path="tools/seL4" revision="2f15ba2dc6a08c30b74c722b0673131d2aab32ac" upstream="master" dest-branch="master">
     <linkfile src="cmake-tool/init-build.sh" dest="init-build.sh"/>
     <linkfile src="cmake-tool/default-CMakeLists.txt" dest="CMakeLists.txt"/>
   </project>
   <project name="sel4runtime.git" path="projects/sel4runtime" revision="d935dd05da0cf959e9fd0140af913dc6fdaa0221" upstream="master" dest-branch="master"/>
-  <project name="util_libs" path="projects/util_libs" revision="984dd598b75be5d04ebf1514198a86aefd256188" upstream="master" dest-branch="master"/>
+  <project name="util_libs" path="projects/util_libs" revision="73d4ccaeca68dcda83eda49245d774cab73480c0" upstream="master" dest-branch="master"/>
 </manifest>
