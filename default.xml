@@ -26,5 +26,5 @@
     <linkfile src="cmake-tool/default-CMakeLists.txt" dest="CMakeLists.txt"/>
   </project>
   <project name="sel4runtime.git" path="projects/sel4runtime" revision="d935dd05da0cf959e9fd0140af913dc6fdaa0221" upstream="master" dest-branch="master"/>
-  <project name="util_libs" path="projects/util_libs" revision="abdb1c846794b2d93fb97944d9c2adbd10b0e05f" upstream="master" dest-branch="master"/>
+  <project name="util_libs" path="projects/util_libs" revision="76873a35ca4280c86eac230d40c221201db86e15" upstream="master" dest-branch="master"/>
 </manifest>
