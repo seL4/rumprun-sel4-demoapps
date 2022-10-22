@@ -15,16 +15,16 @@
   <project name="musllibc" path="projects/musllibc" revision="3d6b939e8f05cb1d2a1a8c8166609bf2e652e975" upstream="sel4" dest-branch="sel4"/>
   <project name="rumprun" path="projects/rumprun" revision="04464ab931c28ca1c78e807741d82a4792660183" upstream="master" dest-branch="master"/>
   <project name="rumprun-packages" path="projects/rumprun-packages" revision="b6a88a4bab2a98fb419bb73836a6b50e26a9a7ae" upstream="master" dest-branch="master"/>
-  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" revision="de1b96baf6e1c6ac3fd428f9aae9a0389ddbb1a5" upstream="master" dest-branch="master">
+  <project name="rumprun-sel4-demoapps" path="projects/rumprun-sel4-demoapps" revision="13d9982dce1d29427e2901246e6f2425d49eb74c" upstream="master" dest-branch="master">
     <linkfile src="README.md" dest="README.md"/>
     <linkfile src="settings.cmake" dest="settings.cmake"/>
   </project>
   <project name="seL4" path="kernel" revision="6e1bb9d2a8c471b575d727a40635323ed12ed227" upstream="master" dest-branch="master"/>
-  <project name="seL4_libs" path="projects/seL4_libs" revision="793456649c8b185ad4b3d274ee747cf684db8858" upstream="master" dest-branch="master"/>
+  <project name="seL4_libs" path="projects/seL4_libs" revision="0aa8d43fe53564e40248215d2b3b5cedddcc1ee3" upstream="master" dest-branch="master"/>
   <project name="seL4_tools" path="tools/seL4" revision="60c0d06fa8bb1b0cd767ae9f1eb94d95f3b141e8" upstream="master" dest-branch="master">
     <linkfile src="cmake-tool/init-build.sh" dest="init-build.sh"/>
     <linkfile src="cmake-tool/default-CMakeLists.txt" dest="CMakeLists.txt"/>
   </project>
   <project name="sel4runtime.git" path="projects/sel4runtime" revision="d935dd05da0cf959e9fd0140af913dc6fdaa0221" upstream="master" dest-branch="master"/>
-  <project name="util_libs" path="projects/util_libs" revision="7c30656cebbb0d3d9d8eb2819a951f8462089d45" upstream="master" dest-branch="master"/>
+  <project name="util_libs" path="projects/util_libs" revision="8552bcc1b0ed879f59e7f0a6b11371e18f86d5b4" upstream="master" dest-branch="master"/>
 </manifest>
