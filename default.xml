@@ -19,7 +19,7 @@
     <linkfile src="README.md" dest="README.md"/>
     <linkfile src="settings.cmake" dest="settings.cmake"/>
   </project>
-  <project name="seL4" path="kernel" revision="cc3205ea486f6ce3da3a64d8a99e166f047b8419" upstream="master" dest-branch="master"/>
+  <project name="seL4" path="kernel" revision="494dd2dd96b7761c27961c49b69dc48831584b71" upstream="master" dest-branch="master"/>
   <project name="seL4_libs" path="projects/seL4_libs" revision="f3443015111db398747b05b74f0668bb4c92044e" upstream="master" dest-branch="master"/>
   <project name="seL4_tools" path="tools/seL4" revision="b65ed8f5f50ef28f2ebe5039238af2ad58d3439c" upstream="master" dest-branch="master">
     <linkfile src="cmake-tool/init-build.sh" dest="init-build.sh"/>
