@@ -15,7 +15,7 @@ on:
   # allow manual trigger
   workflow_dispatch:
 
-  # allow explict trigger from other repos when dependencies have changed
+  # allow explicit trigger from other repos when dependencies have changed
   repository_dispatch:
     types: [deps-update]
 
