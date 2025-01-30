@@ -24,7 +24,7 @@ jobs:
         req: ${{ matrix.req }}
     - name: Upload images
       if: ${{ matrix.req != 'sim' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: images-${{ matrix.req }}
         path: '*-images.tar.gz'
