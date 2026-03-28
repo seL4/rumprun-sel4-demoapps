@@ -21,7 +21,7 @@
   </project>
   <project name="seL4" path="kernel" revision="55c1ea653c6a737243b5f950a28f866af0def4d2" upstream="master" dest-branch="master"/>
   <project name="seL4_libs" path="projects/seL4_libs" revision="4ce71fca2adbf1c2add7eabf5670633a70177a2f" upstream="master" dest-branch="master"/>
-  <project name="seL4_tools" path="tools/seL4" revision="21d3f19e3311345bd47e0a15023e41abe80ff3b9" upstream="master" dest-branch="master">
+  <project name="seL4_tools" path="tools/seL4" revision="63f2e49577e5b0beb8d05de3ef0239c8d63f4940" upstream="master" dest-branch="master">
     <linkfile src="cmake-tool/init-build.sh" dest="init-build.sh"/>
     <linkfile src="cmake-tool/default-CMakeLists.txt" dest="CMakeLists.txt"/>
   </project>
